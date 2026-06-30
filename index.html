@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>MMH Knowledge Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mmh-blue:#3A5CAA; --mmh-navy:#0E2F5F; --mmh-yellow:#FFE100;
+  --lb1:#C2D4F1; --lb2:#CADFEE; --lb3:#CFE2F3; --pale:#F0F7FF;
+  --gray:#F5F5F5; --link:#1155CC; --white:#FFFFFF;
+  --text:#1a2340; --sub:#5a6a8a; --border:#e2e8f5;
+  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444; --info:#3b82f6;
+  --font-main:'Be Vietnam Pro',-apple-system,BlinkMacSystemFont,sans-serif;
+  --radius-xl:20px; --radius-lg:16px; --radius-md:12px; --radius-sm:8px;
+  --shadow-sm:0 2px 8px rgba(58,92,170,.08);
+  --shadow-md:0 4px 20px rgba(58,92,170,.14);
+  --shadow-lg:0 8px 40px rgba(58,92,170,.2);
+  --tab-h:64px; --header-h:60px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-top:env(safe-area-inset-top,0px);
+  --max-app-width:480px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:var(--font-main);color:var(--text);background:var(--gray);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+#app{display:flex;flex-direction:column;height:100%;max-width:var(--max-app-width);margin:0 auto;background:var(--white);position:relative;box-shadow:var(--shadow-lg)}
+@media(min-width:480px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--white);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.load-logo{width:72px;height:72px;background:var(--mmh-blue);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(58,92,170,.35)}
+.load-logo span{color:var(--mmh-yellow);font-size:24px;font-weight:700;letter-spacing:-.5px}
+#loading h2{font-size:18px;font-weight:700;color:var(--mmh-navy)}
+#loading p{font-size:13px;color:var(--sub);text-align:center;max-width:260px}
+.spin{width:26px;height:26px;border:3px solid var(--lb1);border-top-color:var(--mmh-blue);border-radius:50%;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* HEADER */
+#header{height:calc(var(--header-h) + var(--safe-top));padding-top:var(--safe-top);background:var(--white);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding-left:16px;padding-right:16px;gap:10px;position:sticky;top:0;z-index:100;flex-shrink:0}
+.logo{width:34px;height:34px;background:var(--mmh-blue);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo span{color:var(--mmh-yellow);font-size:12px;font-weight:700;letter-spacing:-.5px}
+.htitle{flex:1}
+.htitle .t1{font-size:15px;font-weight:700;color:var(--mmh-navy);line-height:1.2}
+.htitle .t2{font-size:11px;color:var(--sub)}
+.streak{font-size:12px;color:var(--mmh-blue);background:var(--pale);padding:4px 10px;border-radius:20px;font-weight:600;display:flex;align-items:center;gap:4px}
+
+/* CONTENT */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{padding:16px;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--pale);border-radius:var(--radius-md);padding:12px 14px}
+.stat .lbl{font-size:11px;color:var(--sub);margin-bottom:2px}
+.stat .num{font-size:24px;font-weight:700;color:var(--mmh-navy)}
+.stat .num small{font-size:12px;color:var(--sub);font-weight:500}
+
+/* SECTION TITLE */
+.sect{font-size:13px;font-weight:700;color:var(--mmh-navy);margin:18px 0 10px}
+.sect:first-child{margin-top:0}
+
+/* BIG ACTION BTN */
+.act{width:100%;text-align:left;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:var(--white);cursor:pointer;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:.15s}
+.act:active{transform:scale(.98);background:var(--pale)}
+.act .ico{width:42px;height:42px;border-radius:11px;background:var(--pale);color:var(--mmh-blue);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.act .a1{font-size:15px;font-weight:600;color:var(--text)}
+.act .a2{font-size:12px;color:var(--sub)}
+
+/* PILL FILTER */
+.pills{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;-ms-overflow-style:none;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex-shrink:0;padding:7px 13px;border-radius:20px;border:1.2px solid var(--border);background:var(--white);font-size:12px;color:var(--sub);cursor:pointer;white-space:nowrap;font-weight:500;transition:.12s}
+.pill.on{background:var(--mmh-blue);color:#fff;border-color:var(--mmh-blue)}
+
+/* FLASHCARD */
+.fcard{min-height:230px;border-radius:var(--radius-lg);padding:24px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border:1.5px solid var(--border);background:var(--white);transition:.2s;position:relative;overflow:hidden}
+.fcard.back{background:var(--pale);border-color:var(--lb1)}
+.fcard .cat{font-size:11px;font-weight:600;color:var(--mmh-blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.fcard .term{font-size:26px;font-weight:700;color:var(--mmh-navy);line-height:1.25}
+.fcard .term.en{font-size:24px}
+.fcard .hint{font-size:12px;color:#aab;margin-top:16px;display:flex;align-items:center;gap:5px}
+.fcard .blbl{font-size:11px;color:var(--sub);font-weight:600;margin-bottom:5px;margin-top:2px}
+.fcard .bval{font-size:15px;color:var(--text);line-height:1.5;margin-bottom:12px}
+.fcard .bval.hi{font-size:17px;font-weight:600;color:var(--mmh-blue);margin-bottom:0}
+.fc-actions{display:flex;gap:8px;margin-top:14px}
+.fbtn{flex:1;padding:13px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:.12s}
+.fbtn:active{transform:scale(.97)}
+.fbtn.again{color:var(--warning);border-color:#fde9c8}
+.fbtn.know{color:#fff;background:var(--success);border-color:var(--success)}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:12px;color:var(--sub)}
+.pbar{height:5px;background:var(--gray);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.pbar>i{display:block;height:100%;background:var(--mmh-blue);border-radius:3px;transition:width .3s}
+
+/* QUIZ */
+.q-text{font-size:17px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:18px}
+.q-text b{color:var(--mmh-navy)}
+.opt{width:100%;text-align:left;padding:13px 15px;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--white);cursor:pointer;font-size:13px;line-height:1.4;margin-bottom:9px;transition:.12s;color:var(--text)}
+.opt:active{transform:scale(.99)}
+.opt.correct{background:#e9fbef;border-color:var(--success);color:#157f3b}
+.opt.wrong{background:#fdeaea;border-color:var(--danger);color:#b42424}
+.opt:disabled{cursor:default}
+.q-next{width:100%;margin-top:14px;padding:13px;border-radius:var(--radius-md);border:none;background:var(--mmh-blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.q-result{text-align:center;padding:28px 0}
+.q-result .big{font-size:46px;font-weight:700;line-height:1}
+.q-result .sub{font-size:14px;color:var(--sub);margin:8px 0 22px}
+.q-setup-btn{padding:12px 26px;border-radius:var(--radius-md);border:none;background:var(--mmh-blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
+
+/* SEARCH */
+.sinput{width:100%;padding:12px 14px 12px 40px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;font-family:inherit;color:var(--text);background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%235a6a8a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") no-repeat 13px center;margin-bottom:12px}
+.sinput:focus{outline:none;border-color:var(--mmh-blue);box-shadow:0 0 0 3px var(--pale)}
+.res{padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-md);margin-bottom:9px}
+.res .rh{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.res .tag{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.tag.sp{background:#e8effc;color:var(--mmh-blue)}
+.tag.tn{background:#f0eafd;color:#7a4fd0}
+.tag.tt{background:#e9fbef;color:#157f3b}
+.res .rt{font-size:14px;font-weight:600;color:var(--text)}
+.res .rb{font-size:12px;color:var(--sub);margin-top:2px;line-height:1.45}
+.res .rc{font-size:12px;color:var(--mmh-blue);font-weight:500;margin-top:3px}
+.empty{text-align:center;padding:36px 16px;color:#aab}
+.empty .ei{font-size:36px;margin-bottom:10px}
+.empty .et{font-size:13px;line-height:1.5}
+
+/* TAB BAR */
+#tabbar{height:calc(var(--tab-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:var(--white);border-top:1.5px solid var(--border);display:flex;flex-shrink:0}
+.tab{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9aa8c4;transition:.12s;padding-top:8px}
+.tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tab span{font-size:10px;font-weight:500}
+.tab.on{color:var(--mmh-blue)}
+
+/* TOAST + MODAL */
+#toast{position:fixed;bottom:calc(var(--tab-h) + 20px);left:50%;transform:translateX(-50%) translateY(20px);background:var(--mmh-navy);color:#fff;padding:11px 18px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;pointer-events:none;transition:.25s;z-index:500;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal-bg{position:fixed;inset:0;background:rgba(14,47,95,.4);display:none;align-items:center;justify-content:center;z-index:600;padding:24px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:var(--radius-lg);padding:22px;width:100%;max-width:340px;box-shadow:var(--shadow-lg)}
+.modal h3{font-size:17px;font-weight:700;color:var(--mmh-navy);margin-bottom:6px}
+.modal p{font-size:13px;color:var(--sub);margin-bottom:16px;line-height:1.5}
+.modal input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:14px;font-family:inherit;margin-bottom:14px}
+.modal input:focus{outline:none;border-color:var(--mmh-blue)}
+.modal-btns{display:flex;gap:9px}
+.mbtn{flex:1;padding:11px;border-radius:var(--radius-md);font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--sub)}
+.mbtn.pri{background:var(--mmh-blue);color:#fff;border-color:var(--mmh-blue)}
+
+/* RANKING */
+.rank-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1.5px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px}
+.rank-row .pos{width:26px;height:26px;border-radius:8px;background:var(--pale);color:var(--mmh-blue);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-row.top1 .pos{background:var(--mmh-yellow);color:var(--mmh-navy)}
+.rank-row .rn{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.rank-row .rs{font-size:14px;font-weight:700;color:var(--mmh-blue)}
+.rank-row .rx{font-size:11px;color:var(--sub)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <div class="logo"><span>MMH</span></div>
+    <div class="htitle"><div class="t1">Knowledge Quiz</div><div class="t2" id="hsub">Ôn tập kiến thức Sales</div></div>
+    <div class="streak"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span id="streakN">0</span></div>
+  </div>
+  <div id="content">
+    <div id="loading">
+      <div class="load-logo"><span>MMH</span></div>
+      <h2>Knowledge Quiz</h2>
+      <div class="spin"></div>
+      <p id="loadMsg">Đang tải dữ liệu kiến thức…</p>
+    </div>
+  </div>
+  <div id="tabbar"></div>
+</div>
+<div id="toast"></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+
+<script>
+// ═══ STATE ═══
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6XiLgLZU5M6NRV8aRgbzpfBrp6kHf_C3j43VjlJKvwGJTzqkcpkG-QLBkZXryYATyXw/exec';
+
+const TABS=[
+ {id:'home',label:'Trang chủ',svg:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'},
+ {id:'flash',label:'Flashcard',svg:'<rect x="3" y="5" width="14" height="14" rx="2"/><path d="M7 9h6M7 13h4"/>'},
+ {id:'quiz',label:'Quiz',svg:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 11 2 2 4-4"/>'},
+ {id:'search',label:'Tra cứu',svg:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'},
+ {id:'rank',label:'Xếp hạng',svg:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'}
+];
+
+const DB={thuthuat:[],thuatngu:[],sanpham:[]};
+const S={
+  screen:'home', cards:[], ci:0, flip:false,
+  fFilter:'all',
+  quiz:null, qi:0, qscore:0, qans:null, quizFilter:'sanpham',
+  squery:'',
+  rankFilter:'all',
+  progress:{}, streak:0, bestQuiz:0, totalSessions:0, ranking:[]
+};
+const LS_KEY='mmh_kq_progress_v1';
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>String(s==null?'':s).toLowerCase().normalize('NFC');
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ═══ API LAYER (hỗ trợ cả google.script.run lẫn fetch) ═══
+async function apiGet(action){
+  const r=await fetch(GAS_URL+'?action='+action,{method:'GET',redirect:'follow'});
+  const j=await r.json();
+  if(!j.ok) throw new Error(j.error||'Lỗi tải dữ liệu');
+  return j.data;
+}
+async function apiPost(body){
+  // POST dạng text/plain để tránh CORS preflight khi gọi từ GitHub Pages
+  const r=await fetch(GAS_URL,{method:'POST',redirect:'follow',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify(body)});
+  const j=await r.json();
+  if(!j.ok) throw new Error(j.error||'Lỗi gửi dữ liệu');
+  return j.data;
+}
+
+// ═══ LOAD PROGRESS (localStorage) ═══
+function loadProgress(){
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){const p=JSON.parse(raw);
+    S.progress=p.progress||{};S.streak=p.streak||0;S.bestQuiz=p.bestQuiz||0;
+    S.totalSessions=p.totalSessions||0;S.userName=p.userName||'';
+    // cập nhật streak theo ngày
+    const today=new Date().toDateString();
+    if(p.lastDay && p.lastDay!==today){
+      const diff=(new Date(today)-new Date(p.lastDay))/86400000;
+      if(diff>1) S.streak=0;
+    }
+  }}catch(e){}
+}
+function saveProgress(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({
+    progress:S.progress,streak:S.streak,bestQuiz:S.bestQuiz,
+    totalSessions:S.totalSessions,userName:S.userName,lastDay:new Date().toDateString()
+  }));}catch(e){}
+}
+function bumpStreak(){
+  const today=new Date().toDateString();
+  const raw=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  if(raw.lastDay!==today){S.streak=(S.streak||0)+1;}
+  saveProgress();$('streakN').textContent=S.streak;
+}
+
+// ═══ SM-2 SPACED REPETITION (rút gọn) ═══
+// progress[key] = {ease, interval, due (timestamp), reps}
+function cardKey(type,id){return type+':'+id;}
+function gradeCard(key,known){
+  const now=Date.now();
+  let p=S.progress[key]||{ease:2.5,interval:0,reps:0};
+  if(known){
+    p.reps++;
+    p.ease=Math.max(1.3,p.ease+0.1);
+    p.interval = p.reps===1?1 : p.reps===2?3 : Math.round(p.interval*p.ease);
+  }else{
+    p.reps=0;p.ease=Math.max(1.3,p.ease-0.2);p.interval=0; // hiện lại ngay
+  }
+  p.due=now + p.interval*86400000;
+  S.progress[key]=p;saveProgress();
+}
+function isDue(key){const p=S.progress[key];return !p || !p.due || p.due<=Date.now();}
+function isKnown(key){const p=S.progress[key];return p && p.reps>=2;}
+
+// ═══ BUILD FLASHCARD POOL ═══
+// Mỗi nguồn → thẻ {type,id,front,frontCat,back:[{lbl,val,hi}], searchText}
+function buildCards(){
+  const cards=[];
+  DB.sanpham.forEach((p,i)=>{
+    if(!p.TenSP) return;
+    cards.push({type:'sp',id:'sp'+i,cat:p.Nhom||'Sản phẩm',front:p.TenSP,
+      back:[{lbl:'USP',val:p.USP||p.DacTinh||''},{lbl:'Tagline',val:p.Tagline||'',hi:true}],
+      filterCat:p.PhanLoai||'Sản phẩm'});
+  });
+  DB.thuatngu.forEach((t,i)=>{
+    if(!t.EN) return;
+    cards.push({type:'tn',id:'tn'+i,cat:t.ChuyenMon||'Thuật ngữ',front:t.EN,frontEn:true,
+      back:[{lbl:'Tiếng Việt',val:t.VI||'',hi:true},{lbl:'Mô tả',val:t.MoTa||''}],
+      filterCat:t.ChuyenMon||'Thuật ngữ'});
+  });
+  DB.thuthuat.forEach((t,i)=>{
+    if(!t.TenThuThuat) return;
+    cards.push({type:'tt',id:'tt'+i,cat:t.LoaiThuThuat||'Thủ thuật',front:t.TenThuThuat,
+      back:[{lbl:'Nhóm thủ thuật',val:t.NhomThuThuat||''},{lbl:'Loại',val:t.LoaiThuThuat||'',hi:true}],
+      filterCat:t.LoaiThuThuat||'Thủ thuật'});
+  });
+  return cards;
+}
+
+// ═══ NAV ═══
+function nav(s){
+  S.screen=s;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+  const subs={home:'Ôn tập kiến thức Sales',flash:'Flashcard · chạm để lật',quiz:'Quiz trắc nghiệm',search:'Tra cứu nhanh',rank:'Bảng xếp hạng team'};
+  $('hsub').textContent=subs[s]||'';
+  render();
+}
+function render(){
+  const c=$('content');
+  if(S.screen==='home')   c.innerHTML=viewHome();
+  if(S.screen==='flash')  return renderFlash();
+  if(S.screen==='quiz')   return renderQuiz();
+  if(S.screen==='search') return renderSearch();
+  if(S.screen==='rank')   return renderRank();
+}
+
+// ═══ HOME ═══
+function viewHome(){
+  const total=DB.sanpham.length+DB.thuatngu.length+DB.thuthuat.length;
+  const known=Object.keys(S.progress).filter(k=>isKnown(k)).length;
+  const dueCount=S.cards.filter(c=>isDue(cardKey(c.type,c.id))).length;
+  return `<div class="screen">
+    <div class="stat-grid">
+      <div class="stat"><div class="lbl">Sản phẩm</div><div class="num">${DB.sanpham.length}</div></div>
+      <div class="stat"><div class="lbl">Thuật ngữ</div><div class="num">${DB.thuatngu.length}</div></div>
+      <div class="stat"><div class="lbl">Thủ thuật</div><div class="num">${DB.thuthuat.length}</div></div>
+      <div class="stat"><div class="lbl">Đã thuộc</div><div class="num" style="color:var(--success)">${known}<small> /${total}</small></div></div>
+    </div>
+    <div class="sect">Bắt đầu ôn</div>
+    <button class="act" onclick="nav('flash')">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="M7 9h6M7 13h4"/></svg></div>
+      <div><div class="a1">Flashcard hôm nay</div><div class="a2">${dueCount} thẻ cần ôn theo lịch</div></div>
+    </button>
+    <button class="act" onclick="startQuiz('sanpham')">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 11 2 2 4-4"/></svg></div>
+      <div><div class="a1">Quiz kiến thức sản phẩm</div><div class="a2">10 câu · tagline, USP, nhóm SP</div></div>
+    </button>
+    <button class="act" onclick="startQuiz('thuatngu')">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg></div>
+      <div><div class="a1">Quiz thuật ngữ EN–VI</div><div class="a2">10 câu · dịch Anh ↔ Việt</div></div>
+    </button>
+    <button class="act" onclick="startQuiz('thuthuat')">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 2v2M5 5l1.5 1.5M2 11h2M20 11h2M9 22h6M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/></svg></div>
+      <div><div class="a1">Quiz thủ thuật BYT</div><div class="a2">10 câu · thủ thuật thuộc nhóm nào</div></div>
+    </button>
+    <div class="sect">Cá nhân</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="lbl">Điểm quiz cao nhất</div><div class="num">${S.bestQuiz}<small>%</small></div></div>
+      <div class="stat"><div class="lbl">Chuỗi ngày học</div><div class="num">${S.streak}<small> ngày</small></div></div>
+    </div>
+    <button class="act" onclick="openSync()" style="margin-top:6px">
+      <div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16M21 21v-5h-5"/></svg></div>
+      <div><div class="a1">Đồng bộ điểm lên bảng xếp hạng</div><div class="a2">Lưu điểm để cả team cùng thấy</div></div>
+    </button>
+  </div>`;
+}
+
+// ═══ FLASHCARD ═══
+function flashPool(){
+  let pool=S.cards;
+  if(S.fFilter!=='all') pool=pool.filter(c=>c.type===S.fFilter);
+  // ưu tiên thẻ due, rồi tới thẻ mới
+  const due=pool.filter(c=>isDue(cardKey(c.type,c.id)));
+  return due.length?due:pool;
+}
+function renderFlash(){
+  const pool=flashPool();
+  if(!pool.length){$('content').innerHTML=`<div class="screen"><div class="empty"><div class="ei">🎉</div><div class="et">Bạn đã ôn hết thẻ theo lịch hôm nay!</div></div></div>`;return;}
+  if(S.ci>=pool.length)S.ci=0;
+  const c=pool[S.ci];
+  const known=Object.keys(S.progress).filter(k=>isKnown(k)).length;
+  const filters=[['all','Tất cả'],['sp','Sản phẩm'],['tn','Thuật ngữ'],['tt','Thủ thuật']];
+  let face;
+  if(!S.flip){
+    face=`<div class="cat">${esc(c.cat)}</div><div class="term${c.frontEn?' en':''}">${esc(c.front)}</div>
+      <div class="hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg> Chạm để xem mặt sau</div>`;
+  }else{
+    face=c.back.map(b=>b.val?`<div class="blbl">${esc(b.lbl)}</div><div class="bval${b.hi?' hi':''}">${esc(b.val)}</div>`:'').join('');
+  }
+  $('content').innerHTML=`<div class="screen">
+    <div class="pills">${filters.map(f=>`<button class="pill ${S.fFilter===f[0]?'on':''}" onclick="setFFilter('${f[0]}')">${f[1]}</button>`).join('')}</div>
+    <div class="progress-row"><span>Thẻ ${S.ci+1}/${pool.length}</span><span style="color:var(--success)">${known} đã thuộc</span></div>
+    <div class="pbar"><i style="width:${(S.ci)/pool.length*100}%"></i></div>
+    <div class="fcard ${S.flip?'back':''}" onclick="S.flip=!S.flip;renderFlash()">${face}</div>
+    <div class="fc-actions">
+      <button class="fbtn again" onclick="markCard(false)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Cần ôn lại</button>
+      <button class="fbtn know" onclick="markCard(true)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg> Đã thuộc</button>
+    </div>
+    <div style="font-size:11px;color:#aab;text-align:center;margin-top:10px">Spaced repetition: thẻ "cần ôn" sẽ hiện lại sớm hơn</div>
+  </div>`;
+}
+function setFFilter(f){S.fFilter=f;S.ci=0;S.flip=false;renderFlash();}
+function markCard(known){
+  const pool=flashPool();const c=pool[S.ci];
+  gradeCard(cardKey(c.type,c.id),known);
+  bumpStreak();
+  S.flip=false;S.ci++;
+  renderFlash();
+}
+
+// ═══ QUIZ ═══
+function startQuiz(kind){
+  S.quizFilter=kind||'sanpham';
+  let qs=[];
+  if(S.quizFilter==='sanpham'){
+    const pool=DB.sanpham.filter(p=>p.TenSP&&p.Tagline);
+    qs=shuffle(pool).slice(0,10).map(p=>{
+      const wrong=shuffle(pool.filter(x=>x.TenSP!==p.TenSP)).slice(0,3).map(x=>x.Tagline);
+      return mkQ(`Tagline của <b>${esc(p.TenSP)}</b> là gì?`,p.Tagline,wrong);
+    });
+  }else if(S.quizFilter==='thuatngu'){
+    const pool=DB.thuatngu.filter(t=>t.EN&&t.VI);
+    qs=shuffle(pool).slice(0,10).map(t=>{
+      const wrong=shuffle(pool.filter(x=>x.VI!==t.VI)).slice(0,3).map(x=>x.VI);
+      return mkQ(`"<b>${esc(t.EN)}</b>" dịch sang tiếng Việt là?`,t.VI,wrong);
+    });
+  }else{
+    const pool=DB.thuthuat.filter(t=>t.TenThuThuat&&t.LoaiThuThuat);
+    const loais=[...new Set(pool.map(t=>t.LoaiThuThuat))];
+    qs=shuffle(pool).slice(0,10).map(t=>{
+      const wrong=shuffle(loais.filter(l=>l!==t.LoaiThuThuat)).slice(0,3);
+      return mkQ(`Thủ thuật "<b>${esc(t.TenThuThuat)}</b>" thuộc nhóm nào?`,t.LoaiThuThuat,wrong);
+    });
+  }
+  S.quiz=qs;S.qi=0;S.qscore=0;S.qans=null;nav('quiz');
+}
+function mkQ(q,correct,wrong){return {q,correct,opts:shuffle([correct,...wrong.filter(Boolean)])};}
+
+function renderQuiz(){
+  const c=$('content');
+  if(!S.quiz){
+    c.innerHTML=`<div class="screen"><div class="q-result"><div style="font-size:40px;color:#cdd">?</div><div class="sub">Chọn loại quiz bạn muốn làm</div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button class="act" onclick="startQuiz('sanpham')"><div class="ico" style="font-size:16px">SP</div><div><div class="a1">Kiến thức sản phẩm</div><div class="a2">Tagline · USP · nhóm</div></div></button>
+        <button class="act" onclick="startQuiz('thuatngu')"><div class="ico" style="font-size:14px">EN</div><div><div class="a1">Thuật ngữ EN–VI</div><div class="a2">Dịch Anh ↔ Việt</div></div></button>
+        <button class="act" onclick="startQuiz('thuthuat')"><div class="ico" style="font-size:14px">TT</div><div><div class="a1">Thủ thuật BYT</div><div class="a2">Thuộc nhóm nào</div></div></button>
+      </div></div></div>`;return;
+  }
+  if(S.qi>=S.quiz.length){
+    const pct=Math.round(S.qscore/S.quiz.length*100);
+    const col=pct>=80?'var(--success)':pct>=50?'var(--warning)':'var(--danger)';
+    if(pct>S.bestQuiz){S.bestQuiz=pct;}
+    S.totalSessions++;saveProgress();
+    c.innerHTML=`<div class="screen"><div class="q-result">
+      <div class="big" style="color:${col}">${pct}%</div>
+      <div class="sub">Đúng ${S.qscore}/${S.quiz.length} câu${pct>=80?' · Xuất sắc!':''}</div>
+      <div style="display:flex;gap:9px;justify-content:center">
+        <button class="mbtn" style="flex:0 0 auto;padding:11px 20px" onclick="startQuiz(S.quizFilter)">Làm lại</button>
+        <button class="mbtn pri" style="flex:0 0 auto;padding:11px 20px" onclick="openSync()">Lưu điểm</button>
+      </div></div></div>`;return;
+  }
+  const q=S.quiz[S.qi];
+  const opts=q.opts.map(o=>{
+    let cls='opt';
+    if(S.qans!==null){if(o===q.correct)cls+=' correct';else if(o===S.qans)cls+=' wrong';}
+    return `<button class="${cls}" ${S.qans!==null?'disabled':''} onclick="answer(${JSON.stringify(o).replace(/"/g,'&quot;')})">${esc(o)}</button>`;
+  }).join('');
+  c.innerHTML=`<div class="screen">
+    <div class="pbar"><i style="width:${S.qi/S.quiz.length*100}%"></i></div>
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px">Câu ${S.qi+1}/${S.quiz.length}</div>
+    <div class="q-text">${q.q}</div>
+    ${opts}
+    ${S.qans!==null?`<button class="q-next" onclick="nextQ()">${S.qi+1>=S.quiz.length?'Xem kết quả':'Câu tiếp theo'} <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>`:''}
+  </div>`;
+}
+function answer(a){S.qans=a;if(a===S.quiz[S.qi].correct)S.qscore++;bumpStreak();renderQuiz();}
+function nextQ(){S.qi++;S.qans=null;renderQuiz();}
+
+// ═══ SEARCH ═══
+function renderSearch(){
+  const q=norm(S.squery).trim();
+  let results=[];
+  if(q){
+    DB.sanpham.forEach(p=>{if(norm(p.TenSP+p.Nhom+p.USP+p.Tagline+p.DacTinh).includes(q))results.push({t:'sp',tag:'Sản phẩm',a:p.TenSP,b:p.Nhom,c:p.Tagline});});
+    DB.thuatngu.forEach(t=>{if(norm(t.EN+t.VI+t.MoTa).includes(q))results.push({t:'tn',tag:'Thuật ngữ',a:t.EN+' — '+t.VI,b:t.MoTa,c:''});});
+    DB.thuthuat.forEach(t=>{if(norm(t.TenThuThuat+t.NhomThuThuat+t.LoaiThuThuat).includes(q))results.push({t:'tt',tag:'Thủ thuật',a:t.TenThuThuat,b:t.LoaiThuThuat+(t.NhomThuThuat&&t.NhomThuThuat!==t.TenThuThuat?' · '+t.NhomThuThuat:''),c:''});});
+  }
+  results=results.slice(0,60);
+  const body=!q
+    ?`<div class="empty"><div class="ei">🔍</div><div class="et">Gõ để tìm trong cả 3 nguồn dữ liệu<br>Thử: "tủy", "JIZAI", "implant", "cornea"</div></div>`
+    :results.length
+      ?`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">${results.length} kết quả</div>`+results.map(r=>`<div class="res"><div class="rh"><span class="tag ${r.t}">${r.tag}</span><span class="rt">${esc(r.a)}</span></div>${r.b?`<div class="rb">${esc(r.b)}</div>`:''}${r.c?`<div class="rc">${esc(r.c)}</div>`:''}</div>`).join('')
+      :`<div class="empty"><div class="ei">😕</div><div class="et">Không tìm thấy. Thử từ khoá khác.</div></div>`;
+  $('content').innerHTML=`<div class="screen"><input class="sinput" id="sq" placeholder="Tìm sản phẩm, thuật ngữ, thủ thuật…" value="${esc(S.squery)}">${body}</div>`;
+  const el=$('sq');
+  el.addEventListener('input',e=>{S.squery=e.target.value;renderSearchKeepFocus();});
+  if(q){el.focus();el.setSelectionRange(el.value.length,el.value.length);}
+}
+function renderSearchKeepFocus(){
+  // re-render chỉ phần kết quả để không mất focus
+  renderSearch();
+}
+
+// ═══ RANKING ═══
+async function renderRank(){
+  $('content').innerHTML=`<div class="screen"><div class="empty"><div class="spin" style="margin:0 auto 14px"></div><div class="et">Đang tải bảng xếp hạng…</div></div></div>`;
+  try{
+    const d=await apiGet('getRanking');
+    S.ranking=(d&&d.ranking)||[];
+  }catch(e){S.ranking=[];}
+  const rows=S.ranking.length
+    ? S.ranking.map((r,i)=>`<div class="rank-row ${i===0?'top1':''}"><div class="pos">${i+1}</div><div class="rn">${esc(r.Ten)}</div><div style="text-align:right"><div class="rs">${r.DiemCao}%</div><div class="rx">${r.SoLuot} lượt</div></div></div>`).join('')
+    : `<div class="empty"><div class="ei">🏆</div><div class="et">Chưa có ai trên bảng xếp hạng.<br>Làm quiz rồi bấm "Lưu điểm" để lên bảng!</div></div>`;
+  $('content').innerHTML=`<div class="screen"><div class="sect">Top sales kiến thức MMH</div>${rows}
+    <button class="act" onclick="openSync()" style="margin-top:14px"><div class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><div><div class="a1">Thêm điểm của tôi</div><div class="a2">Điểm cao nhất: ${S.bestQuiz}%</div></div></button>
+  </div>`;
+}
+
+// ═══ SYNC MODAL ═══
+function openSync(){
+  $('modalBox').innerHTML=`<h3>Đồng bộ điểm</h3><p>Nhập tên để lưu điểm lên bảng xếp hạng của team. Điểm cao nhất: <b>${S.bestQuiz}%</b></p>
+    <input id="syncName" placeholder="Tên hoặc biệt danh" value="${esc(S.userName||'')}" maxlength="40">
+    <div class="modal-btns"><button class="mbtn" onclick="closeModal()">Huỷ</button><button class="mbtn pri" onclick="doSync()">Lưu điểm</button></div>`;
+  $('modalBg').classList.add('show');
+  setTimeout(()=>$('syncName').focus(),100);
+}
+function closeModal(){$('modalBg').classList.remove('show');}
+async function doSync(){
+  const name=$('syncName').value.trim();
+  if(!name){toast('Vui lòng nhập tên');return;}
+  S.userName=name;saveProgress();
+  const known=Object.keys(S.progress).filter(k=>isKnown(k)).length;
+  closeModal();toast('Đang lưu…');
+  try{
+    const d=await apiPost({action:'syncScore',name,score:S.bestQuiz,sessions:S.totalSessions||1,cardsKnown:known});
+    if(d&&d.ranking)S.ranking=d.ranking;
+    toast('Đã lưu điểm lên bảng xếp hạng!');
+    if(S.screen==='rank')renderRank();
+  }catch(e){toast('Lỗi: '+e.message);}
+}
+$('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
+
+// ═══ INIT ═══
+function buildTabBar(){
+  $('tabbar').innerHTML=TABS.map(t=>`<button class="tab ${t.id==='home'?'on':''}" data-s="${t.id}" onclick="nav('${t.id}')"><svg viewBox="0 0 24 24">${t.svg}</svg><span>${t.label}</span></button>`).join('');
+}
+async function init(){
+  loadProgress();
+  $('streakN').textContent=S.streak;
+  try{
+    const d=await apiGet('getAll');
+    DB.thuthuat=d.thuthuat||[];DB.thuatngu=d.thuatngu||[];DB.sanpham=d.sanpham||[];
+  }catch(e){
+    $('loadMsg').innerHTML='Lỗi tải dữ liệu:<br>'+esc(e.message)+'<br><br>Kiểm tra GAS_URL trong index.html';
+    return;
+  }
+  S.cards=buildCards();
+  buildTabBar();
+  nav('home');
+}
+window.onload=init;
+</script>
+</body>
+</html>
