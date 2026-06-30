@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>MMH Knowledge Quiz</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3A5CAA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MMH Quiz">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -205,10 +212,20 @@ const norm=s=>String(s==null?'':s).toLowerCase().normalize('NFC');
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
 
-// ═══ API LAYER (hỗ trợ cả google.script.run lẫn fetch) ═══
+// ═══ API LAYER (GitHub Pages → Apps Script) ═══
+function parseJsonOrThrow(text){
+  const t=(text||'').trim();
+  if(t.charAt(0)==='<'){
+    // Backend trả HTML (trang lỗi Apps Script) thay vì JSON
+    throw new Error('Backend trả HTML, không phải JSON. Code.gs chưa đúng hoặc deployment chưa cập nhật.');
+  }
+  try{ return JSON.parse(t); }
+  catch(e){ throw new Error('Không đọc được JSON từ backend.'); }
+}
 async function apiGet(action){
   const r=await fetch(GAS_URL+'?action='+action,{method:'GET',redirect:'follow'});
-  const j=await r.json();
+  const text=await r.text();
+  const j=parseJsonOrThrow(text);
   if(!j.ok) throw new Error(j.error||'Lỗi tải dữ liệu');
   return j.data;
 }
@@ -217,7 +234,8 @@ async function apiPost(body){
   const r=await fetch(GAS_URL,{method:'POST',redirect:'follow',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify(body)});
-  const j=await r.json();
+  const text=await r.text();
+  const j=parseJsonOrThrow(text);
   if(!j.ok) throw new Error(j.error||'Lỗi gửi dữ liệu');
   return j.data;
 }
@@ -542,6 +560,13 @@ async function init(){
   S.cards=buildCards();
   buildTabBar();
   nav('home');
+}
+
+// ═══ PWA: đăng ký service worker ═══
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
 }
 window.onload=init;
 </script>
