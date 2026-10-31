@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
 <style id="eh-css">
-/* Sự kiện MKT v2.1 — v2.1: tab "MKT Offline · Online" (file MKT Offline + file Digital, chỉ đọc), gợi ý link khi nộp việc.
+/* Sự kiện MKT v2.2 — v2.2: tab "Theo trạng thái" (thay "Bảng Kanban"), tên vai trò dễ hiểu (Truyền thông · Ấn phẩm · Hậu cần), thông báo ghi rõ bình luận ở việc nào.
+   v2.1: tab "MKT Offline · Online" (file MKT Offline + file Digital, chỉ đọc), gợi ý link khi nộp việc.
    v2.0 — Bảng điều khiển (quản lý) · Lịch tháng · Sự kiện (thẻ ảnh) · Buồng điều phối Owner (hồ sơ sự kiện) · Việc của tôi.
    Màu: navy / blue MMH, vàng MANI chỉ làm điểm nhấn (hôm nay, ngày D). Màu sức khoẻ: xanh = đúng tiến độ, cam = cần chú ý, đỏ = chậm. */
 :root{
@@ -424,6 +425,7 @@ table.t td{padding:8px 12px;border-top:1px solid var(--line);vertical-align:top}
 table.t td.g{font-weight:600;color:var(--navy);white-space:nowrap}
 .sec{margin-bottom:22px}
 .sec h5{margin:0 0 8px;font:600 12px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.pop .nq{display:block;margin-top:2px;padding:2px 0 2px 8px;border-left:2px solid var(--line2);color:var(--ink2)}
 /* v2.1 MKT Offline · Online */
 .mk-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:4px}
 .mk-b{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);min-width:0}
@@ -557,7 +559,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "2.1"
+  ver: "2.2"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -621,7 +623,7 @@ var ST_CLS = { "Chưa làm":"todo", "Đang làm":"prog", "Chờ duyệt":"wait",
 var TYPES = ["Hội thảo", "Workshop", "Triển lãm", "Webinar", "Khác"];
 var TYPE_C = { "Triển lãm":"exh", "Workshop":"ws", "Hội thảo":"sem", "Webinar":"web" };
 var tc = function(t){ return TYPE_C[t] || "oth"; };
-var ROLE_VI = { Owner:"Owner", Digital:"Digital", Design:"Thiết kế", Trade:"Trade", Sales:"Sales" };
+var ROLE_VI = { Owner:"Owner (điều phối)", Digital:"Truyền thông", Design:"Ấn phẩm", Trade:"Hậu cần", Sales:"Sales" };   /* v2.2: tên vai trò dễ hiểu (mã vai trò trong dữ liệu giữ nguyên) */
 var PROOF_VI = { file:"Cần file (PDF / ảnh)", image:"Cần ảnh", link:"Cần link" };
 var PRODUCTS = ["JIZAI", "Composite", "MANI Bond", "Bleach'N Shine", "#1559L", "Dia-Burs", "Manipler", "Ophthalmic Knife"];
 var PRODUCT_IMG = { "JIZAI":"jizai-set.png", "Composite":"comp-nano.png", "Bleach'N Shine":"bleach-shine.png", "#1559L":"carbide-app.jpg", "MANI Bond":"mani-bond.png",
@@ -893,12 +895,12 @@ function notes(){
   (S.D.log || []).forEach(function(l){
     if (l.by === me()) return; var t = l.taskId ? taskById(l.taskId) : null, e = evById(l.eventId); if (!e || (S.hideSample && e.sample)) return;
     if ((mine(t) && /Cập nhật|Thêm việc|Nhắc/.test(l.action)) || (l.action === "Nhắc việc" && String(l.text).indexOf(me()) >= 0) || (e.Owner === me() && /Chờ duyệt/.test(l.text)))
-      L.push({ at: l.at, by: l.by, text: l.action + ": " + l.text, ev: e, t: t });
+      L.push({ at: l.at, by: l.by, text: /Thêm việc/.test(l.action) ? "giao cho bạn việc mới" : /Nhắc/.test(l.action) ? "nhắc việc" : /Chờ duyệt/.test(l.text) ? "nộp kết quả, chờ bạn duyệt" : "cập nhật việc của bạn", ev: e, t: t });
   });
   (S.D.comments || []).forEach(function(c){
     if (c.by === me()) return; var t = c.taskId ? taskById(c.taskId) : null, e = evById(c.eventId); if (!e || (S.hideSample && e.sample)) return;
     if (String(c.mentions || "").split(/\s*,\s*/).indexOf(me()) >= 0 || String(c.text).indexOf("@" + me()) >= 0 || mine(t) || (!t && e.Owner === me()))
-      L.push({ at: c.at, by: c.by, text: "bình luận: " + c.text, ev: e, t: t, c: 1 });
+      L.push({ at: c.at, by: c.by, text: c.text, ev: e, t: t, c: 1, why: String(c.mentions || "").split(/\s*,\s*/).indexOf(me()) >= 0 || String(c.text).indexOf("@" + me()) >= 0 ? "nhắc tên bạn" : mine(t) ? "ở việc của bạn" : "ở sự kiện bạn điều phối" });
   });
   return L.sort(function(a, b){ return tsOf(b.at) - tsOf(a.at); }).slice(0, 40);
 }
@@ -924,9 +926,10 @@ function shell(){
       (S.me && S.me.admin ? '<button data-act="settings">Xoá / nạp lại dữ liệu mẫu</button>' : "") + "</div></div>" : "");
 }
 function bellPop(N, seen){
-  return '<div class="pop" role="dialog" aria-label="Thông báo"><div class="sech" style="margin:8px 0 4px"><b>Thông báo</b><span class="sp"></span><small>Việc của bạn, bình luận nhắc bạn</small></div>' +
-    (N.length ? '<ul class="feed">' + N.map(function(n){ return '<li style="cursor:pointer" data-go="' + (n.t ? "t-" + esc(n.t.id) : "ev-" + esc(n.ev.id)) + '">' + av(n.by) + "<span" + (tsOf(n.at) > seen ? ' style="font-weight:600"' : "") + "><b>" + esc(n.by) + "</b> " + esc(String(n.text).slice(0, 140)) +
-      "<small>" + esc(n.ev.name) + (n.t ? " · " + esc(n.t.title) : "") + " · " + esc(ago(n.at)) + "</small></span></li>"; }).join("") + "</ul>" : '<p class="empty">Chưa có thông báo.</p>') + "</div>";
+  return '<div class="pop" role="dialog" aria-label="Thông báo"><div class="sech" style="margin:8px 0 4px"><b>Thông báo</b><span class="sp"></span><small>Việc giao cho bạn · bình luận liên quan đến bạn</small></div>' +
+    (N.length ? '<ul class="feed">' + N.map(function(n){ return '<li style="cursor:pointer" data-go="' + (n.t ? "t-" + esc(n.t.id) : "ev-" + esc(n.ev.id)) + '">' + av(n.by) + "<span" + (tsOf(n.at) > seen ? ' style="font-weight:600"' : "") + "><b>" + esc(n.by) + "</b> " + (n.c ? "bình luận " + (n.t ? "ở việc <b>" + esc(n.t.title) + "</b>" : "trong Thảo luận của sự kiện") + ' <span class="pill mut" style="font-size:10.5px;padding:0 6px">' + esc(n.why) + '</span><span class="nq">“' + esc(String(n.text).slice(0, 140)) + "”</span>"
+        : esc(n.text) + (n.t ? ": <b>" + esc(n.t.title) + "</b>" : "")) +
+      "<small>" + esc(n.ev.name) + " · " + esc(ago(n.at)) + "</small></span></li>"; }).join("") + "</ul>" : '<p class="empty">Chưa có thông báo.</p>') + "</div>";
 }
 function needChip(t){
   if (!t.proof) return ""; var ok = proofOk(t);
@@ -1193,7 +1196,7 @@ function vEvent(e){
     '<div style="display:flex;gap:6px;flex-wrap:wrap">' + (boss ? '<button class="btn pri sm" data-act="quickadd">' + ic("plus") + 'Thêm việc</button><button class="btn sm" data-act="remindteam">' + ic("mail") + "Nhắc cả đội</button>" : "") +
     (e.planUrl ? '<a class="btn sm" href="' + esc(e.planUrl) + '" target="_blank" rel="noopener">' + ic("out") + "File kế hoạch</a>" : "") + (e.folderUrl ? '<a class="btn sm" href="' + esc(e.folderUrl) + '" target="_blank" rel="noopener">' + ic("folder") + "Thư mục tệp</a>" : "") + "</div></div></div>";
   var cm = (IX.cmE[e.id] || []);
-  var TABS = [["progress", "Danh sách việc", s.total, "list"], ["board", "Bảng Kanban", 0, "board"], ["timeline", "Dòng thời gian", 0, "chart"], ["files", "Ấn phẩm & tệp", files.length, "image"], ["mkt", "MKT Offline · Online", mkCount(e), "chart"], ["talk", "Thảo luận", cm.length, "chat"], ["plan", "Kế hoạch", 0, "file"], ["log", "Nhật ký", 0, "clock"]];
+  var TABS = [["progress", "Danh sách việc", s.total, "list"], ["board", "Theo trạng thái", 0, "board"], ["timeline", "Dòng thời gian", 0, "chart"], ["files", "Ấn phẩm & tệp", files.length, "image"], ["mkt", "MKT Offline · Online", mkCount(e), "chart"], ["talk", "Thảo luận", cm.length, "chat"], ["plan", "Kế hoạch", 0, "file"], ["log", "Nhật ký", 0, "clock"]];
   var body = S.tab === "board" ? pBoard(e, ts) : S.tab === "timeline" ? pTimeline(e, ts) : S.tab === "files" ? pFiles(e, files) : S.tab === "mkt" ? pMkt(e) : S.tab === "talk" ? pTalk(e) : S.tab === "plan" ? pPlan(e, (S.D.plan || {})[e.id]) : S.tab === "log" ? pLog(e) : pProgress(e, ts);
   return hd + '<div class="cockpit"><section class="card" style="min-width:0"><div class="tabs" role="tablist">' + TABS.map(function(t){ return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + ic(t[3]) + t[1] + (t[2] ? '<span class="n num">' + t[2] + "</span>" : "") + "</button>"; }).join("") + "</div>" +
     '<div class="pbody" role="tabpanel">' + body + "</div>" +
@@ -1788,7 +1791,7 @@ document.addEventListener("keydown", function(ev){
 });
 document.addEventListener("submit", function(ev){ ev.preventDefault(); });
 document.addEventListener("input", function(ev){ if (ev.target.id === "q"){ S.q = ev.target.value; clearTimeout(S.qt); S.qt = setTimeout(function(){ if (S.q && !/events|mine/.test(S.view)){ location.hash = "events"; S.evf = "all"; return; } render(); }, 240); } });
-/* Kanban: kéo thả đổi trạng thái */
+/* Theo trạng thái (kanban): kéo thả đổi trạng thái */
 document.addEventListener("dragstart", function(ev){ var c = ev.target.closest && ev.target.closest(".kc[data-kid]"); if (!c) return; S.kanDrag = c.dataset.kid; c.classList.add("drag"); try { ev.dataTransfer.setData("text/plain", c.dataset.kid); ev.dataTransfer.effectAllowed = "move"; } catch(x){} });
 document.addEventListener("dragend", function(ev){ var c = ev.target.closest && ev.target.closest(".kc"); if (c) c.classList.remove("drag"); $$(".kcol.over").forEach(function(x){ x.classList.remove("over"); }); });
 document.addEventListener("dragover", function(ev){ var col = ev.target.closest && ev.target.closest(".kcol"); if (!col || !S.kanDrag) return; ev.preventDefault(); $$(".kcol.over").forEach(function(x){ if (x !== col) x.classList.remove("over"); }); col.classList.add("over"); });
