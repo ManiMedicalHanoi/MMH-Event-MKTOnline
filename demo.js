@@ -126,6 +126,23 @@
       promo: [{ product: "JIZAI", offer: "Mua 3 tặng 1", gift: "Túi vải", qty: "50" }, { product: "Composite", offer: "Giảm 15%", gift: "", qty: "" }], activities: [], sessions: [], gifts: [], results: [] };
     D.plan["EVMAU-6"] = { info: { format: "Hội thảo (mẫu)" }, results: [{ metric: "Khách tham dự", unit: "người", actual: "134" }, { metric: "Đơn hàng tại sự kiện", unit: "đơn", actual: "27" }, { metric: "Khách để lại thông tin", unit: "người", actual: "88" }],
       gifts: [{ npp: "NPP (mẫu)", item: "Túi vải", advance: "100", used: "92", diff: "8", status: "Đã hoàn" }], tasks: [], checklist: [], agenda: [], staff: [], promo: [], activities: [], sessions: [] };
+    /* v2.1: dữ liệu file MKT Offline / Digital (giống backend MKT_EventHubLink.gs) — hư cấu */
+    D.link = {};
+    D.events.forEach(function(e, i){
+      var x = EVS[i], past = e.end < iso(T0), sheet = "https://docs.google.com/spreadsheets/";
+      var reg = Math.round(x.target * (past ? 1.2 : .55)), conf = past ? Math.max(Math.round(reg * .82), (x.actual || 0) + 3) : 0, okc = past ? Math.min(conf, x.actual || Math.round(conf * .95)) : 0;
+      var L = { off: { src: past ? "R" : "P", row: 40 + i, url: sheet, name: e.name, start: e.start, end: e.end, type: e.type, form: e.type === "Webinar" ? "Webinar" : "Trực tiếp", segment: /nhãn/i.test(e.name) ? "Surgical" : "Dental",
+                       topic: x.purpose, product: e.products, kol: "BS. A (mẫu)", partner: "NPP khu vực (mẫu)", place: e.city, plan: "Approved", action: past ? "As planned" : "", folderUrl: "https://drive.google.com/drive/",
+                       review: past ? "Khách quan tâm nhiều tới phần thực hành; nên tăng thời lượng hands-on và chuẩn bị thêm bộ mẫu (mẫu)." : "", tPart: x.target, aPart: past ? okc : "", tJ: /JIZAI/.test(e.products) ? 20 : "", aJ: past && /JIZAI/.test(e.products) ? 14 : "",
+                       tC: /Composite/.test(e.products) ? 15 : "", aC: past && /Composite/.test(e.products) ? 17 : "", amount: past ? 86500000 : "", proof: past ? "https://drive.google.com/file/" : "" },
+                cust: { reg: reg, conf: conf, ok: okc, sign: e.type === "Webinar" ? 0 : conf, zoom: e.type === "Webinar" ? conf : 0, url: sheet }, postsUrl: sheet, designsUrl: sheet };
+      var P = [["Teaser", "Image", -14], ["Giới thiệu KOL", "Image", -10], ["Countdown", "Video", -3], ["Recap / cảm ơn", "Album", 1]];
+      L.posts = P.map(function(p, k){ var d = add(x.s + p[2]), up = d < iso(T0) && !(k === 2 && i === 0);
+        return { k: p[0], f: p[1], pl: "Event", pg: /nhãn/i.test(e.name) ? "MMH Surgical" : "MMH Dental", m: "", d: d, a: up ? d : "", st: up ? "On air đúng hạn" : "", n: "", lk: up ? IMG + imgFor(/teaser|giới thiệu/i.test(p[0]) ? "teaser" : "cảm ơn", k + i) : "", row: 100 + i * 5 + k }; });
+      L.designs = [["Key visual", 1, -21], ["Standee", 2, -10], ["Backdrop", 1, -10]].filter(function(d){ return e.type !== "Webinar" || d[0] === "Key visual"; }).map(function(d, k){ var dl = add(x.s + d[2]), dn = dl < iso(T0);
+        return { task: e.name + " - " + d[0], type: d[0], qty: d[1], dl: dl, st: dn ? "Completed" : "In progress", chk: dn ? "On time" : "", res: "", lk: dn ? IMG + imgFor(/key/i.test(d[0]) ? "key visual" : d[0].toLowerCase(), i) : "", done: dn ? dl : "", pic: "Đức Anh", req: e.Owner, pts: 2, row: 200 + i * 5 + k }; });
+      D.link[e.id] = L;
+    });
     return D;
   }
   var D = window.EH_DEMO_DATA || make();
@@ -144,6 +161,7 @@
     N = [];
     if (action === "ehBoot") return ok(Object.assign({}, D, { me: ME }));
     if (action === "ehSync") return ok({ message: "Bản xem trước — không có file kế hoạch thật để đồng bộ." });
+    if (action === "ehLink") return ok({ message: "Bản xem trước — dữ liệu file MKT Offline / Digital là dữ liệu mẫu." });
     if (action === "ehSample"){ if (!ME.admin) return ok({ ok: false, error: "Chỉ Admin được nạp / xoá dữ liệu mẫu." });
       var keep = function(L){ return L.filter(function(x){ return !x.sample; }); };
       var ids = D.events.filter(function(e){ return e.sample; }).map(function(e){ return e.id; });
