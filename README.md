@@ -20,3 +20,8 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
 - Backend: `ManiMedicalHanoi/mmh-backend` ▸ `backends/marketing/MKT_EventHub.gs` + `MKT_EventHubPlus.gs`. Dữ liệu: Google Sheet "MMH · Event Hub FY68" trong thư mục Drive Event FY68.
 - Xem thử với dữ liệu mẫu: `index.html?demo=1` (`&as=Đức Anh` để xem như thành viên). `sample/tai-lieu-mau.pdf` = file PDF của dữ liệu mẫu.
 - App Quiz cũ: `quiz.html`.
+- **v2.3 (02/11/2026)**: tab **Việc** gộp 3 cách xem (Danh sách · Kanban · Dòng thời gian); nút **＋ Thêm việc** ở cuối mỗi hạng mục (thay ô "gõ tên rồi Enter");
+  **Biên bản họp** (tab + khối bên phải: ngày họp, người dự, nội dung, việc cần làm sau họp — thêm / sửa / xoá); gõ **@** ⇒ gợi ý tên (đội sự kiện lên trước);
+  người được @nhắc nhận email + thông báo trên app này và nút **Nhắc tôi** của Report Hub / CRM (hộp thông báo chung Training Hub `RH_Notify`);
+  link `#ev-<id>/notes` · `#ev-<id>/talk` mở đúng tab; giao diện gọn hơn (khung không đổ bóng, đội sự kiện gọn + nút Đổi, điều khiển trên dòng việc chỉ hiện khi rê chuột).
+

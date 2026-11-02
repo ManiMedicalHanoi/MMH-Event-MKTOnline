@@ -73,7 +73,7 @@
   }
   function make(){
     var seed = 11, rnd = function(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    var D = { events: [], tasks: [], files: [], comments: [], log: [], notify: [], plan: {}, people: PEOPLE.map(function(p){ return { pic: p }; }), roles: ["Owner", "Digital", "Design", "Trade", "Sales"],
+    var D = { events: [], tasks: [], files: [], comments: [], meetings: [], log: [], notify: [], plan: {}, people: PEOPLE.map(function(p){ return { pic: p }; }), roles: ["Owner", "Digital", "Design", "Trade", "Sales"],
               status: ["Chưa làm", "Đang làm", "Chờ duyệt", "Xong", "Bỏ qua"], groups: TPL.map(function(g){ return { group: g[0], role: g[1] }; }),
               cfg: { mailAssign: true, mailReview: true, mailComment: true, remind: true, remindHour: 8, before: 2, ownerDigest: true, weekly: true }, book: "", sync: { at: Date.now(), msg: "Bản xem trước — dữ liệu mẫu" } };
     EVS.forEach(function(x, i){
@@ -110,6 +110,14 @@
         if (fm) cm(fm, e.Digital, "Form đã có câu hỏi \"Đồng ý sử dụng dữ liệu\" và trường Nơi công tác.", 50 + i * 3);
         cm(null, e.Owner, (e.Trade ? "@" + e.Trade + " chốt giúp phòng / gian hàng trước thứ Sáu. " : "") + "@" + e.Sales + " cập nhật số khách NPP đăng ký hộ vào nhóm Zalo.", 20 + i * 7);
         cm(null, e.Sales, "NPP báo đã có " + Math.round(x.target * .45) + " khách đăng ký, em gửi danh sách trong nhóm Zalo rồi ạ.", 8 + i * 4);
+      }
+      if (!past && i < 4){
+        D.meetings.push({ id: "MMAU-" + i + "-1", eventId: e.id, date: add(-9 - i), title: "Họp khởi động", attendees: [e.Owner, e.Digital, e.Design, e.Trade, e.Sales].filter(Boolean).join(", "),
+          content: "- Chốt chủ đề, KOL và địa điểm.\n- Mục tiêu " + x.target + " khách, ngân sách dự kiến " + Math.round(x.budget / 1e6) + " triệu.\n- NPP hỗ trợ mời khách khu vực.",
+          actions: (e.Design ? "@" + e.Design + " gửi key visual bản 1 trước " + add(-2 - i).slice(8) + "/" + add(-2 - i).slice(5, 7) + "\n" : "") + "@" + e.Digital + " mở form đăng ký + nhóm Zalo", by: e.Owner, at: add(-9 - i) + "T15:00:00", sample: "x" });
+        D.meetings.push({ id: "MMAU-" + i + "-2", eventId: e.id, date: add(-2), title: "Họp với NPP", attendees: [e.Owner, e.Sales, "NPP (mẫu)"].join(", "),
+          content: "- NPP xác nhận " + Math.round(x.target * .45) + " khách đăng ký.\n- Thống nhất chương trình khuyến mại tại sự kiện.\n- Chia ca trực bàn bán hàng.",
+          actions: "@" + e.Sales + " gửi danh sách khách trước " + add(1).slice(8) + "/" + add(1).slice(5, 7) + (e.Trade ? "\n@" + e.Trade + " chuẩn bị quà tạm ứng NPP" : ""), by: e.Owner, at: add(-2) + "T10:30:00", sample: "x" });
       }
       if (past) cm(null, e.Owner, "Tổng kết: " + (x.actual || "") + " khách tham dự / mục tiêu " + x.target + ". Báo cáo đã gửi toàn MMH.", 24 * (ddiff(e.end, iso(T0)) - 6));
     });
@@ -165,8 +173,8 @@
     if (action === "ehSample"){ if (!ME.admin) return ok({ ok: false, error: "Chỉ Admin được nạp / xoá dữ liệu mẫu." });
       var keep = function(L){ return L.filter(function(x){ return !x.sample; }); };
       var ids = D.events.filter(function(e){ return e.sample; }).map(function(e){ return e.id; });
-      D.events = keep(D.events); D.tasks = keep(D.tasks); D.files = keep(D.files); D.comments = keep(D.comments); D.log = D.log.filter(function(l){ return ids.indexOf(l.eventId) < 0; });
-      if (p.op === "seed"){ var M = make(); ["events", "tasks", "files", "comments", "log"].forEach(function(k){ D[k] = D[k].concat(M[k]); }); Object.assign(D.plan, M.plan); return ok({ seeded: { events: M.events.length, tasks: M.tasks.length } }); }
+      D.events = keep(D.events); D.tasks = keep(D.tasks); D.files = keep(D.files); D.comments = keep(D.comments); D.meetings = keep(D.meetings || []); D.log = D.log.filter(function(l){ return ids.indexOf(l.eventId) < 0; });
+      if (p.op === "seed"){ var M = make(); ["events", "tasks", "files", "comments", "meetings", "log"].forEach(function(k){ D[k] = (D[k] || []).concat(M[k]); }); Object.assign(D.plan, M.plan); return ok({ seeded: { events: M.events.length, tasks: M.tasks.length } }); }
       return ok({}); }
     if (action === "ehDaily"){ var lim = add(D.cfg.before || 0), per = {};
       D.tasks.forEach(function(t){ var e = by(D.events, "id", t.eventId); if (!e || !t.pic || !t.due || /Xong|Bỏ qua/.test(t.status) || t.due > lim) return; if (!t.parentId && D.tasks.some(function(x){ return x.parentId === t.id; })) return; var x = per[t.pic] = per[t.pic] || { late: 0, soon: 0 }; if (t.due < iso(T0)) x.late++; else x.soon++; });
@@ -201,6 +209,16 @@
       if (ct && ct.pic && !sent[ct.pic]){ sent[ct.pic] = 1; mail(ct.pic, "comment", ce, ct, ME.pic + " bình luận · " + ct.title); }
       if (ce.Owner && !sent[ce.Owner]) mail(ce.Owner, "comment", ce, ct, ME.pic + " bình luận · " + ce.name);
       return reply({ comment: c }); }
+    if (op === "note.add" || op === "note.update"){ var ne6 = by(D.events, "id", d.eventId);
+      if (!canEv(ne6) && ["Owner", "Digital", "Design", "Trade", "Sales"].every(function(r){ return ne6[r] !== ME.pic; })) return ok({ ok: false, error: "Chỉ người trong đội sự kiện được ghi biên bản họp." });
+      var nt6 = op === "note.update" ? by(D.meetings, "id", d.id) : null, old6 = nt6 ? (nt6.content + " " + nt6.actions) : "";
+      if (op === "note.update" && !nt6) return ok({ ok: false, error: "Không thấy biên bản." });
+      if (!nt6){ nt6 = { id: uid("M"), eventId: d.eventId, by: ME.pic, at: now(), sample: ne6.sample }; D.meetings.push(nt6); }
+      ["date", "title", "attendees", "content", "actions"].forEach(function(k){ nt6[k] = d[k] || ""; }); nt6.updatedAt = now(); nt6.updatedBy = ME.pic;
+      log(op === "note.add" ? "Thêm biên bản họp" : "Sửa biên bản họp", d.eventId, "", nt6.title);
+      PEOPLE.forEach(function(n){ var k = "@" + n; if ((nt6.content + " " + nt6.actions + " " + nt6.attendees).indexOf(k) >= 0 && old6.indexOf(k) < 0) mail(n, "mention", ne6, null, ME.pic + " nhắc đến bạn trong biên bản họp · " + ne6.name); });
+      return reply({ note: nt6 }); }
+    if (op === "note.delete"){ D.meetings = D.meetings.filter(function(x){ return x.id !== d.id; }); window.EH_DEMO.data.meetings = D.meetings; return ok({}); }
     if (op === "comment.delete"){ D.comments = D.comments.filter(function(x){ return x.id !== d.id; }); return ok({}); }
     if (op === "task.remind"){ var tr = by(D.tasks, "id", d.id), er = by(D.events, "id", tr.eventId); if (!canEv(er)) return ok({ ok: false, error: "Chỉ quản lý hoặc Owner của sự kiện được gửi nhắc." });
       mail(tr.pic, "remind", er, tr, "Nhắc việc: " + tr.title); log("Nhắc việc", er.id, tr.id, tr.title + " ⇒ " + tr.pic); return reply({ reminded: [tr.pic] }); }
