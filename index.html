@@ -618,7 +618,7 @@ input.due::-webkit-calendar-picker-indicator{opacity:0;cursor:pointer}
 @media (max-width:820px){.trow{grid-template-columns:auto minmax(0,1fr) 116px}}
 </style>
 <style id="v24-css">
-/* v2.4 — Tuần này · Phân tích · Vướng · mốc quan trọng · tình hình tuần · đóng sự kiện · follow-up. Giữ token sẵn có, không thêm màu mới. */
+/* v2.4 — Tuần này · Phân tích · Pending · mốc quan trọng · tình hình tuần · đóng sự kiện · follow-up. Giữ token sẵn có, không thêm màu mới. */
 .kpis.k4{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:900px){.kpis.k4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kpi[aria-pressed="true"]{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
@@ -803,8 +803,8 @@ var S = { tv: LS.get("eh_tv") || "list", D: null, me: null, view: "dash", evId: 
           cal: null, calMode: LS.get("eh_calmode") || "month", calSel: null, hideSample: LS.get("eh_hidesample") === "1", pop: null, lb: null, kanDrag: null,
           wkv: LS.get("eh_wkv") || "list", wkf: "", wkMine: false, otp: "month" };   /* v2.4: Tuần này (danh sách / lộ trình, lọc việc), Phân tích (kỳ đúng hạn) */
 try { S.closed = JSON.parse(LS.get("eh_closed") || "{}") || {}; } catch(e){}
-var STATUSES = ["Chưa làm", "Đang làm", "Vướng", "Chờ duyệt", "Xong", "Bỏ qua"];   /* v2.4: "Vướng" = cần Owner hỗ trợ (bắt buộc ghi lý do) */
-var ST_CLS = { "Chưa làm":"todo", "Đang làm":"prog", "Vướng":"block", "Chờ duyệt":"wait", "Xong":"done", "Bỏ qua":"skip" };
+var STATUSES = ["Chưa làm", "Đang làm", "Pending", "Chờ duyệt", "Xong", "Bỏ qua"];   /* v2.4: "Pending" = cần Owner hỗ trợ (bắt buộc ghi lý do) */
+var ST_CLS = { "Chưa làm":"todo", "Đang làm":"prog", "Pending":"block", "Chờ duyệt":"wait", "Xong":"done", "Bỏ qua":"skip" };
 var TYPES = ["Hội thảo", "Workshop", "Triển lãm", "Webinar", "Khác"];
 var TYPE_C = { "Triển lãm":"exh", "Workshop":"ws", "Hội thảo":"sem", "Webinar":"web" };
 var tc = function(t){ return TYPE_C[t] || "oth"; };
@@ -892,7 +892,7 @@ function evs(){ return S.D.events.filter(function(e){ return !(S.hideSample && e
 function visTasks(){ return S.D.tasks.filter(function(t){ var e = IX.ev[t.eventId]; return e && !(S.hideSample && e.sample); }); }
 function stateOf(t){
   if (t.status === "Xong") return "done"; if (t.status === "Bỏ qua") return "skip";
-  if (t.status === "Vướng") return "block";
+  if (t.status === "Pending") return "block";
   if (t.due && t.due < TISO) return "over";
   if (t.status === "Chờ duyệt") return "wait";
   if (t.due && days(TODAY, d0(t.due)) <= 3) return "soon";
@@ -979,12 +979,12 @@ function saveTask(id, patch, opts){
     S.drawer = id; render(); setTimeout(function(){ var el = $(t.proof === "link" ? "#dr-link" : "#drop"); if (el){ el.scrollIntoView({ block: "center" }); if (el.focus) el.focus(); } }, 40); return Promise.resolve();
   }
   Object.assign(t, patch); if (patch.status === "Xong") t.doneAt = new Date().toISOString().slice(0, 19); else if (patch.status) t.doneAt = ""; if ("due" in patch) t.dueManual = "x";
-  if (patch.status && patch.status !== "Vướng") t.block = "";
+  if (patch.status && patch.status !== "Pending") t.block = "";
   render();
   return api("ehSave", { op: "task.update", rid: rid(), data: Object.assign({ id: id }, patch, opts.notify === false ? { notify: false } : {}, opts.reason ? { reason: opts.reason } : {}) }).then(function(d){
     if (!d || !d.ok) throw new Error(d && d.error || "Không lưu được");
     Object.assign(t, d.task || {}); render();
-    if (!opts.quiet || (d.mailed && d.mailed.length)) done(d, patch.status === "Xong" ? "Đã xong: " + t.title : patch.status === "Chờ duyệt" ? "Đã gửi duyệt" : patch.status === "Vướng" ? "Đã báo vướng" : "pic" in patch ? (patch.pic ? "Đã giao cho " + patch.pic : "Đã bỏ người phụ trách") : "Đã lưu");
+    if (!opts.quiet || (d.mailed && d.mailed.length)) done(d, patch.status === "Xong" ? "Đã xong: " + t.title : patch.status === "Chờ duyệt" ? "Đã gửi duyệt" : patch.status === "Pending" ? "Đã chuyển Pending" : "pic" in patch ? (patch.pic ? "Đã giao cho " + patch.pic : "Đã bỏ người phụ trách") : "Đã lưu");
   }).catch(function(err){ Object.assign(t, old); render(); toast(err.message, true); });
 }
 function addTask(data){
@@ -1126,8 +1126,8 @@ function notes(){
   var L = [], mine = function(t){ return t && t.pic === me(); };
   (S.D.log || []).forEach(function(l){
     if (l.by === me()) return; var t = l.taskId ? taskById(l.taskId) : null, e = evById(l.eventId); if (!e || (S.hideSample && e.sample)) return;
-    if ((mine(t) && /Cập nhật|Thêm việc|Nhắc/.test(l.action)) || (l.action === "Nhắc việc" && String(l.text).indexOf(me()) >= 0) || (e.Owner === me() && /Chờ duyệt|→ Vướng/.test(l.text)))
-      L.push({ at: l.at, by: l.by, text: /Thêm việc/.test(l.action) ? "giao cho bạn việc mới" : /Nhắc/.test(l.action) ? "nhắc việc" : /Chờ duyệt/.test(l.text) ? "nộp kết quả, chờ bạn duyệt" : /→ Vướng/.test(l.text) && e.Owner === me() && !mine(t) ? "báo vướng, cần bạn hỗ trợ" : "cập nhật việc của bạn", ev: e, t: t });
+    if ((mine(t) && /Cập nhật|Thêm việc|Nhắc/.test(l.action)) || (l.action === "Nhắc việc" && String(l.text).indexOf(me()) >= 0) || (e.Owner === me() && /Chờ duyệt|→ Pending/.test(l.text)))
+      L.push({ at: l.at, by: l.by, text: /Thêm việc/.test(l.action) ? "giao cho bạn việc mới" : /Nhắc/.test(l.action) ? "nhắc việc" : /Chờ duyệt/.test(l.text) ? "nộp kết quả, chờ bạn duyệt" : /→ Pending/.test(l.text) && e.Owner === me() && !mine(t) ? "chuyển Pending, cần bạn hỗ trợ" : "cập nhật việc của bạn", ev: e, t: t });
   });
   (S.D.comments || []).forEach(function(c){
     if (c.by === me()) return; var t = c.taskId ? taskById(c.taskId) : null, e = evById(c.eventId); if (!e || (S.hideSample && e.sample)) return;
@@ -1220,7 +1220,7 @@ function vWeek(){
     (S.me.manager ? '<button class="btn pri" data-act="newevent">' + ic("plus") + "Sự kiện mới</button>" : "") + "</div>";
   h += '<div class="kpis k4">' +
     kpi("over", over.length ? "crit" : "ok", ic("alert") + "Trễ hạn", over.length, over.length ? (newOver ? "+" + newOver + " mới trễ trong tuần" : "trễ từ tuần trước") : "Không có việc trễ") +
-    kpi("block", blk.length ? "warn" : "", ic("flag") + "Đang vướng", blk.length, blk.length ? "cần Owner hỗ trợ" : "Không ai báo vướng") +
+    kpi("block", blk.length ? "warn" : "", ic("flag") + "Pending", blk.length, blk.length ? "cần Owner hỗ trợ" : "Không có việc Pending") +
     kpi("wait", wait.length ? "wait" : "", ic("eye") + "Chờ Owner duyệt", wait.length, wait.length ? "đã nộp, đang chờ duyệt" : "Không có việc chờ") +
     kpi("week", "", ic("cal") + "Đến hạn tuần này", wk.length, wk.length ? wkDone + " đã xong · " + (wk.length - wkDone) + " còn lại" : "Tuần này không có hạn") + "</div>";
   var road = S.wkv === "road";
@@ -1239,13 +1239,13 @@ function wlist(E){
 function wrow(e){
   var s = stat(tasksOf(e.id)), h = health(e, s), c = lastCk(e), cn = ckNow(e), ms = nextMs(e), dy = dday(e), boss = canEv(e) || inTeam(e);
   var barc = h.k === "crit" ? " crit" : h.k === "warn" ? " warn" : "";
-  var rag = '<i class="rag ' + (c ? RAG_K[c.rag] : "none") + '" title="' + esc(c ? "Owner đánh giá tuần " + fmt(c.week) + ": " + c.rag + (c.block ? " · Vướng: " + c.block : "") : "Chưa có cập nhật tuần") + '"></i>';
+  var rag = '<i class="rag ' + (c ? RAG_K[c.rag] : "none") + '" title="' + esc(c ? "Owner đánh giá tuần " + fmt(c.week) + ": " + c.rag + (c.block ? " · Tồn đọng: " + c.block : "") : "Chưa có cập nhật tuần") + '"></i>';
   var msH = ms ? '<span class="wms ' + (ms.due && ms.due < TISO ? "crit" : ms.due && days(TODAY, d0(ms.due)) <= 3 ? "warn" : "") + '" data-open="' + esc(ms.id) + '" title="' + esc(ms.title + " · " + (ms.pic || "chưa giao")) + '">' + ic("flag") + "<span>" + esc(shortT(ms.title)) + "</span><b>" + (ms.due ? (ms.due < TISO ? "trễ " + days(d0(ms.due), TODAY) + " ngày" : fmt(ms.due)) : "chưa có hạn") + "</b></span>"
     : '<span class="wms ok">' + ic("check") + "<span>Đã qua mọi mốc</span></span>";
-  var cnt = (s.over ? '<span class="c">' + s.over + " trễ</span>" : "") + (s.block ? '<span class="b">' + s.block + " vướng</span>" : "") + (s.wait ? '<span class="w">' + s.wait + " chờ duyệt</span>" : "") + (!s.over && !s.block && !s.wait ? '<span class="o">' + ic("check") + "Ổn</span>" : "");
+  var cnt = (s.over ? '<span class="c">' + s.over + " trễ</span>" : "") + (s.block ? '<span class="b">' + s.block + " Pending</span>" : "") + (s.wait ? '<span class="w">' + s.wait + " chờ duyệt</span>" : "") + (!s.over && !s.block && !s.wait ? '<span class="o">' + ic("check") + "Ổn</span>" : "");
   var ck = cn ? '<span class="ckok" title="' + esc((cn.by || "") + " · " + ago(cn.at)) + '">' + ic("check") + "Đã cập nhật tuần</span>" : needCk(e) ? (boss ? '<button class="btn sm" data-act="week" data-ev="' + esc(e.id) + '">Cập nhật tuần</button>' : '<span class="ckno">Chưa cập nhật tuần</span>') : "";
   return '<div class="wrow">' + rag + '<a class="wn" href="#ev-' + esc(e.id) + '"><b>' + esc(e.name) + "</b><small>" + esc(evDates(e)) + " · " + esc(dy.big) + (e.Owner ? " · " + esc(e.Owner) : "") + (e.sample ? " · MẪU" : "") + "</small>" +
-    (cn && (cn.block || cn.help) ? '<small class="wbk">' + esc(cn.help ? "Cần hỗ trợ: " + cn.help : "Vướng: " + cn.block) + "</small>" : "") + "</a>" +
+    (cn && (cn.block || cn.help) ? '<small class="wbk">' + esc(cn.help ? "Cần hỗ trợ: " + cn.help : "Tồn đọng: " + cn.block) + "</small>" : "") + "</a>" +
     '<div class="wp" title="Thực tế ' + s.pct + "% · kế hoạch đến hôm nay " + s.planPct + '%"><div class="bar h12' + barc + '"><i style="width:' + s.pct + '%"></i><b style="left:calc(' + s.planPct + '% - 1px)"></b></div><span class="num">' + s.pct + "%</span></div>" +
     '<div class="wm">' + msH + '</div><div class="wc">' + cnt + '</div><div class="wk">' + ck + "</div></div>";
 }
@@ -1279,7 +1279,7 @@ function weekList(over, blk, wait, wk){
   var grp = function(k, title, L, map){ L = L.filter(keep); if (f && f !== k) return; if (!L.length){ if (f === k) h += '<p class="empty">Không có việc.</p>'; return; }
     h += '<h3 class="wgh">' + title + " <span>" + L.length + '</span></h3><ul class="todo">' + L.slice(0, 15).map(map).join("") + "</ul>" + (L.length > 15 ? '<p class="small muted" style="margin:4px 0 8px">… và ' + (L.length - 15) + " việc khác.</p>" : ""); };
   grp("over", "Trễ hạn", over.slice().sort(byDue), function(t){ return item(t, "Trễ " + days(d0(t.due), TODAY) + " ngày", "crit"); });
-  grp("block", "Đang vướng", blk.slice().sort(byDue), function(t){ return item(t, "Vướng", "warn"); });
+  grp("block", "Pending", blk.slice().sort(byDue), function(t){ return item(t, "Pending", "warn"); });
   grp("wait", "Chờ Owner duyệt", wait.slice().sort(byDue), function(t){ var e = evById(t.eventId); return item(t, "Owner: " + (e && e.Owner || "—"), "wait"); });
   if (!f || f === "week"){
     var open = wk.filter(function(t){ return !/done|over|block/.test(stateOf(t)) && t.status !== "Chờ duyệt"; }).filter(keep);
@@ -1287,8 +1287,8 @@ function weekList(over, blk, wait, wk){
       h += '<h3 class="wgh' + (k === TISO ? " today" : "") + '">' + (k === TISO ? "Hôm nay · " : "") + DOW[(i + 1) % 7] + " " + fmt(k) + " <span>" + L.length + '</span></h3><ul class="todo">' + L.sort(function(a, b){ return (a.pic === me() ? -1 : 0) - (b.pic === me() ? -1 : 0); }).slice(0, 6).map(function(t){ return item(t, t.status === "Đang làm" ? "Đang làm" : "Chưa làm", t.status === "Đang làm" ? "prog" : "none"); }).join("") + "</ul>" +
         (L.length > 6 ? '<p class="small muted" style="margin:2px 0 6px">+' + (L.length - 6) + ' việc khác trong ngày — bấm “Chỉ việc của tôi” hoặc xem trong từng sự kiện.</p>' : ""); }
   }
-  return '<div class="sech"><h2 class="h2">Việc cần xử lý</h2><span class="sp"></span>' + (f ? '<button class="chip" data-kpi="' + f + '" aria-pressed="true">' + ({ over: "Trễ hạn", block: "Đang vướng", wait: "Chờ duyệt", week: "Đến hạn tuần này" }[f]) + " " + ic("x") + "</button>" : "") +
-    '<button class="chip" data-wkmine="1" aria-pressed="' + !!only + '">Chỉ việc của tôi</button></div>' + (h || '<p class="empty">Không có việc trễ, vướng hay đến hạn trong tuần. Mọi thứ đang ổn.</p>');
+  return '<div class="sech"><h2 class="h2">Việc cần xử lý</h2><span class="sp"></span>' + (f ? '<button class="chip" data-kpi="' + f + '" aria-pressed="true">' + ({ over: "Trễ hạn", block: "Pending", wait: "Chờ duyệt", week: "Đến hạn tuần này" }[f]) + " " + ic("x") + "</button>" : "") +
+    '<button class="chip" data-wkmine="1" aria-pressed="' + !!only + '">Chỉ việc của tôi</button></div>' + (h || '<p class="empty">Không có việc trễ, Pending hay đến hạn trong tuần. Mọi thứ đang ổn.</p>');
 }
 /* người × tuần: số việc chưa xong theo hạn */
 function workload(T, n){
@@ -1541,9 +1541,9 @@ function weekPanel(e){
   var c = lastCk(e), cn = ckNow(e), can = canEv(e) || inTeam(e), need = needCk(e);
   if (!need && !c) return "";
   var h = '<section class="card' + (need && !cn ? " needck" : "") + '"><div class="panel-h"><h3>Tình hình tuần</h3><span class="sp"></span>' + (can && need ? '<button class="btn sm' + (cn ? " ghost" : " pri") + '" data-act="week">' + (cn ? ic("edit") + "Sửa" : "Cập nhật") + "</button>" : "") + '</div><div class="panel-b">';
-  if (need && !cn) h += '<p class="small" style="margin:4px 0 8px;color:var(--warn)">' + ic("clock") + " Chưa cập nhật tuần này" + (can ? " — 1 phút: chọn Xanh / Vàng / Đỏ, ghi đã làm gì, vướng gì." : ".") + "</p>";
+  if (need && !cn) h += '<p class="small" style="margin:4px 0 8px;color:var(--warn)">' + ic("clock") + " Chưa cập nhật tuần này" + (can ? " — 1 phút: chọn Xanh / Vàng / Đỏ, ghi đã làm gì, vấn đề tồn đọng." : ".") + "</p>";
   if (c) h += '<div class="ckv"><span class="pill ' + RAG_K[c.rag] + '"><i></i>' + esc(c.rag) + '</span><small class="muted">Tuần ' + esc(fmt(c.week)) + " · " + esc(c.by || "") + " · " + esc(ago(c.at)) + "</small></div>" +
-    [["Đã làm", c.done], ["Đang vướng", c.block], ["Cần hỗ trợ", c.help], ["Tuần tới", c.next]].filter(function(x){ return x[1]; }).map(function(x){ return '<div class="ckl' + (/vướng|hỗ trợ/i.test(x[0]) ? " w" : "") + '"><b>' + x[0] + "</b>" + linkify(x[1]).replace(/\n/g, "<br>") + "</div>"; }).join("");
+    [["Đã làm", c.done], ["Vấn đề tồn đọng", c.block], ["Cần hỗ trợ", c.help], ["Tuần tới", c.next]].filter(function(x){ return x[1]; }).map(function(x){ return '<div class="ckl' + (/tồn đọng|hỗ trợ/i.test(x[0]) ? " w" : "") + '"><b>' + x[0] + "</b>" + linkify(x[1]).replace(/\n/g, "<br>") + "</div>"; }).join("");
   return h + "</div></section>";
 }
 /* v2.4 — phễu follow-up khách: đăng ký → tham dự → cần liên hệ → đã liên hệ → ra đơn */
@@ -1575,8 +1575,8 @@ function ownerPanel(e, ts){
   var P = people(), n = wait.length + over.length + none.length + blk.length;
   var h = '<section class="card"><div class="panel-h"><h3>Cần bạn xử lý</h3><span class="sp"></span>' + (n ? '<span class="badge">' + n + "</span>" : '<span class="pill ok">Ổn</span>') + '</div><div class="panel-b">';
   if (!n && !soon.length) return h + '<p class="small muted" style="margin:6px 0">Không có việc chờ duyệt, trễ hay chưa giao. Theo dõi tiếp ở danh sách việc.</p></div></section>';
-  if (blk.length) h += '<div class="small" style="font-weight:600;color:var(--warn);margin-top:4px">Đang vướng — cần bạn hỗ trợ · ' + blk.length + "</div>" + blk.map(function(t){
-    return '<div class="act"><div><div class="t" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="s">' + esc(t.pic || "chưa giao") + " · " + esc(t.block || "") + '</div></div><div class="b"><button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '" title="Đã hỗ trợ xong — chuyển lại Đang làm">Đã gỡ</button></div></div>'; }).join("");
+  if (blk.length) h += '<div class="small" style="font-weight:600;color:var(--warn);margin-top:4px">Pending — cần bạn hỗ trợ · ' + blk.length + "</div>" + blk.map(function(t){
+    return '<div class="act"><div><div class="t" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="s">' + esc(t.pic || "chưa giao") + " · " + esc(t.block || "") + '</div></div><div class="b"><button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '" title="Đã xử lý — chuyển lại Đang làm">Đã xử lý</button></div></div>'; }).join("");
   if (wait.length) h += '<div class="small" style="font-weight:600;color:var(--wait);margin-top:' + (blk.length ? 10 : 4) + 'px">Chờ duyệt · ' + wait.length + "</div>" + wait.map(function(t){
     var F = filesOf(t.id);
     return '<div class="act"><div><div class="t" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="s">' + esc(t.pic || "") + " · nộp " + esc(ago(t.updatedAt)) + '</div></div><div class="b"><button class="btn sm ok" data-approve="' + esc(t.id) + '">' + ic("check") + 'Duyệt</button><button class="btn sm" data-return="' + esc(t.id) + '">Trả lại</button></div>' +
@@ -1620,7 +1620,7 @@ function cmtHtml(c, short){
 var keepF = function(t){ var st = stateOf(t); return S.tfilter === "all" || (S.tfilter === "mine" && t.pic === me()) || (S.tfilter === "open" && st !== "done" && st !== "skip") || (S.tfilter === "over" && st === "over") || (S.tfilter === "block" && st === "block") || (S.tfilter === "wait" && t.status === "Chờ duyệt") || (S.tfilter === "none" && !t.pic && st !== "skip" && st !== "done"); };
 function tfilterBar(e, ts){
   var L = ts.filter(isLeaf), cnt = function(f){ var k = S.tfilter; S.tfilter = f; var n = L.filter(keepF).length; S.tfilter = k; return n; };
-  var F = [["all", "Tất cả"], ["open", "Chưa xong"], ["over", "Quá hạn"], ["block", "Vướng"], ["wait", "Chờ duyệt"], ["none", "Chưa giao"], ["mine", "Của tôi"]];
+  var F = [["all", "Tất cả"], ["open", "Chưa xong"], ["over", "Quá hạn"], ["block", "Pending"], ["wait", "Chờ duyệt"], ["none", "Chưa giao"], ["mine", "Của tôi"]];
   return msStrip(e, ts) + '<div class="tfilter">' + F.filter(function(f){ return f[0] !== "block" || cnt("block"); }).map(function(f){ var n = cnt(f[0]); return '<button class="chip" data-tf="' + f[0] + '" aria-pressed="' + (S.tfilter === f[0]) + '">' + f[1] + ' <span class="n num">' + n + "</span></button>"; }).join("") + '<span class="sp"></span>' +
     '<span class="vseg" role="group" aria-label="Cách xem">' + [["list", "Danh sách", "list"], ["board", "Kanban", "board"], ["timeline", "Dòng thời gian", "chart"]].map(function(v){ return '<button data-tv="' + v[0] + '" aria-pressed="' + (S.tv === v[0]) + '">' + ic(v[2]) + v[1] + "</button>"; }).join("") + "</span>" +
     (canEv(e) ? '<button class="btn sm pri" data-act="quickadd">' + ic("plus") + "Thêm việc</button>" : "") + "</div>";
@@ -1650,13 +1650,13 @@ function trow(t, boss, P){
   var due = boss ? '<input class="due ' + dl.c + '" type="date" data-due="' + esc(t.id) + '" value="' + esc(t.due || "") + '" aria-label="Hạn"><span class="lt ' + dl.c + '">' + esc(dl.s || "") + "</span>"
     : '<span class="ro due ' + dl.c + '">' + esc(dl.t) + '</span><span class="lt ' + dl.c + '">' + esc(dl.s || "") + "</span>";
   return '<div class="trow ' + st + '">' + chk(t) + '<div class="tt" data-open="' + esc(t.id) + '">' + (t.priority === "Cao" ? '<span class="prio">GẤP · </span>' : "") + (isMs(t) ? '<span class="msf" title="Mốc quan trọng">' + ic("flag") + "</span>" : "") + "<b>" + esc(t.title) + "</b>" +
-    (st === "block" && t.block ? '<div class="bkr">' + ic("flag") + "Vướng: " + esc(t.block) + "</div>" : "") +
+    (st === "block" && t.block ? '<div class="bkr">' + ic("flag") + "Lý do Pending: " + esc(t.block) + "</div>" : "") +
     '<div class="pf">' + fileChips(t, 3) + (proofOk(t) || st === "skip" ? "" : needChip(t)) + dueTag(t) + (ncm ? '<span class="cm-n">' + ic("chat") + ncm + "</span>" : "") + (t.note && st === "skip" ? '<span class="muted small">' + esc(t.note) + "</span>" : "") + "</div></div>" +
     '<div class="c-st">' + stSel + '</div><div class="c-who">' + who + '</div><div class="c-due">' + due + "</div></div>";
 }
 function pBoard(e, ts){
   var L = ts.filter(function(t){ return isLeaf(t) && t.status !== "Bỏ qua" && keepF(t); });
-  var cols = [["Chưa làm", "var(--ink3)"], ["Đang làm", "var(--prog)"], ["Vướng", "var(--warn)"], ["Chờ duyệt", "var(--wait)"], ["Xong", "var(--ok)"]];
+  var cols = [["Chưa làm", "var(--ink3)"], ["Đang làm", "var(--prog)"], ["Pending", "var(--warn)"], ["Chờ duyệt", "var(--wait)"], ["Xong", "var(--ok)"]];
   return tfilterBar(e, ts) + '<p class="small muted" style="margin:-4px 0 10px">Kéo thẻ sang cột khác để đổi trạng thái. Bấm thẻ để xem chi tiết, nộp file, bình luận.</p><div class="kan">' + cols.map(function(c){
     var cs = L.filter(function(t){ return (t.status || "Chưa làm") === c[0]; }).sort(byDue);
     return '<div class="kcol" data-kcol="' + c[0] + '"><h4 style="color:' + c[1] + '"><i class="dot" style="background:' + c[1] + ';margin:0"></i>' + c[0] + '<span class="n num">' + cs.length + "</span></h4>" + cs.slice(0, 60).map(function(t){
@@ -1701,7 +1701,7 @@ function pTimeline(e, ts){
   var GH = y0 + r * RH + 26, gt = "";
   for (var k2 = 0; k2 <= span; k2 += step){ var dk = addD(a, k2); gt += '<line class="ax" x1="' + X(dk) + '" x2="' + X(dk) + '" y1="0" y2="' + (GH - 18) + '" stroke-dasharray="2 4"/><text x="' + X(dk) + '" y="' + (GH - 4) + '" text-anchor="middle">' + (s0 ? (days(s0, dk) === 0 ? "D" : "D" + (days(s0, dk) > 0 ? "+" : "−") + Math.abs(days(s0, dk))) : fmt(iso(dk))) + "</text>"; }
   var gm = (s0 ? '<rect x="' + X(s0) + '" y="0" width="' + Math.max(3, X(addD(en || s0, 1)) - X(s0)) + '" height="' + (GH - 18) + '" fill="var(--mani)" opacity=".28"/>' : "") + '<line x1="' + X(TODAY) + '" x2="' + X(TODAY) + '" y1="0" y2="' + (GH - 18) + '" stroke="var(--blue)" stroke-width="2"/>';
-  return tfilterBar(e, ts) + burn + '<div class="sech" style="margin-top:18px"><h2 class="h2" style="font-size:16px">Lịch việc theo hạng mục</h2><small>Mỗi chấm = 1 việc, hình thoi = mốc quan trọng (bấm để mở) · xanh lá xong · đỏ trễ · cam vướng · tím chờ duyệt · xanh dương đang làm</small></div>' +
+  return tfilterBar(e, ts) + burn + '<div class="sech" style="margin-top:18px"><h2 class="h2" style="font-size:16px">Lịch việc theo hạng mục</h2><small>Mỗi chấm = 1 việc, hình thoi = mốc quan trọng (bấm để mở) · xanh lá xong · đỏ trễ · cam Pending · tím chờ duyệt · xanh dương đang làm</small></div>' +
     '<div class="gantt"><svg viewBox="0 0 ' + W + " " + GH + '" style="min-width:640px;width:100%">' + gt + gm + rows + "</svg></div>";
 }
 function pFiles(e, files){
@@ -1838,13 +1838,13 @@ function linkSugg(t, e, files){
 function vMine(){
   var L = visTasks().filter(function(t){ return t.pic === me() && isLeaf(t); });
   if (S.q) L = L.filter(function(t){ var e = evById(t.eventId); return norm(t.title + " " + e.name).indexOf(norm(S.q)) >= 0; });
-  var G = [["over", "Quá hạn", function(t){ return stateOf(t) === "over"; }], ["block", "Bạn đang báo vướng — chờ Owner hỗ trợ", function(t){ return stateOf(t) === "block"; }], ["soon", "Đến hạn 3 ngày tới", function(t){ return stateOf(t) === "soon" && t.status !== "Chờ duyệt"; }],
+  var G = [["over", "Quá hạn", function(t){ return stateOf(t) === "over"; }], ["block", "Bạn đã chuyển Pending — chờ Owner hỗ trợ", function(t){ return stateOf(t) === "block"; }], ["soon", "Đến hạn 3 ngày tới", function(t){ return stateOf(t) === "soon" && t.status !== "Chờ duyệt"; }],
            ["wait", "Đã gửi duyệt — chờ Owner", function(t){ return t.status === "Chờ duyệt" && stateOf(t) !== "over"; }], ["open", "Sắp tới", function(t){ return /open|prog/.test(stateOf(t)); }],
            ["done", "Đã xong 14 ngày qua", function(t){ return stateOf(t) === "done" && t.doneAt && days(d0(String(t.doneAt).slice(0, 10)), TODAY) <= 14; }]];
   var h = "", any = false;
-  /* v2.4: Owner — việc đang nằm ở mình (người làm đã nộp chờ duyệt / báo vướng) */
-  var OQ = visTasks().filter(function(t){ var e = evById(t.eventId); return e && e.Owner === me() && t.pic !== me() && isLeaf(t) && (t.status === "Chờ duyệt" || t.status === "Vướng"); }).sort(byDue);
-  if (OQ.length){ any = true; h += '<section class="mgroup"><h3 style="color:var(--wait)">Chờ bạn xử lý (bạn là Owner) <small>' + OQ.length + ' việc · duyệt / trả lại / gỡ vướng</small></h3><div class="card">' + OQ.slice(0, 30).map(tcard).join("") + "</div></section>"; }
+  /* v2.4: Owner — việc đang nằm ở mình (người làm đã nộp chờ duyệt / chuyển Pending) */
+  var OQ = visTasks().filter(function(t){ var e = evById(t.eventId); return e && e.Owner === me() && t.pic !== me() && isLeaf(t) && (t.status === "Chờ duyệt" || t.status === "Pending"); }).sort(byDue);
+  if (OQ.length){ any = true; h += '<section class="mgroup"><h3 style="color:var(--wait)">Chờ bạn xử lý (bạn là Owner) <small>' + OQ.length + ' việc · duyệt / trả lại / xử lý Pending</small></h3><div class="card">' + OQ.slice(0, 30).map(tcard).join("") + "</div></section>"; }
   G.forEach(function(g){
     var ts = L.filter(g[2]).sort(byDue); if (!ts.length) return; any = true;
     h += '<section class="mgroup"><h3' + (g[0] === "over" ? ' style="color:var(--crit)"' : "") + ">" + g[1] + " <small>" + ts.length + ' việc</small></h3><div class="card">' + ts.slice(0, g[0] === "open" ? 40 : 25).map(tcard).join("") + "</div></section>";
@@ -1860,7 +1860,7 @@ function vMine(){
 function tcard(t){
   var e = evById(t.eventId), dl = dueLabel(t), st = stateOf(t), ok = proofOk(t), boss = canEv(e);
   if (boss && t.pic !== me() && t.status === "Chờ duyệt") return tcardOwner(t, '<button class="btn sm ok" data-approve="' + esc(t.id) + '">' + ic("check") + 'Duyệt</button><button class="btn sm" data-return="' + esc(t.id) + '">Trả lại</button>');
-  if (boss && t.pic !== me() && t.status === "Vướng") return tcardOwner(t, '<button class="btn sm" data-open="' + esc(t.id) + '">Xem</button><button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '">Đã gỡ</button>');
+  if (boss && t.pic !== me() && t.status === "Pending") return tcardOwner(t, '<button class="btn sm" data-open="' + esc(t.id) + '">Xem</button><button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '">Đã xử lý</button>');
   var acts = st === "done" ? '<button class="btn sm ghost" data-act="toggle" data-id="' + esc(t.id) + '">' + ic("undo") + "Mở lại</button>" :
     (t.proof && !ok ? '<button class="btn sm pri" data-open="' + esc(t.id) + '" data-focus="' + (t.proof === "link" ? "link" : "file") + '">' + ic(t.proof === "link" ? "link" : "upload") + (t.proof === "link" ? "Dán link" : t.proof === "image" ? "Tải ảnh" : "Tải file") + "</button>" : "") +
     (t.proof && ok && t.status !== "Chờ duyệt" && !boss ? '<button class="btn sm pri" data-setst="Chờ duyệt" data-id="' + esc(t.id) + '">' + ic("send") + "Gửi duyệt</button>" : "") +
@@ -1874,7 +1874,7 @@ function tcard(t){
 function tcardOwner(t, acts){
   var e = evById(t.eventId), dl = dueLabel(t);
   return '<div class="tcard"><span></span><img class="ti" src="' + esc(img(coverName(e))) + '" alt="" loading="lazy"><div style="min-width:0"><div class="tt" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="meta"><span>' + esc(e.name) + "</span><span>" + av(t.pic, "s") + " " + esc(t.pic || "") + "</span>" +
-    (t.status === "Vướng" ? '<span class="pill warn">Vướng: ' + esc(t.block || "") + "</span>" : '<span class="pill wait">Chờ duyệt · nộp ' + esc(ago(t.updatedAt)) + "</span>") + '<span class="due ' + dl.c + '">' + ic("clock") + " " + esc(dl.t) + "</span>" +
+    (t.status === "Pending" ? '<span class="pill warn">Lý do Pending: ' + esc(t.block || "") + "</span>" : '<span class="pill wait">Chờ duyệt · nộp ' + esc(ago(t.updatedAt)) + "</span>") + '<span class="due ' + dl.c + '">' + ic("clock") + " " + esc(dl.t) + "</span>" +
     (filesOf(t.id).length ? '<span class="pf">' + fileChips(t, 3) + "</span>" : "") + '</div></div><div class="acts">' + acts + "</div></div>";
 }
 
@@ -1887,8 +1887,8 @@ function drawer(){
     (boss ? '<textarea rows="2" id="dr-title" aria-label="Tên việc">' + esc(t.title) + "</textarea>" : "<h3>" + esc(t.title) + "</h3>") + '</div><button class="btn ghost icon" data-act="close" aria-label="Đóng">' + ic("x") + '</button></div><div class="dr-b">';
   if (!big && t.status === "Chờ duyệt" && boss) h += '<div class="approve"><b>' + esc(t.pic || "") + " đã nộp, chờ bạn duyệt</b><button class=\"btn sm ok\" data-approve=\"" + esc(t.id) + '">' + ic("check") + 'Duyệt · Xong</button><button class="btn sm" data-return="' + esc(t.id) + '">Trả lại</button></div>';
   if (!big) h += '<div><label class="fl">Trạng thái</label><div class="sbtn" role="group">' + STATUSES.filter(function(s){ return boss || s !== "Bỏ qua"; }).map(function(s){
-    return '<button data-status="' + esc(s) + '" class="' + (s === "Xong" ? "ok" : s === "Chờ duyệt" ? "wait" : s === "Đang làm" ? "prog" : s === "Vướng" ? "block" : "") + '" aria-pressed="' + ((t.status || "Chưa làm") === s) + '"' + (mine ? "" : " disabled") + ">" + esc(s) + "</button>"; }).join("") + "</div>" +
-    (t.status === "Vướng" ? '<div class="bkbox">' + ic("flag") + '<span><b>Đang vướng:</b> ' + esc(t.block || "") + "</span>" + (mine ? '<button class="btn sm ghost" data-act="blockedit">Sửa</button>' : "") + "</div>" : "") +
+    return '<button data-status="' + esc(s) + '" class="' + (s === "Xong" ? "ok" : s === "Chờ duyệt" ? "wait" : s === "Đang làm" ? "prog" : s === "Pending" ? "block" : "") + '" aria-pressed="' + ((t.status || "Chưa làm") === s) + '"' + (mine ? "" : " disabled") + ">" + esc(s) + "</button>"; }).join("") + "</div>" +
+    (t.status === "Pending" ? '<div class="bkbox">' + ic("flag") + '<span><b>Lý do Pending:</b> ' + esc(t.block || "") + "</span>" + (mine ? '<button class="btn sm ghost" data-act="blockedit">Sửa</button>' : "") + "</div>" : "") +
     (mine && !boss && t.proof && t.status !== "Chờ duyệt" && t.status !== "Xong" ? '<div class="small muted" style="margin-top:6px">Nộp ' + esc(PROOF_VI[t.proof].replace("Cần ", "")) + ' rồi bấm “Chờ duyệt” để Owner kiểm tra (Owner nhận email).</div>' : "") + "</div>";
   h += '<div class="grid2"><div><label class="fl" for="dr-pic">Người phụ trách</label>' + (boss ? '<select class="in" id="dr-pic"><option value="">Chưa giao</option>' + P.map(function(p){ return "<option" + (p === t.pic ? " selected" : "") + ">" + esc(p) + "</option>"; }).join("") + '</select><label class="tg small"><input type="checkbox" id="dr-mail" checked>Gửi email báo người được giao</label>' : '<div style="padding:7px 0;display:flex;gap:8px;align-items:center">' + av(t.pic, "s") + esc(t.pic || "Chưa giao") + "</div>") + "</div>" +
     (big ? "" : '<div><label class="fl" for="dr-due">Hạn</label>' + (boss ? '<input class="in" type="date" id="dr-due" value="' + esc(t.due || "") + '">' + (dl.s ? '<div class="small due ' + dl.c + '" style="margin-top:4px">' + esc(dl.s) + "</div>" : "") : '<div style="padding:7px 0" class="due ' + dl.c + '">' + esc(dl.t) + (dl.s ? " · " + esc(dl.s) : "") + "</div>") + "</div>") + "</div>";
@@ -1903,7 +1903,7 @@ function drawer(){
       '<div class="linkin"><input class="in" id="dr-link" type="url" placeholder="Dán link bài đăng Facebook, Google Form, video…"><button class="btn" data-act="addlink">' + ic("link") + "Thêm</button></div>" + linkSugg(t, e, files) : "") + "</div>";
   else h += '<div class="small muted">Hạng mục = task lớn. Tiến độ tính theo các việc con; người phụ trách hạng mục được thêm việc con.</div>';
   if (t.hint) h += '<div class="small muted">Gợi ý: ' + esc(t.hint) + "</div>";
-  h += '<div><label class="fl" for="dr-note">Ghi chú</label><textarea class="in" id="dr-note" rows="2" placeholder="Thông tin trao đổi với đối tác… (tự lưu khi rời ô). Cần Owner hỗ trợ ⇒ chọn trạng thái “Vướng”."' + (mine ? "" : " disabled") + ">" + esc(t.note || "") + "</textarea></div>";
+  h += '<div><label class="fl" for="dr-note">Ghi chú</label><textarea class="in" id="dr-note" rows="2" placeholder="Thông tin trao đổi với đối tác… (tự lưu khi rời ô). Cần Owner hỗ trợ ⇒ chọn trạng thái “Pending”."' + (mine ? "" : " disabled") + ">" + esc(t.note || "") + "</textarea></div>";
   h += '<div><label class="fl">Thảo luận · ' + cm.length + "</label>" + (cm.length ? '<ul class="cmts">' + cm.map(function(c){ return cmtHtml(c); }).join("") + "</ul>" : "") +
     '<div class="cbox" style="margin-top:8px"><textarea class="in" rows="2" id="dc-' + esc(t.id) + '" data-cbox="' + esc(e.id) + '" data-ctask="' + esc(t.id) + '" placeholder="Bình luận về việc này, @Tên để nhắc… (Ctrl+Enter gửi)"></textarea><div class="mrow">' +
     [t.pic, e.Owner].filter(function(x, i, a){ return x && x !== me() && a.indexOf(x) === i; }).map(function(n){ return '<button data-mention="' + esc(n) + '" data-for="dc-' + esc(t.id) + '">@' + esc(n) + "</button>"; }).join("") + '<span style="flex:1"></span><button class="btn sm pri" data-sendc="dc-' + esc(t.id) + '" style="border-radius:8px;padding:4px 12px;color:#fff">' + ic("send") + "Gửi</button></div></div></div>";
@@ -2086,12 +2086,12 @@ function mReturn(m){
   return mHead("Trả lại việc") + '<div class="mb"><p style="margin:0"><b>' + esc(t.title) + "</b> · " + esc(t.pic || "") + '</p><div><label class="fl" for="ret-msg">Cần chỉnh gì?</label><textarea class="in" rows="3" id="ret-msg" placeholder="Ví dụ: Đổi màu nền sang vàng MANI, thêm QR đăng ký." autofocus></textarea></div><p class="small muted" style="margin:0">Việc chuyển về “Đang làm”, người làm nhận email kèm lời nhắn.</p></div>' +
     '<div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Huỷ</button><button class="btn pri" data-act="doreturn">Trả lại</button></div>';
 }
-/* v2.4 — báo vướng · cập nhật tuần · đóng sự kiện */
+/* v2.4 — chuyển Pending · cập nhật tuần · đóng sự kiện */
 function mBlock(m){
   var t = taskById(m.id), e = evById(t.eventId);
-  return mHead("Báo vướng") + '<div class="mb"><p style="margin:0"><b>' + esc(t.title) + "</b> · " + esc(e.name) + '</p><div><label class="fl" for="bk-msg">Đang vướng gì? Cần ai hỗ trợ?</label><textarea class="in" rows="3" id="bk-msg" placeholder="Ví dụ: Chờ NPP gửi logo — cần anh/chị Owner nhắc NPP giúp.">' + esc(t.block || "") + "</textarea></div>" +
-    '<p class="small muted" style="margin:0">Owner ' + esc(e.Owner || "") + " nhận email + thông báo. Việc hiện ở mục “Đang vướng” cho tới khi chuyển lại Đang làm / Xong — hệ thống thôi nhắc bạn việc này; vướng quá 2 ngày quản lý sẽ thấy.</p><p class=\"small\" id=\"bk-err\" style=\"color:var(--crit);margin:0\"></p></div>" +
-    '<div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Huỷ</button><button class="btn pri" data-act="doblock">' + ic("flag") + "Báo vướng</button></div>";
+  return mHead("Chuyển Pending") + '<div class="mb"><p style="margin:0"><b>' + esc(t.title) + "</b> · " + esc(e.name) + '</p><div><label class="fl" for="bk-msg">Lý do Pending? Cần ai hỗ trợ?</label><textarea class="in" rows="3" id="bk-msg" placeholder="Ví dụ: Chờ NPP gửi logo — cần anh/chị Owner nhắc NPP giúp.">' + esc(t.block || "") + "</textarea></div>" +
+    '<p class="small muted" style="margin:0">Owner ' + esc(e.Owner || "") + " nhận email + thông báo. Việc hiện ở mục “Pending” cho tới khi chuyển lại Đang làm / Xong — hệ thống thôi nhắc bạn việc này; Pending quá 2 ngày quản lý sẽ thấy.</p><p class=\"small\" id=\"bk-err\" style=\"color:var(--crit);margin:0\"></p></div>" +
+    '<div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Huỷ</button><button class="btn pri" data-act="doblock">' + ic("flag") + "Chuyển Pending</button></div>";
 }
 function mWeek(m){
   var e = evById(m.ev), c = ckNow(e), s = stat(tasksOf(e.id)), h = health(e, s), wEnd = iso(addD(d0(WEEK0), 6)), nEnd = iso(addD(d0(WEEK0), 13));
@@ -2101,10 +2101,10 @@ function mWeek(m){
   var nxt = L.filter(function(t){ return !/done|skip/.test(stateOf(t)) && t.due && t.due > wEnd && t.due <= nEnd; }).sort(byDue).map(function(t){ return t.title + " (" + fmt(t.due) + ")"; });
   var v = function(k, sug){ return esc(c ? c[k] || "" : sug.length ? "- " + sug.slice(0, 8).join("\n- ") : ""); };
   var prev = cksOf(e.id).filter(function(x){ return x.week !== WEEK0; }).slice(0, 3);
-  return mHead("Tình hình tuần " + fmt(WEEK0) + " – " + fmt(wEnd)) + '<form class="mb" id="ckform" novalidate><div class="small muted">' + esc(e.name) + " · tiến độ " + s.pct + "% (kế hoạch " + s.planPct + "%) · " + s.over + " trễ · " + s.block + " vướng</div>" +
+  return mHead("Tình hình tuần " + fmt(WEEK0) + " – " + fmt(wEnd)) + '<form class="mb" id="ckform" novalidate><div class="small muted">' + esc(e.name) + " · tiến độ " + s.pct + "% (kế hoạch " + s.planPct + "%) · " + s.over + " trễ · " + s.block + " Pending</div>" +
     '<div><label class="fl">Tình hình chung</label><div class="ragpick">' + [["Xanh", "Đúng kế hoạch"], ["Vàng", "Có rủi ro, đang xử lý"], ["Đỏ", "Trễ / cần quản lý hỗ trợ"]].map(function(x){ return '<button type="button" class="' + RAG_K[x[0]] + '" data-rag="' + x[0] + '" aria-pressed="' + (m.rag === x[0]) + '"><i></i><b>' + x[0] + "</b><small>" + x[1] + "</small></button>"; }).join("") + "</div></div>" +
     '<div><label class="fl" for="ck-done">Tuần này đã làm</label><textarea class="in" rows="3" id="ck-done">' + v("done", done) + "</textarea></div>" +
-    '<div><label class="fl" for="ck-block">Đang vướng / rủi ro</label><textarea class="in" rows="2" id="ck-block">' + v("block", blk) + "</textarea></div>" +
+    '<div><label class="fl" for="ck-block">Vấn đề tồn đọng / rủi ro</label><textarea class="in" rows="2" id="ck-block">' + v("block", blk) + "</textarea></div>" +
     '<div><label class="fl" for="ck-help">Cần quản lý hỗ trợ <span class="muted">(nếu có — quản lý nhận email)</span></label><input class="in" id="ck-help" value="' + esc(c ? c.help || "" : "") + '" placeholder="Ví dụ: duyệt thêm 5 triệu chi phí in gấp"></div>' +
     '<div><label class="fl" for="ck-next">Tuần tới</label><textarea class="in" rows="2" id="ck-next">' + v("next", nxt) + "</textarea></div>" +
     '<p class="small muted" style="margin:0">App đã điền sẵn từ danh sách việc — sửa lại cho đúng ý. Chọn Đỏ hoặc ghi “Cần hỗ trợ” ⇒ quản lý nhận email. Báo cáo tuần Report Hub tự lấy tiến độ việc.</p>' +
@@ -2132,8 +2132,8 @@ function mSettings(m){
     '<fieldset class="fs"><legend>Email tự động</legend>' + tg("mailAssign", "Email khi giao việc / tạo sự kiện", "Người được giao nhận 1 email liệt kê việc, hạn, kết quả cần nộp") + tg("mailReview", "Email khi nộp “Chờ duyệt” và khi Owner trả lại") + tg("mailComment", "Email khi được @nhắc tên hoặc có bình luận ở việc của mình") + "</fieldset>" +
     '<fieldset class="fs"><legend>Nhắc việc hằng ngày</legend>' + tg("remind", "Bật nhắc việc tự động (T2–T7, bỏ ngày nghỉ)", "Mỗi người 1 email: việc quá hạn + việc sắp đến hạn") +
     '<div class="grid2" style="margin:6px 0"><div><label class="fl" for="c-hour">Gửi lúc</label>' + sel("c-hour", [6, 7, 8, 9, 10, 13, 16, 17].map(function(x){ return [x, x + ":00"]; }), c.remindHour) + '</div><div><label class="fl" for="c-before">Nhắc trước hạn</label>' + sel("c-before", [[0, "Đúng ngày hạn"], [1, "1 ngày"], [2, "2 ngày"], [3, "3 ngày"], [5, "5 ngày"]], c.before) + "</div></div>" +
-    tg("ownerDigest", "Owner nhận thêm việc trễ / chưa giao / chờ duyệt / vướng của sự kiện mình", "Việc đã nộp “Chờ duyệt” chỉ nhắc Owner, không nhắc người làm") +
-    tg("escalate", "Báo quản lý việc trễ lâu / vướng lâu", "Mỗi ngày, người trong TEAM ▸ Quản lý nhận danh sách việc trễ từ số ngày dưới đây hoặc vướng ≥ 2 ngày") +
+    tg("ownerDigest", "Owner nhận thêm việc trễ / chưa giao / chờ duyệt / Pending của sự kiện mình", "Việc đã nộp “Chờ duyệt” chỉ nhắc Owner, không nhắc người làm") +
+    tg("escalate", "Báo quản lý việc trễ lâu / Pending lâu", "Mỗi ngày, người trong TEAM ▸ Quản lý nhận danh sách việc trễ từ số ngày dưới đây hoặc Pending ≥ 2 ngày") +
     '<div class="grid2" style="margin:6px 0"><div><label class="fl" for="c-esc">Báo quản lý khi trễ từ</label>' + sel("c-esc", [[2, "2 ngày"], [3, "3 ngày"], [5, "5 ngày"], [7, "7 ngày"]], c.escDays) + "</div></div>" +
     tg("checkin", "Thứ Sáu: nhắc Owner cập nhật tình hình tuần", "Sự kiện chưa có cập nhật tuần (Xanh / Vàng / Đỏ)") +
     tg("weekly", "Thứ Hai: tổng hợp tuần cho quản lý", "Sự kiện 30 ngày tới + sự kiện đã diễn ra chưa đóng, kèm tình hình tuần Owner ghi") +
@@ -2161,9 +2161,10 @@ function openLb(fid){
 /* ═════════ ĐIỀU HƯỚNG + VẼ ═════════ */
 function route(){
   var h = decodeURIComponent(location.hash.replace(/^#/, ""));
+  if (S.D && !IX) index();
   if (/^t-/.test(h)){ var t = S.D && taskById(h.slice(2)); if (t){ S.view = "event"; S.evId = t.eventId; S.drawer = t.id; } else S.view = "dash"; }
   else if (/^ev-/.test(h)){ S.view = "event"; var sub = h.slice(3).split("/"); if (S.evId !== sub[0]){ S.evId = sub[0]; S.tab = "progress"; S.tfilter = "all"; window.scrollTo(0, 0); } if (/^(notes|talk|files|mkt|plan|log)$/.test(sub[1] || "")) S.tab = sub[1];
-    var ew = S.D && evById(sub[0]); if (sub[1] === "week" && ew && (canEv(ew) || inTeam(ew))) S.modal = { k: "week", ev: ew.id }; }   /* v2.4: link email "cập nhật tuần" */
+    if (S.D && !IX) index(); var ew = S.D && evById(sub[0]); if (sub[1] === "week" && ew && (canEv(ew) || inTeam(ew))) S.modal = { k: "week", ev: ew.id }; }   /* v2.4: link email "cập nhật tuần" */
   else if (/^(dash|cal|events|mine|stats)$/.test(h)){ if (S.view !== h) window.scrollTo(0, 0); S.view = h; }
   else S.view = S.me && !S.me.manager ? "mine" : "dash";
   S.pop = null; render();
@@ -2240,7 +2241,7 @@ document.addEventListener("click", function(ev){
   if (a.dataset.type){ S.type = a.dataset.type; render(); return; }
   if (a.dataset.delfile){ delFile(a.dataset.delfile); return; }
   if (a.dataset.status){ var cur = taskById(S.drawer); if (cur && cur.status === "Chờ duyệt" && a.dataset.status === "Đang làm" && canEv(evById(cur.eventId)) && cur.pic !== me()){ S.modal = { k: "return", id: cur.id }; render(); return; }
-    if (a.dataset.status === "Vướng"){ openBlock(S.drawer); return; } saveTask(S.drawer, { status: a.dataset.status }); return; }
+    if (a.dataset.status === "Pending"){ openBlock(S.drawer); return; } saveTask(S.drawer, { status: a.dataset.status }); return; }
   var act = a.dataset.act, t = a.dataset.id ? taskById(a.dataset.id) : taskById(S.drawer), e = evById(S.evId);
   if (act === "close"){ S.drawer = null; if (/^#t-/.test(location.hash)) history.replaceState(null, "", "#ev-" + S.evId); render(); return; }
   if (act === "mclose"){ if (a.classList.contains("modal") && ev.target !== a) return; S.modal = null; render(); return; }
@@ -2262,7 +2263,7 @@ document.addEventListener("click", function(ev){
   if (act === "reopen"){ closeEvent(S.evId, "", true, a); return; }
   if (act === "doclose"){ var cn0 = $("#cl-note"); if (cn0 && !cn0.value.trim()){ $("#cl-err").textContent = "Ghi lý do đóng khi còn việc chưa xong."; cn0.focus(); return; } closeEvent(S.modal.ev, cn0 ? cn0.value.trim() : "", false, a); return; }
   if (act === "blockedit"){ openBlock(S.drawer); return; }
-  if (act === "doblock"){ var bm = $("#bk-msg").value.trim(); if (!bm){ $("#bk-err").textContent = "Ghi rõ đang vướng gì để Owner hỗ trợ."; $("#bk-msg").focus(); return; } var bid = S.modal.id; S.modal = null; saveTask(bid, { status: "Vướng", block: bm }); return; }
+  if (act === "doblock"){ var bm = $("#bk-msg").value.trim(); if (!bm){ $("#bk-err").textContent = "Ghi rõ lý do Pending để Owner hỗ trợ."; $("#bk-msg").focus(); return; } var bid = S.modal.id; S.modal = null; saveTask(bid, { status: "Pending", block: bm }); return; }
   if (act === "quickadd"){ S.modal = { k: "quick", ev: S.evId, grp: a.dataset.grp || "" }; render(); setTimeout(function(){ var x = $("#q-title"); if (x) x.focus(); }, 30); return; }
   if (act === "remindteam"){ S.modal = { k: "remind", ev: S.evId, days: 7 }; render(); return; }
   if (act === "evlink"){ S.modal = { k: "evlink", ev: S.evId }; render(); setTimeout(function(){ var x = $("#el-url"); if (x) x.focus(); }, 30); return; }
@@ -2323,7 +2324,7 @@ document.addEventListener("change", function(ev){
   if (el.dataset.team){ saveEvent(S.evId, (function(o){ o[el.dataset.team] = el.value; return o; })({}), el.value ? "Đã chọn " + el.value + " làm " + ROLE_VI[el.dataset.team] : "Đã bỏ " + ROLE_VI[el.dataset.team]); return; }
   if (el.dataset.upev){ upload(el.files, el.dataset.upev, ""); el.value = ""; return; }
   if (el.dataset.st){ var t0 = taskById(el.dataset.st); if (t0 && t0.status === "Chờ duyệt" && el.value === "Đang làm" && canEv(evById(t0.eventId)) && t0.pic !== me()){ S.modal = { k: "return", id: t0.id }; render(); return; }
-    if (el.value === "Vướng"){ openBlock(el.dataset.st); return; } saveTask(el.dataset.st, { status: el.value }); return; }
+    if (el.value === "Pending"){ openBlock(el.dataset.st); return; } saveTask(el.dataset.st, { status: el.value }); return; }
   if (el.dataset.fu){ var pf = {}; pf[el.dataset.fu] = el.value === "" ? "" : String(Math.max(0, Math.round(+el.value) || 0)); saveTask(S.drawer, pf, { quiet: true }); return; }
   if (el.dataset.pic){ saveTask(el.dataset.pic, { pic: el.value }); return; }
   if (el.dataset.due){ saveTask(el.dataset.due, { due: el.value }, { quiet: true }); return; }
@@ -2363,7 +2364,7 @@ document.addEventListener("dragover", function(ev){ var col = ev.target.closest 
 document.addEventListener("drop", function(ev){ var col = ev.target.closest && ev.target.closest(".kcol"); if (!col || !S.kanDrag) return; ev.preventDefault(); var id = S.kanDrag; S.kanDrag = null; col.classList.remove("over");
   var t = taskById(id), to = col.dataset.kcol; if (!t || (t.status || "Chưa làm") === to) return;
   if (t.status === "Chờ duyệt" && to === "Đang làm" && canEv(evById(t.eventId)) && t.pic !== me()){ S.modal = { k: "return", id: id }; render(); return; }
-  if (to === "Vướng"){ openBlock(id); return; }
+  if (to === "Pending"){ openBlock(id); return; }
   saveTask(id, { status: to }); });
 window.addEventListener("hashchange", route);
 

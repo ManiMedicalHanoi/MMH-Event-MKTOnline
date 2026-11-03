@@ -118,7 +118,7 @@
   function make(){
     var seed = 11, rnd = function(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
     var D = { events: [], tasks: [], files: [], comments: [], meetings: [], checkins: [], log: [], notify: [], plan: {}, people: PEOPLE.map(function(p){ return { pic: p }; }), roles: ["Owner", "Digital", "Design", "Trade", "Sales"],
-              status: ["Chưa làm", "Đang làm", "Vướng", "Chờ duyệt", "Xong", "Bỏ qua"], groups: TPL.map(function(g){ return { group: g[0], role: g[1] }; }),
+              status: ["Chưa làm", "Đang làm", "Pending", "Chờ duyệt", "Xong", "Bỏ qua"], groups: TPL.map(function(g){ return { group: g[0], role: g[1] }; }),
               cfg: { mailAssign: true, mailReview: true, mailComment: true, remind: true, remindHour: 8, before: 2, ownerDigest: true, weekly: true, escalate: true, escDays: 3, checkin: true }, book: "", sync: { at: Date.now(), msg: "Bản xem trước — dữ liệu mẫu" } };
     EVS.forEach(function(x, i){
       var e = { id: "EVMAU-" + (i + 1), name: x.name, start: add(x.s), end: add(x.s + x.n), type: x.type, city: x.city, venue: x.venue, organizer: "MMH", purpose: x.purpose, audience: x.audience, scale: x.target + " khách", kpi: x.kpi,
@@ -170,7 +170,7 @@
         block: ["", "Chưa chốt được link Zoom Webinar bản trả phí.", "Backdrop chưa in kịp, nhà in báo trễ 3 ngày."][i], help: i === 2 ? "Cần duyệt thêm 5 triệu chi phí in gấp." : "",
         next: ["Đăng bài giới thiệu KOL, chốt danh sách check-in.", "Đăng bài đếm ngược, gửi nhắc lịch cho khách.", "Gửi đồ đi Hải Phòng, chốt ca trực gian hàng."][i] });
       if (!past && i < 3) D.checkins.push({ id: "KMAU-" + i + "b", eventId: e.id, week: wk0(add(-7)), rag: "Xanh", by: e.Owner, at: add(-3) + "T16:00:00", sample: "x", done: "Họp khởi động, chốt địa điểm.", block: "", help: "", next: "Mở form đăng ký." });
-      if (!past && i === 1){ var bt = leaf.filter(function(t){ return !/Xong|Chờ duyệt/.test(t.status) && t.due >= iso(T0); })[0]; if (bt){ bt.status = "Vướng"; bt.block = "Chờ NPP xác nhận số lượng — cần Owner gọi NPP giúp"; bt.updatedAt = add(-1) + "T11:00:00"; } }
+      if (!past && i === 1){ var bt = leaf.filter(function(t){ return !/Xong|Chờ duyệt/.test(t.status) && t.due >= iso(T0); })[0]; if (bt){ bt.status = "Pending"; bt.block = "Chờ NPP xác nhận số lượng — cần Owner gọi NPP giúp"; bt.updatedAt = add(-1) + "T11:00:00"; } }
       if (past) ts.forEach(function(t){ var n = x.actual || x.target; if (/liên hệ lần đầu/i.test(t.title)){ t.fuTotal = Math.round(n * .4); t.fuDone = Math.round(n * .25); } if (/chuyển đổi/i.test(t.title)){ t.fuTotal = Math.round(n * .4); t.fuOrder = Math.round(n * .07); } });
       if (past && /Bleach/.test(x.name)){ ts.forEach(function(t){ if (t.parentId && t.status !== "Xong"){ t.status = "Xong"; t.doneAt = add(-4) + "T09:00:00"; } }); e.closedAt = add(-3) + "T16:00:00"; e.closedBy = e.Owner; e.closeNote = ""; }
       if (x.late){ e.latePlan = String(compress(e, ts)); }
@@ -235,9 +235,9 @@
       D.tasks.forEach(function(t){ var e = by(D.events, "id", t.eventId); if (!e || e.closedAt || /Xong|Bỏ qua/.test(t.status)) return; if (!t.parentId && D.tasks.some(function(x){ return x.parentId === t.id; })) return;
         var X = function(p){ return per[p] = per[p] || { late: 0, soon: 0, wait: 0, block: 0 }; };
         if (t.status === "Chờ duyệt"){ if (e.Owner && e.Owner !== t.pic) X(e.Owner).wait++; return; }
-        if (t.status === "Vướng"){ if (e.Owner && e.Owner !== t.pic) X(e.Owner).block++; return; }
+        if (t.status === "Pending"){ if (e.Owner && e.Owner !== t.pic) X(e.Owner).block++; return; }
         if (!t.pic || !t.due || t.due > lim) return; var x = X(t.pic); if (t.due < iso(T0)) x.late++; else x.soon++; });
-      return ok({ dry: true, items: Object.keys(per).map(function(k){ var x = per[k]; return { to: k, subject: "[Sự kiện MKT] Việc cần làm " + iso(T0).slice(8) + "/" + iso(T0).slice(5, 7) + ": " + [x.late ? x.late + " quá hạn" : "", x.soon ? x.soon + " sắp đến hạn" : "", x.wait ? x.wait + " chờ bạn duyệt" : "", x.block ? x.block + " vướng" : ""].filter(String).join(" · "), ok: "Xem trước" }; }) }); }
+      return ok({ dry: true, items: Object.keys(per).map(function(k){ var x = per[k]; return { to: k, subject: "[Sự kiện MKT] Việc cần làm " + iso(T0).slice(8) + "/" + iso(T0).slice(5, 7) + ": " + [x.late ? x.late + " quá hạn" : "", x.soon ? x.soon + " sắp đến hạn" : "", x.wait ? x.wait + " chờ bạn duyệt" : "", x.block ? x.block + " Pending" : ""].filter(String).join(" · "), ok: "Xem trước" }; }) }); }
     if (action === "ehUpload"){
       var e = by(D.events, "id", p.eventId), t = p.taskId ? by(D.tasks, "id", p.taskId) : null;
       if (!canEv(e) && !(t && t.pic === ME.pic) && ["Owner", "Digital", "Design", "Trade", "Sales"].every(function(r){ return e[r] !== ME.pic; })) return ok({ ok: false, error: "Chỉ người trong đội sự kiện được tải tệp lên." });
@@ -311,13 +311,13 @@
     if (op === "task.update"){ var e3 = by(D.events, "id", tk.eventId), boss = canEv(e3), st0 = tk.status;
       if (!boss && tk.pic !== ME.pic) return ok({ ok: false, error: "Bạn không phụ trách việc này." });
       if (!boss && ["title", "pic", "due", "proof", "priority", "milestone"].some(function(k){ return k in d && d[k] !== tk[k]; })) return ok({ ok: false, error: "Chỉ Owner / quản lý được đổi người, hạn, yêu cầu nộp." });
-      if (d.status === "Vướng" && !(d.block || tk.block)) return ok({ ok: false, code: "BLOCK", error: "Ghi rõ đang vướng gì (cần ai hỗ trợ) để Owner biết." });
+      if (d.status === "Pending" && !(d.block || tk.block)) return ok({ ok: false, code: "BLOCK", error: "Ghi rõ lý do Pending (cần ai hỗ trợ) để Owner biết." });
       if (d.status === "Xong" && tk.proof && !D.files.some(function(f){ return f.taskId === tk.id && (tk.proof !== "image" || f.kind === "image"); }))
         return ok({ ok: false, code: "PROOF", error: tk.proof === "link" ? "Dán link trước khi chuyển Xong." : "Tải file lên trước khi chuyển Xong." });
       var picCh = "pic" in d && d.pic !== tk.pic;
       Object.keys(d).forEach(function(k){ if (k !== "id" && k !== "notify" && k !== "reason") tk[k] = d[k]; }); if (d.status === "Xong") tk.doneAt = now(); if ("due" in d) tk.dueManual = "x"; tk.updatedAt = now(); tk.updatedBy = ME.pic;
-      if (tk.status !== "Vướng") tk.block = "";
-      if (d.status === "Vướng" && st0 !== "Vướng") mail(e3.Owner, "block", e3, tk, "Vướng: " + tk.title);
+      if (tk.status !== "Pending") tk.block = "";
+      if (d.status === "Pending" && st0 !== "Pending") mail(e3.Owner, "block", e3, tk, "Lý do Pending: " + tk.title);
       if (picCh && tk.pic && d.notify !== false) mail(tk.pic, "assign", e3, tk, "Việc mới: " + tk.title);
       if (d.status === "Chờ duyệt" && st0 !== "Chờ duyệt") mail(e3.Owner, "review", e3, tk, "Chờ duyệt: " + tk.title);
       if (st0 === "Chờ duyệt" && /Đang làm|Chưa làm/.test(d.status || "")) mail(tk.pic, "return", e3, tk, "Cần chỉnh sửa: " + tk.title);

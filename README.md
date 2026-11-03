@@ -26,17 +26,17 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   link `#ev-<id>/notes` · `#ev-<id>/talk` mở đúng tab; giao diện gọn hơn (khung không đổ bóng, đội sự kiện gọn + nút Đổi, điều khiển trên dòng việc chỉ hiện khi rê chuột).
 
 - **v2.4 (03/11/2026) — không để rơi việc lập kế hoạch / follow-up / báo cáo**:
-  - **Tuần này** (màn hình chính, thay Bảng điều khiển): 4 số (Trễ hạn · Đang vướng · Chờ Owner duyệt · Đến hạn tuần này — bấm để lọc),
+  - **Tuần này** (màn hình chính, thay Bảng điều khiển): 4 số (Trễ hạn · Pending · Chờ Owner duyệt · Đến hạn tuần này — bấm để lọc),
     sự kiện đang theo dõi chia **Đang diễn ra / Sắp diễn ra / Sau sự kiện · chưa đóng** (chấm Xanh / Vàng / Đỏ do Owner tự đánh giá, thanh tiến độ, **mốc tiếp theo**, Đã cập nhật tuần chưa),
-    chế độ **Lộ trình** (11 tuần, mốc quan trọng = hình thoi), danh sách việc trễ / vướng / chờ duyệt / theo ngày trong tuần, **Ai đang bị dồn việc** (người × tuần).
+    chế độ **Lộ trình** (11 tuần, mốc quan trọng = hình thoi), danh sách việc trễ / Pending / chờ duyệt / theo ngày trong tuần, **Ai đang bị dồn việc** (người × tuần).
   - **Phân tích**: các biểu đồ cũ + **Đúng hạn theo người** (tháng này / tháng trước / FY68) + khối lượng 8 tuần.
   - Sự kiện đã diễn ra **vẫn được theo dõi tới khi Owner bấm “Đóng sự kiện”** (còn việc ⇒ ghi lý do, việc còn lại chuyển Bỏ qua; mở lại được).
   - **Lập kế hoạch muộn**: không còn tự “Bỏ qua” việc có hạn mẫu đã qua — hạn được dồn lại (nhãn “hạn dồn”), sự kiện hiện cảnh báo.
-  - **Trạng thái “Vướng”** (bắt buộc ghi lý do, Owner nhận email, cột riêng trong Kanban) · **mốc quan trọng** (dải mốc đầu tab Việc, ◆ trên dòng thời gian; trễ mốc ⇒ “Trễ mốc quan trọng”).
-  - **Tình hình tuần** (Owner / đội: Xanh · Vàng · Đỏ, đã làm · vướng · cần hỗ trợ · tuần tới — app điền sẵn từ danh sách việc; Đỏ / cần hỗ trợ ⇒ quản lý nhận email).
+  - **Trạng thái “Pending”** (bắt buộc ghi lý do, Owner nhận email, cột riêng trong Kanban) · **mốc quan trọng** (dải mốc đầu tab Việc, ◆ trên dòng thời gian; trễ mốc ⇒ “Trễ mốc quan trọng”).
+  - **Tình hình tuần** (Owner / đội: Xanh · Vàng · Đỏ, đã làm · Pending · cần hỗ trợ · tuần tới — app điền sẵn từ danh sách việc; Đỏ / cần hỗ trợ ⇒ quản lý nhận email).
   - **Biên bản họp ⇒ việc**: mỗi dòng “Việc cần làm sau họp” tự thành 1 việc (hạng mục “Việc sau họp”, @Tên = người làm, hạn đọc từ chữ), biên bản hiện trạng thái từng việc.
   - **Follow-up khách**: phễu Đăng ký → Tham dự → Cần liên hệ → Đã liên hệ → Ra đơn; Sales nhập số ở việc follow-up.
-  - **Việc của tôi**: thêm “Chờ bạn xử lý (bạn là Owner)” (duyệt / trả lại / gỡ vướng ngay tại chỗ).
-  - Nhắc việc (backend v1.5): “Chờ duyệt” chỉ nhắc Owner · trễ ≥ 3 ngày / vướng ≥ 2 ngày ⇒ quản lý mỗi ngày · thứ Sáu nhắc cập nhật tuần ·
+  - **Việc của tôi**: thêm “Chờ bạn xử lý (bạn là Owner)” (duyệt / trả lại / xử lý Pending ngay tại chỗ).
+  - Nhắc việc (backend v1.5): “Chờ duyệt” chỉ nhắc Owner · trễ ≥ 3 ngày / Pending ≥ 2 ngày ⇒ quản lý mỗi ngày · thứ Sáu nhắc cập nhật tuần ·
     nhắc hằng ngày cũng hiện ở nút **Nhắc tôi** của Report Hub / CRM · việc sự kiện tự thành sub-task chỉ đọc dưới Key task trùng tên trong Report Hub.
   - Sửa lỗi: nút chuyển Danh sách / Kanban / Dòng thời gian không bấm được; Dòng thời gian thiếu thanh chuyển cách xem.
