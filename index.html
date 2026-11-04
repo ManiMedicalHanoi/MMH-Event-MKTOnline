@@ -747,6 +747,8 @@ var EH_CFG = {
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
+<script>/* giao diện thử ui2 (kiểu Tender Map): ?ui=2 bật, ?ui=1 tắt — nhớ ở localStorage.eh_ui */
+(function(){ try { var q = location.search; if (/[?&]ui=2/.test(q)) localStorage.setItem("eh_ui", "2"); if (/[?&]ui=1/.test(q)) localStorage.removeItem("eh_ui"); if (localStorage.getItem("eh_ui") === "2") document.write('<script src="ui2.js?v=1"><\/script>'); } catch(e){} })();</script>
 <script id="eh-js">
 "use strict";
 (function(){
@@ -2172,6 +2174,7 @@ function route(){
 function render(){
   if (!S.D) return;
   index(); MNT.close();
+  if (window.EH_UI2 && window.EH_UI2.render()) return;   /* giao diện thử ui2.js */
   var scrollY = window.scrollY, dsc = $(".dr-b") ? $(".dr-b").scrollTop : 0, ae = document.activeElement, focusId = ae && ae.id, sel0 = ae && ae.selectionStart, val0 = ae && ae.value;
   var e = S.view === "event" ? evById(S.evId) : null;
   var body = S.view === "mine" ? vMine() : S.view === "cal" ? vCal() : S.view === "events" ? vEvents() : S.view === "stats" ? vStats() : S.view === "event" ? (e ? vEvent(e) : '<div class="card"><p class="empty">Không thấy sự kiện (có thể đã bị xoá). <a href="#events">Về danh sách</a></p></div>') : vWeek();
@@ -2414,6 +2417,7 @@ function boot(manual){
 }
 setInterval(function(){ if (document.visibilityState === "visible" && S.D && !S.drawer && !S.modal && !S.lb && Date.now() - S.loadedAt > 90000 && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) boot(false); }, 30000);
 window.EH = { S: S, boot: boot, render: render };
+window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
 })();
 </script>

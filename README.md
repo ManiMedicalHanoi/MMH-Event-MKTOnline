@@ -40,3 +40,8 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   - Nhắc việc (backend v1.5): “Chờ duyệt” chỉ nhắc Owner · trễ ≥ 3 ngày / Pending ≥ 2 ngày ⇒ quản lý mỗi ngày · thứ Sáu nhắc cập nhật tuần ·
     nhắc hằng ngày cũng hiện ở nút **Nhắc tôi** của Report Hub / CRM · việc sự kiện tự thành sub-task chỉ đọc dưới Key task trùng tên trong Report Hub.
   - Sửa lỗi: nút chuyển Danh sách / Kanban / Dòng thời gian không bấm được; Dòng thời gian thiếu thanh chuyển cách xem.
+- **Giao diện thử kiểu Tender Map** (`ui2.js`, 11/2026): mở `index.html?ui=2` (nhớ trên máy; `?ui=1` để về giao diện cũ). Trái: dòng thời gian FY68 —
+  mỗi sự kiện 1 dòng, khối đậm = ngày diễn ra, thanh nhạt = thời gian chuẩn bị (phần đậm = % việc xong), vòng số % màu theo tiến độ, vạch Hôm nay, + / − / ⌂, chú giải; hoặc Lịch tháng.
+  Phải: bảng chi tiết cuộn riêng — FY68 (số tổng, sự kiện theo tiến độ, theo loại, cần xử lý, việc của tôi, theo người) ⇒ 1 sự kiện (cảnh báo trễ / chờ duyệt, đội, việc theo hạng mục, các tab cũ) ⇒ 1 việc (khung chi tiết cũ).
+  Dùng chung dữ liệu và thao tác với giao diện cũ (đọc hàm nội bộ qua `window.EH_X`, hook đầu `render()`).
+
