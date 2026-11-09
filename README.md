@@ -1,6 +1,6 @@
 # Sự kiện MKT · MMH
 
-App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.4).
+App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.5).
 
 - **Bảng điều khiển** (quản lý / giám đốc): thẻ sự kiện có ảnh + sức khoẻ tiến độ (Đúng tiến độ / Cần chú ý / Chậm — so % xong với % lẽ ra phải xong),
   thực tế so với kế hoạch, cần xử lý, trạng thái việc, việc theo tuần, khối lượng theo người, tiến độ theo hạng mục, ấn phẩm mới nộp, hoạt động.
@@ -44,4 +44,9 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   mỗi sự kiện 1 dòng, khối đậm = ngày diễn ra, thanh nhạt = thời gian chuẩn bị (phần đậm = % việc xong), vòng số % màu theo tiến độ, vạch Hôm nay, + / − / ⌂, chú giải; hoặc Lịch tháng.
   Phải: bảng chi tiết cuộn riêng — FY68 (số tổng, sự kiện theo tiến độ, theo loại, cần xử lý, việc của tôi, theo người) ⇒ 1 sự kiện (cảnh báo trễ / chờ duyệt, đội, việc theo hạng mục, các tab cũ) ⇒ 1 việc (khung chi tiết cũ).
   Dùng chung dữ liệu và thao tác với giao diện cũ (đọc hàm nội bộ qua `window.EH_X`, hook đầu `render()`).
+- **v2.5 (09/11/2026) — Tiến độ từng sự kiện**: tab Việc có cách xem mặc định mới **Tiến độ**:
+  - Đầu trang: vòng % đã xong + thanh nhiều màu theo trạng thái (Xong · Chờ duyệt · Đang làm · Pending · Trễ hạn · Chưa làm — bấm số để lọc), mức hoàn thành có tính việc đang làm, kế hoạch đến hôm nay, số hạng mục đã xong.
+  - Mỗi hạng mục 1 thẻ: vòng %, nhãn Xong / n trễ / n Pending / Tuần này, thanh trạng thái.
+  - Mỗi việc 1 dòng có thanh tiến độ riêng: Chưa làm 0% · Pending 40% · Đang làm 50% · Chờ duyệt 85% · Xong 100%; quá hạn tô đỏ.
+  - Thanh nhiều màu cũng dùng ở màn Tuần này và thẻ sự kiện (thay thanh 1 màu).
 
