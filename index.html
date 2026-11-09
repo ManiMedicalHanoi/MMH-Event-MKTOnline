@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sự kiện MKT · MMH</title>
 <meta name="description" content="Kế hoạch, giao việc và tiến độ sự kiện Marketing MMH FY68">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
@@ -617,6 +619,20 @@ input.due::-webkit-calendar-picker-indicator{opacity:0;cursor:pointer}
 .trow{grid-template-columns:auto minmax(0,1fr) 124px 140px 122px}
 @media (max-width:820px){.trow{grid-template-columns:auto minmax(0,1fr) 116px}}
 </style>
+<style id="v26-css">
+/* v2.6 — màn chờ lần đầu + chip đang cập nhật */
+.bootw{padding-top:22px}
+.bootmsg{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink2);margin:0 0 16px}
+.bspin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line2);border-top-color:var(--blue);animation:bsp .8s linear infinite;flex:none}
+@keyframes bsp{to{transform:rotate(360deg)}}
+.bootrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+.bootw .skel{border-radius:6px;background:linear-gradient(90deg,var(--sunk) 0,color-mix(in srgb,var(--sunk) 55%,var(--surface)) 50%,var(--sunk) 100%);background-size:200% 100%;animation:bsk 1.3s ease-in-out infinite;margin:5px 0}
+@keyframes bsk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.bspin,.bootw .skel{animation:none}}
+.booterr{max-width:520px;margin:40px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.synct{font-size:12px;color:var(--ink3);white-space:nowrap}
+@media (max-width:860px){.synct{display:none}}
+</style>
 <style id="v25-css">
 /* v2.5 — màn Tiến độ của từng sự kiện + thanh nhiều màu theo trạng thái */
 .sbar{position:relative;display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--sunk);flex:1;min-width:60px}
@@ -792,7 +808,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "2.5"
+  ver: "2.6"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -908,9 +924,10 @@ var AUTH = {
 function api(action, params){
   var body = Object.assign({ action: action, tk: AUTH.tk() }, params || {});
   if (window.EH_DEMO) return window.EH_DEMO.api(action, body);
-  return fetch(EH_CFG.api, { method: "POST", body: JSON.stringify(body), credentials: "omit" })
-    .then(function(r){ if (!r.ok) throw new Error("Máy chủ lỗi " + r.status); return r.json(); })
-    .then(function(d){ if (d && d.code === "AUTH"){ AUTH.clear(); renderLogin(d.error); throw new Error(d.error); } return d; });
+  var ctl = window.AbortController && action === "ehBoot" ? new AbortController() : null, tmo = ctl ? setTimeout(function(){ ctl.abort(); }, 60000) : 0;
+  return fetch(EH_CFG.api, { method: "POST", body: JSON.stringify(body), credentials: "omit", signal: ctl ? ctl.signal : undefined })
+    .then(function(r){ clearTimeout(tmo); if (!r.ok) throw new Error("Máy chủ lỗi " + r.status); return r.json(); }, function(e){ clearTimeout(tmo); throw new Error(e && e.name === "AbortError" ? "Máy chủ phản hồi quá chậm (60 giây)." : "Không kết nối được máy chủ — kiểm tra mạng."); })
+    .then(function(d){ if (d && d.code === "AUTH"){ AUTH.clear(); BC.drop(); renderLogin(d.error); throw new Error(d.error); } return d; });
 }
 function rid(){ return "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function mailMsg(d){
@@ -1206,7 +1223,8 @@ function shell(){
     '<div class="top-r"><label class="search" for="q">' + ic("search") + '<input id="q" type="search" placeholder="Tìm sự kiện, việc, người…  Ctrl K" value="' + esc(S.q) + '" autocomplete="off"></label>' +
     '<span style="position:relative"><button class="tbtn" data-act="bell" title="Thông báo" aria-label="Thông báo">' + ic("bell") + (unseen ? '<span class="badge">' + Math.min(unseen, 99) + "</span>" : "") + "</button>" + (S.pop === "bell" ? bellPop(N, seen) : "") + "</span>" +
     (S.me && S.me.manager ? '<button class="tbtn" data-act="settings" title="Cài đặt email, nhắc việc, dữ liệu mẫu" aria-label="Cài đặt">' + ic("gear") + "</button>" : "") +
-    '<button class="tbtn" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
+    (S.syncing && S.fromCache ? '<span class="synct" title="Đang hiện dữ liệu lưu trên máy lúc ' + new Date(S.fromCache).toTimeString().slice(0, 5) + '">Đang cập nhật…</span>' : "") +
+    '<button class="tbtn' + (S.syncing ? " spin" : "") + '" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
     (S.me ? '<span class="me">' + av(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></span>" : "") +
     "</div></div></header>" +
     (smp ? '<div class="samplebar"><div class="wrap"><span><b>' + smp + ' sự kiện mẫu</b> (nhãn MẪU) để thử mọi thao tác — không gửi email thật.</span><button data-act="togglesample">' + (S.hideSample ? "Hiện dữ liệu mẫu" : "Ẩn dữ liệu mẫu") + "</button>" +
@@ -2502,20 +2520,42 @@ function renderLogin(msg){
 }
 
 /* ═════════ KHỞI ĐỘNG ═════════ */
+/* v2.6 — mở app hiện ngay dữ liệu lần trước (lưu trên máy này), tải bản mới ở nền. Mỗi tài khoản 1 bản, ≤ 1,5 MB, giữ 14 ngày. */
+var BC = {
+  key: function(){ var o = AUTH.get(), u = o && o.user || {}; return "eh_bc1:" + String(u.email || u.pic || u.local || "u").toLowerCase(); },
+  get: function(){ if (window.EH_DEMO) return null; try { var j = JSON.parse(LS.get(BC.key()) || "null"); if (j && j.d && j.d.ok && j.d.events && Date.now() - j.at < 14 * 864e5) return j; } catch(e){} return null; },
+  put: function(d){ if (window.EH_DEMO) return; try {
+    var x = {}; for (var k in d) x[k] = d[k]; x.notify = []; x.log = (d.log || []).slice(-150); x.comments = (d.comments || []).slice(-400);
+    x.files = (d.files || []).filter(function(f){ return !/^tmp-/.test(f.id); });
+    var js = JSON.stringify({ at: Date.now(), d: x }); if (js.length > 1.5e6) { BC.drop(); return; } LS.set(BC.key(), js); } catch(e){ BC.drop(); } },
+  drop: function(){ try { LS.set(BC.key(), null); } catch(e){} }
+};
+var BOOT_MSG = [[0, "Đang kết nối máy chủ…"], [4000, "Đang tải dữ liệu sự kiện…"], [10000, "Máy chủ Google đang khởi động — lần mở đầu tiên trong ngày có thể mất 15–20 giây."], [30000, "Vẫn đang chờ máy chủ… mạng chậm hoặc máy chủ bận."]];
+function bootScreen(){
+  var sk = function(w, h){ return '<span class="skel" style="display:block;width:' + w + ";height:" + (h || 12) + 'px"></span>'; };
+  $("#app").innerHTML = '<header class="top"><div class="wrap"><a class="brand"><i></i><b>Sự kiện MKT</b><span>MMH · FY68</span></a><span class="sp"></span></div></header>' +
+    '<main class="wrap bootw"><div class="bootmsg"><span class="bspin"></span><span id="bootmsg">' + BOOT_MSG[0][1] + '</span></div>' +
+    '<div class="kpis k4">' + [1, 2, 3, 4].map(function(){ return '<div class="kpi" style="cursor:default">' + sk("55%") + sk("36px", 30) + sk("70%") + "</div>"; }).join("") + "</div>" +
+    '<div class="card cardp">' + sk("30%", 16) + [1, 2, 3, 4, 5].map(function(){ return '<div class="bootrow">' + sk("10px", 10) + '<div style="flex:1">' + sk("60%") + sk("35%", 10) + "</div>" + sk("24%", 12) + "</div>"; }).join("") + "</div></main>";
+  var t0 = Date.now(); clearInterval(bootScreen.h);
+  bootScreen.h = setInterval(function(){ var el = $("#bootmsg"); if (!el){ clearInterval(bootScreen.h); return; } var m = BOOT_MSG.filter(function(x){ return Date.now() - t0 >= x[0]; }).pop(); if (m && el.textContent !== m[1]) el.textContent = m[1]; }, 1000);
+}
 function boot(manual){
   if (!window.EH_DEMO && !AUTH.get()){ renderLogin(); return; }
-  if (!S.D) $("#app").innerHTML = '<main class="wrap" style="padding-top:40px"><div class="evgrid">' + [1, 2, 3, 4].map(function(){ return '<div class="card" style="padding:0;overflow:hidden"><div style="aspect-ratio:16/8;background:var(--sunk)"></div><div style="padding:14px"><div class="skel" style="width:70%"></div><div class="skel"></div></div></div>'; }).join("") + '</div><p class="muted" style="margin-top:14px">Đang tải sự kiện…</p></main>';
+  S.syncing = true;
+  if (!S.D){ var cached = BC.get(); if (cached){ S.D = cached.d; S.me = cached.d.me; S.loadedAt = 0; S.fromCache = cached.at; S.routed = true; route(); } else bootScreen(); }   /* v2.6: hiện ngay bản lưu trên máy */
   var rb = $("#reload"); if (rb) rb.classList.add("spin");
   return api("ehBoot", {}).then(function(d){
     if (!d || !d.ok) throw new Error(d && d.error || "Không tải được dữ liệu");
     var keepPending = S.D ? S.D.files.filter(function(f){ return /^tmp-/.test(f.id); }) : [];
     d.files = (d.files || []).concat(keepPending); d.comments = d.comments || []; d.log = d.log || []; d.notify = d.notify || [];
-    S.D = d; S.me = d.me; S.loadedAt = Date.now();
+    S.D = d; S.me = d.me; S.loadedAt = Date.now(); S.fromCache = 0; S.syncing = false; clearInterval(bootScreen.h); BC.put(d);
     if (!S.routed){ S.routed = true; route(); } else render();
     if (manual) toast("Đã tải dữ liệu mới");
   }).catch(function(err){
-    if (!S.D) $("#app").innerHTML = '<main class="wrap" style="padding-top:40px"><div class="card"><p class="empty">Không tải được dữ liệu: ' + esc(err.message) + '. <button class="btn sm" onclick="location.reload()">Thử lại</button></p></div></main>';
-    else toast(err.message, true);
+    S.syncing = false; clearInterval(bootScreen.h);
+    if (!S.D) $("#app").innerHTML = '<main class="wrap bootw"><div class="card cardp booterr"><b>Chưa tải được dữ liệu</b><p class="muted">' + esc(err.message) + '</p><button class="btn pri" onclick="location.reload()">' + ic("refresh") + 'Thử lại</button></div></main>';
+    else { render(); toast((S.fromCache ? "Đang xem dữ liệu lưu lúc " + new Date(S.fromCache).toTimeString().slice(0, 5) + " — " : "") + err.message, true); }
   }).then(function(){ var r2 = $("#reload"); if (r2) r2.classList.remove("spin"); });
 }
 setInterval(function(){ if (document.visibilityState === "visible" && S.D && !S.drawer && !S.modal && !S.lb && Date.now() - S.loadedAt > 90000 && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) boot(false); }, 30000);

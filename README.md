@@ -1,6 +1,6 @@
 # Sự kiện MKT · MMH
 
-App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.5).
+App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.6).
 
 - **Bảng điều khiển** (quản lý / giám đốc): thẻ sự kiện có ảnh + sức khoẻ tiến độ (Đúng tiến độ / Cần chú ý / Chậm — so % xong với % lẽ ra phải xong),
   thực tế so với kế hoạch, cần xử lý, trạng thái việc, việc theo tuần, khối lượng theo người, tiến độ theo hạng mục, ấn phẩm mới nộp, hoạt động.
@@ -49,4 +49,7 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   - Mỗi hạng mục 1 thẻ: vòng %, nhãn Xong / n trễ / n Pending / Tuần này, thanh trạng thái.
   - Mỗi việc 1 dòng có thanh tiến độ riêng: Chưa làm 0% · Pending 40% · Đang làm 50% · Chờ duyệt 85% · Xong 100%; quá hạn tô đỏ.
   - Thanh nhiều màu cũng dùng ở màn Tuần này và thẻ sự kiện (thay thanh 1 màu).
+- **v2.6 (09/11/2026) — mở app nhanh**: lưu bản dữ liệu trên máy (mỗi tài khoản 1 bản, ≤ 1,5 MB, 14 ngày) ⇒ lần mở sau hiện ngay rồi tự cập nhật ở nền (chữ "Đang cập nhật…" cạnh nút tải lại);
+  lần đầu: màn chờ có khung giao diện + dòng báo tiến trình (máy chủ khởi động / mạng chậm), quá 60 giây báo lỗi + nút Thử lại; máy chủ lỗi mà đã có bản lưu ⇒ vẫn xem được;
+  kết nối trước tới máy chủ Google (`preconnect`). Backend Event Hub v1.6 lưu đệm dữ liệu lớn chia mảnh + giữ đệm nóng (trước: không bao giờ đệm được dữ liệu thật).
 
