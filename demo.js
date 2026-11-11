@@ -312,8 +312,8 @@
       if (!boss && tk.pic !== ME.pic) return ok({ ok: false, error: "Bạn không phụ trách việc này." });
       if (!boss && ["title", "pic", "due", "proof", "priority", "milestone"].some(function(k){ return k in d && d[k] !== tk[k]; })) return ok({ ok: false, error: "Chỉ Owner / quản lý được đổi người, hạn, yêu cầu nộp." });
       if (d.status === "Pending" && !(d.block || tk.block)) return ok({ ok: false, code: "BLOCK", error: "Ghi rõ lý do Pending (cần ai hỗ trợ) để Owner biết." });
-      if (d.status === "Xong" && tk.proof && !D.files.some(function(f){ return f.taskId === tk.id && (tk.proof !== "image" || f.kind === "image"); }))
-        return ok({ ok: false, code: "PROOF", error: tk.proof === "link" ? "Dán link trước khi chuyển Xong." : "Tải file lên trước khi chuyển Xong." });
+      if (d.status === "Xong" && tk.proof && !String(("result" in d ? d.result : tk.result) || "").trim() && !D.files.some(function(f){ return f.taskId === tk.id && (tk.proof !== "image" || f.kind === "image"); }))   /* v2.7: kết quả bằng chữ cũng đủ */
+        return ok({ ok: false, code: "PROOF", error: (tk.proof === "link" ? "Dán link" : "Tải file") + " hoặc ghi kết quả bằng chữ trước khi chuyển Xong." });
       var picCh = "pic" in d && d.pic !== tk.pic;
       Object.keys(d).forEach(function(k){ if (k !== "id" && k !== "notify" && k !== "reason") tk[k] = d[k]; }); if (d.status === "Xong") tk.doneAt = now(); if ("due" in d) tk.dueManual = "x"; tk.updatedAt = now(); tk.updatedBy = ME.pic;
       if (tk.status !== "Pending") tk.block = "";
