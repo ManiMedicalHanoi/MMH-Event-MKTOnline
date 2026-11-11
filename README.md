@@ -1,6 +1,6 @@
 # Sự kiện MKT · MMH
 
-App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.6).
+App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing FY68 (GitHub Pages: `index.html`, v2.7).
 
 - **Bảng điều khiển** (quản lý / giám đốc): thẻ sự kiện có ảnh + sức khoẻ tiến độ (Đúng tiến độ / Cần chú ý / Chậm — so % xong với % lẽ ra phải xong),
   thực tế so với kế hoạch, cần xử lý, trạng thái việc, việc theo tuần, khối lượng theo người, tiến độ theo hạng mục, ấn phẩm mới nộp, hoạt động.
@@ -38,7 +38,7 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   - **Follow-up khách**: phễu Đăng ký → Tham dự → Cần liên hệ → Đã liên hệ → Ra đơn; Sales nhập số ở việc follow-up.
   - **Việc của tôi**: thêm “Chờ bạn xử lý (bạn là Owner)” (duyệt / trả lại / xử lý Pending ngay tại chỗ).
   - Nhắc việc (backend v1.5): “Chờ duyệt” chỉ nhắc Owner · trễ ≥ 3 ngày / Pending ≥ 2 ngày ⇒ quản lý mỗi ngày · thứ Sáu nhắc cập nhật tuần ·
-    nhắc hằng ngày cũng hiện ở nút **Nhắc tôi** của Report Hub / CRM · việc sự kiện tự thành sub-task chỉ đọc dưới Key task trùng tên trong Report Hub.
+    nhắc hằng ngày cũng hiện ở nút **Nhắc tôi** của Report Hub / CRM · ~~việc sự kiện tự thành sub-task chỉ đọc dưới Key task trùng tên trong Report Hub~~ (đã bỏ ở v2.7).
   - Sửa lỗi: nút chuyển Danh sách / Kanban / Dòng thời gian không bấm được; Dòng thời gian thiếu thanh chuyển cách xem.
 - **Giao diện thử kiểu Tender Map** (`ui2.js`, 11/2026): mở `index.html?ui=2` (nhớ trên máy; `?ui=1` để về giao diện cũ). Trái: dòng thời gian FY68 —
   mỗi sự kiện 1 dòng, khối đậm = ngày diễn ra, thanh nhạt = thời gian chuẩn bị (phần đậm = % việc xong), vòng số % màu theo tiến độ, vạch Hôm nay, + / − / ⌂, chú giải; hoặc Lịch tháng.
@@ -52,4 +52,8 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
 - **v2.6 (09/11/2026) — mở app nhanh**: lưu bản dữ liệu trên máy (mỗi tài khoản 1 bản, ≤ 1,5 MB, 14 ngày) ⇒ lần mở sau hiện ngay rồi tự cập nhật ở nền (chữ "Đang cập nhật…" cạnh nút tải lại);
   lần đầu: màn chờ có khung giao diện + dòng báo tiến trình (máy chủ khởi động / mạng chậm), quá 60 giây báo lỗi + nút Thử lại; máy chủ lỗi mà đã có bản lưu ⇒ vẫn xem được;
   kết nối trước tới máy chủ Google (`preconnect`). Backend Event Hub v1.6 lưu đệm dữ liệu lớn chia mảnh + giữ đệm nóng (trước: không bao giờ đệm được dữ liệu thật).
-
+- **v2.7 (11/11/2026, người dùng yêu cầu)**:
+  - **Kết quả bằng chữ**: việc cần nộp file / ảnh / link nay chuyển **Xong** được khi đã ghi *Kết quả bằng chữ* (ô mới trong khung chi tiết việc, tự lưu khi rời ô) —
+    không bắt tải file khi chỉ cần ghi lại. Nút trên thẻ việc đổi thành **Nộp kết quả** (mở khung, con trỏ ở ô kết quả). Backend Event Hub v1.7: cột TASKS.result.
+  - **Bỏ liên kết sang Report Hub**: việc của app không còn tự thành sub-task chỉ đọc trong Report Hub (backend marketing Event_Sync v2.3 gỡ toàn bộ sub đã đẩy,
+    kể cả bản lặp — sao lưu sheet ẩn EVS_Removed). Nhân sự cập nhật Report Hub như bình thường, không phải vào app này bấm Xong.

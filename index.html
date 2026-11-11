@@ -485,6 +485,7 @@ table.t td.g{font-weight:600;color:var(--navy);white-space:nowrap}
 .approve{border:1px solid var(--wait);background:var(--wait-bg);border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}
 .approve b{flex:1;min-width:160px;color:var(--wait)}
 .proof{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.resin{padding:10px 12px;border-top:1px solid var(--line)}.resin textarea{min-height:56px}   /* v2.7 */
 .proof-h{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--sunk);font-size:13px;font-weight:600}
 .proof-h .need{margin-left:auto}
 .plist{list-style:none;margin:0;padding:0}
@@ -808,7 +809,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "2.6"
+  ver: "2.7"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -876,7 +877,7 @@ var TYPES = ["Hội thảo", "Workshop", "Triển lãm", "Webinar", "Khác"];
 var TYPE_C = { "Triển lãm":"exh", "Workshop":"ws", "Hội thảo":"sem", "Webinar":"web" };
 var tc = function(t){ return TYPE_C[t] || "oth"; };
 var ROLE_VI = { Owner:"Owner (điều phối)", Digital:"Truyền thông", Design:"Ấn phẩm", Trade:"Hậu cần", Sales:"Sales" };   /* v2.2: tên vai trò dễ hiểu (mã vai trò trong dữ liệu giữ nguyên) */
-var PROOF_VI = { file:"Cần file (PDF / ảnh)", image:"Cần ảnh", link:"Cần link" };
+var PROOF_VI = { file:"Cần file hoặc kết quả", image:"Cần ảnh hoặc kết quả", link:"Cần link hoặc kết quả" };   /* v2.7: kết quả bằng chữ thay được file / link */
 var PRODUCTS = ["JIZAI", "Composite", "MANI Bond", "Bleach'N Shine", "#1559L", "Dia-Burs", "Manipler", "Ophthalmic Knife"];
 var PRODUCT_IMG = { "JIZAI":"jizai-set.png", "Composite":"comp-nano.png", "Bleach'N Shine":"bleach-shine.png", "#1559L":"carbide-app.jpg", "MANI Bond":"mani-bond.png",
   "Dia-Burs":"diabur-ipr.png", "Manipler":"manipler-4.png", "Ophthalmic Knife":"knife-hero.jpg" };
@@ -966,7 +967,7 @@ function stateOf(t){
   if (t.due && days(TODAY, d0(t.due)) <= 3) return "soon";
   return t.status === "Đang làm" ? "prog" : "open";
 }
-function proofOk(t){ if (!t.proof) return true; var f = filesOf(t.id); return t.proof === "image" ? f.some(function(x){ return x.kind === "image" || /^image\//.test(x.mime || ""); }) : f.length > 0; }
+function proofOk(t){ if (!t.proof || String(t.result || "").trim()) return true; var f = filesOf(t.id); return t.proof === "image" ? f.some(function(x){ return x.kind === "image" || /^image\//.test(x.mime || ""); }) : f.length > 0; }
 function stat(list){
   var s = { total: 0, done: 0, over: 0, soon: 0, wait: 0, none: 0, prog: 0, todo: 0, skip: 0, plan: 0, block: 0, msLate: 0 };
   list.forEach(function(t){ if (!isLeaf(t)) return; var st = stateOf(t); if (st === "skip"){ s.skip++; return; } s.total++;
@@ -1043,8 +1044,8 @@ function saveTask(id, patch, opts){
   opts = opts || {};
   var old = JSON.parse(JSON.stringify(t));
   if (patch.status === "Xong" && !proofOk(Object.assign({}, t, patch))){
-    toast(t.proof === "link" ? "Dán link kết quả trước khi chuyển Xong." : "Tải file " + (t.proof === "image" ? "ảnh" : "ấn phẩm / tài liệu") + " lên trước khi chuyển Xong.", true);
-    S.drawer = id; render(); setTimeout(function(){ var el = $(t.proof === "link" ? "#dr-link" : "#drop"); if (el){ el.scrollIntoView({ block: "center" }); if (el.focus) el.focus(); } }, 40); return Promise.resolve();
+    toast("Ghi kết quả bằng chữ, hoặc " + (t.proof === "link" ? "dán link" : "tải " + (t.proof === "image" ? "ảnh" : "file")) + " trước khi chuyển Xong.", true);
+    S.drawer = id; render(); setTimeout(function(){ var el = $("#dr-res"); if (el){ el.scrollIntoView({ block: "center" }); el.focus(); } }, 40); return Promise.resolve();
   }
   Object.assign(t, patch); if (patch.status === "Xong") t.doneAt = new Date().toISOString().slice(0, 19); else if (patch.status) t.doneAt = ""; if ("due" in patch) t.dueManual = "x";
   if (patch.status && patch.status !== "Pending") t.block = "";
@@ -1720,7 +1721,7 @@ function myPanel(e, ts){
   return '<section class="card"><div class="panel-h"><h3>Việc của bạn</h3><span class="sp"></span><span class="small muted">' + (L.length - open.length) + "/" + L.length + ' xong</span></div><div class="panel-b">' + (open.length ? open.map(function(t){
     var dl = dueLabel(t), ok = proofOk(t);
     return '<div class="act"><div><div class="t" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="s"><span class="due ' + dl.c + '">' + esc(dl.t) + (dl.s ? " · " + esc(dl.s) : "") + "</span> " + needChip(t) + '</div></div><div class="b">' +
-      (t.proof && !ok ? '<button class="btn sm pri" data-open="' + esc(t.id) + '" data-focus="' + (t.proof === "link" ? "link" : "file") + '">' + ic(t.proof === "link" ? "link" : "upload") + "Nộp</button>" : t.status === "Chờ duyệt" ? '<span class="pill wait">Chờ duyệt</span>' :
+      (t.proof && !ok ? '<button class="btn sm pri" data-open="' + esc(t.id) + '" data-focus="res">' + ic(t.proof === "link" ? "link" : "upload") + "Nộp</button>" : t.status === "Chờ duyệt" ? '<span class="pill wait">Chờ duyệt</span>' :
         (t.proof ? '<button class="btn sm" data-setst="Chờ duyệt" data-id="' + esc(t.id) + '">Gửi duyệt</button>' : "") + '<button class="btn sm ok" data-act="done" data-id="' + esc(t.id) + '">' + ic("check") + "Xong</button>") + "</div></div>"; }).join("") : '<p class="small" style="color:var(--ok);margin:6px 0">Bạn đã xong hết việc của mình.</p>') + "</div></section>";
 }
 function groupPanel(e, ts){
@@ -1985,7 +1986,7 @@ function tcard(t){
   if (boss && t.pic !== me() && t.status === "Chờ duyệt") return tcardOwner(t, '<button class="btn sm ok" data-approve="' + esc(t.id) + '">' + ic("check") + 'Duyệt</button><button class="btn sm" data-return="' + esc(t.id) + '">Trả lại</button>');
   if (boss && t.pic !== me() && t.status === "Pending") return tcardOwner(t, '<button class="btn sm" data-open="' + esc(t.id) + '">Xem</button><button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '">Đã xử lý</button>');
   var acts = st === "done" ? '<button class="btn sm ghost" data-act="toggle" data-id="' + esc(t.id) + '">' + ic("undo") + "Mở lại</button>" :
-    (t.proof && !ok ? '<button class="btn sm pri" data-open="' + esc(t.id) + '" data-focus="' + (t.proof === "link" ? "link" : "file") + '">' + ic(t.proof === "link" ? "link" : "upload") + (t.proof === "link" ? "Dán link" : t.proof === "image" ? "Tải ảnh" : "Tải file") + "</button>" : "") +
+    (t.proof && !ok ? '<button class="btn sm pri" data-open="' + esc(t.id) + '" data-focus="res">' + ic(t.proof === "link" ? "link" : "upload") + "Nộp kết quả</button>" : "") +
     (t.proof && ok && t.status !== "Chờ duyệt" && !boss ? '<button class="btn sm pri" data-setst="Chờ duyệt" data-id="' + esc(t.id) + '">' + ic("send") + "Gửi duyệt</button>" : "") +
     (t.status === "Chưa làm" ? '<button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '">Bắt đầu</button>' : "") +
     '<button class="btn sm' + (ok && (boss || !t.proof) ? " ok" : "") + '" data-act="done" data-id="' + esc(t.id) + '">' + ic("check") + "Xong</button>";
@@ -2018,10 +2019,13 @@ function drawer(){
   if (!big && boss) h += '<div class="grid2"><div><label class="fl" for="dr-proof">Kết quả phải nộp khi xong</label><select class="in" id="dr-proof">' + [["", "Không bắt buộc"], ["file", "File ấn phẩm / tài liệu (PDF, ảnh…)"], ["image", "Ảnh"], ["link", "Link (bài đăng, form, video…)"]].map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === (t.proof || "") ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select></div>" +
     '<div><label class="fl">Ưu tiên</label><label class="tg"><input type="checkbox" id="dr-prio"' + (t.priority === "Cao" ? " checked" : "") + '>Gấp — hiện nhãn GẤP</label><label class="tg"><input type="checkbox" id="dr-ms"' + (isMs(t) ? " checked" : "") + ">Mốc quan trọng ◆</label></div></div>";
   if (!big && isFu(t)) h += '<div><label class="fl">Số liệu follow-up khách</label><div class="grid3">' + [["fuTotal", "Khách cần liên hệ"], ["fuDone", "Đã liên hệ"], ["fuOrder", "Ra đơn"]].map(function(x){ return '<label class="small" style="display:flex;flex-direction:column;gap:3px">' + x[1] + '<input class="in" type="number" min="0" data-fu="' + x[0] + '" value="' + esc(t[x[0]] || "") + '"' + (mine ? "" : " disabled") + "></label>"; }).join("") + "</div></div>";
-  if (!big) h += '<div class="proof"><div class="proof-h">' + ic(t.proof === "link" ? "link" : "file") + "Kết quả đã nộp · " + files.length + (t.proof ? '<span class="need' + (proofOk(t) ? "" : " miss") + '">' + (proofOk(t) ? "Đủ để chuyển Xong" : esc(PROOF_VI[t.proof])) + "</span>" : "") + "</div>" +
+  if (!big) h += '<div class="proof"><div class="proof-h">' + ic(t.proof === "link" ? "link" : "file") + "Kết quả đã nộp · " + (files.length + (String(t.result || "").trim() ? 1 : 0)) + (t.proof ? '<span class="need' + (proofOk(t) ? "" : " miss") + '">' + (proofOk(t) ? "Đủ để chuyển Xong" : esc(PROOF_VI[t.proof])) + "</span>" : "") + "</div>" +
     (files.length ? '<ul class="plist">' + files.map(function(f){ var th = fileThumb(f, 200);
       return "<li>" + (th ? '<button class="pt" data-lb="' + esc(f.id) + '" aria-label="Xem ảnh"><img src="' + esc(th) + '" alt=""></button>' : '<span class="pt">' + ic(f.kind === "link" ? "link" : "file") + "</span>") + '<span style="min-width:0"><a href="' + esc(f.url) + '" target="_blank" rel="noopener">' + esc(f.name) + "</a><small>" + esc(f.by) + " · " + esc(ago(f.at)) + "</small></span>" +
         ((boss || f.by === me()) && !/^tmp-/.test(f.id) ? '<button class="btn sm ghost" data-delfile="' + esc(f.id) + '" aria-label="Xoá ' + esc(f.name) + '">' + ic("trash") + "</button>" : "<span></span>") + "</li>"; }).join("") + "</ul>" : "") +
+    /* v2.7: kết quả bằng chữ — đủ để chuyển Xong, không bắt tải file */
+    (mine ? '<div class="resin"><label class="fl" for="dr-res">Kết quả bằng chữ <span class="muted" style="font-weight:400">— không cần file / link nếu chỉ cần ghi lại</span></label><textarea class="in" id="dr-res" rows="2" placeholder="Đã làm gì, kết quả ra sao (tự lưu khi rời ô)">' + esc(t.result || "") + "</textarea></div>"
+      : String(t.result || "").trim() ? '<div class="resin"><label class="fl">Kết quả bằng chữ</label><div class="small" style="white-space:pre-wrap">' + esc(t.result) + "</div></div>" : "") +
     (mine ? '<div class="drop" id="drop" tabindex="-1">Kéo thả file vào đây, dán ảnh (Ctrl+V) hoặc<br><label class="btn sm">' + ic("upload") + 'Chọn file / chụp ảnh<input type="file" id="dr-file" multiple hidden></label><div class="muted" style="font-size:12px;margin-top:6px">Tối đa 25 MB / file — file lớn hơn: tải lên Drive rồi dán link.</div></div>' +
       '<div class="linkin"><input class="in" id="dr-link" type="url" placeholder="Dán link bài đăng Facebook, Google Form, video…"><button class="btn" data-act="addlink">' + ic("link") + "Thêm</button></div>" + linkSugg(t, e, files) : "") + "</div>";
   else h += '<div class="small muted">Hạng mục = task lớn. Tiến độ tính theo các việc con; người phụ trách hạng mục được thêm việc con.</div>';
@@ -2357,7 +2361,7 @@ document.addEventListener("click", function(ev){
   if (a.dataset.sendc){ var tb = $("#" + a.dataset.sendc); if (tb && tb.value.trim()){ addComment(tb.dataset.cbox, tb.dataset.ctask || "", tb.value); tb.value = ""; } return; }
   if (a.dataset.prod){ var v = S.modal.v; readEventForm(); var ps = String(v.products || "").split(/\s*,\s*/).filter(Boolean), i = ps.indexOf(a.dataset.prod); if (i >= 0) ps.splice(i, 1); else ps.push(a.dataset.prod); v.products = ps.join(", "); render(); return; }
   if (a.dataset.cover){ readEventForm(); S.modal.v.cover = S.modal.v.cover === a.dataset.cover ? "" : a.dataset.cover; render(); return; }
-  if (a.dataset.open){ if (ev.target.closest("select,input,.chk")) return; S.drawer = a.dataset.open; render(); var fo = a.dataset.focus; setTimeout(function(){ var el = fo === "link" ? $("#dr-link") : fo === "file" ? $("#drop") : null; if (el){ el.scrollIntoView({ block: "center" }); if (el.focus) el.focus(); } }, 40); return; }
+  if (a.dataset.open){ if (ev.target.closest("select,input,.chk")) return; S.drawer = a.dataset.open; render(); var fo = a.dataset.focus; setTimeout(function(){ var el = fo === "link" ? $("#dr-link") : fo === "file" ? $("#drop") : fo === "res" ? $("#dr-res") : null; if (el){ el.scrollIntoView({ block: "center" }); if (el.focus) el.focus(); } }, 40); return; }
   if (a.dataset.tab){ S.tab = a.dataset.tab; render(); return; }
   if (a.dataset.tv){ S.tv = a.dataset.tv; LS.set("eh_tv", S.tv); render(); return; }
   if (a.dataset.tf){ S.tfilter = a.dataset.tf; render(); return; }
@@ -2464,6 +2468,11 @@ document.addEventListener("change", function(ev){
 document.addEventListener("focusout", function(ev){
   var el = ev.target, t = taskById(S.drawer); if (!t) return;
   if (el.id === "dr-note" && el.value !== (t.note || "")) saveTask(t.id, { note: el.value }, { quiet: true });
+  if (el.id === "dr-res" && el.value.trim() !== String(t.result || "").trim()){   /* v2.7 */
+    var hadOk = proofOk(t);
+    saveTask(t.id, { result: el.value.trim() }, { quiet: true }).then(function(){ var t2 = taskById(t.id);
+      if (t2 && t2.proof && !hadOk && proofOk(t2) && t2.status !== "Xong" && t2.status !== "Chờ duyệt" && t2.pic === me() && !canEv(evById(t2.eventId))) suggest(t2); else toast("Đã lưu kết quả"); });
+  }
   if (el.id === "dr-title" && el.value.trim() && el.value.trim() !== t.title) saveTask(t.id, { title: el.value.trim() }, { quiet: true });
 });
 document.addEventListener("keydown", function(ev){
