@@ -207,6 +207,26 @@
         return { task: e.name + " - " + d[0], type: d[0], qty: d[1], dl: dl, st: dn ? "Completed" : "In progress", chk: dn ? "On time" : "", res: "", lk: dn ? IMG + imgFor(/key/i.test(d[0]) ? "key visual" : d[0].toLowerCase(), i) : "", done: dn ? dl : "", pic: "Đức Anh", req: e.Owner, pts: 2, row: 200 + i * 5 + k }; });
       D.link[e.id] = L;
     });
+    /* v3.0 — đối tác / NPP, số đăng ký theo ngày, thông báo đối tác (mẫu) */
+    D.partners = []; D.pnotice = []; D.reg = {};
+    D.events.forEach(function(e, i){
+      var x = EVS[i], st = new Date(e.start + "T00:00:00"), past = e.end < iso(T0), web = e.type === "Webinar";
+      var NP = web ? [["NPP Nam Dũng (mẫu)", "Nam Dũng", .35]] : [["NPP Nam Dũng (mẫu)", "Nam Dũng", .4], ["NPP Meci (mẫu)", "Meci", .25]];
+      if (i === 2) NP.push(["Trường ĐH Y (mẫu)", "Trường", .15]);
+      NP.forEach(function(n, k){ D.partners.push({ id: "PMAU" + i + k, eventId: e.id, name: n[0], kind: /Trường/.test(n[0]) ? "Trường / Viện" : "NPP", contact: ["Anh Hùng", "Chị Lan", "Thầy Minh"][k], email: "doitac" + (k + 1) + "@example.com", cc: "",
+        quota: Math.round(x.target * n[2]), srcKey: n[1], token: ("0000000000000000" + (i * 7 + k * 3 + 1).toString(16)).slice(-14) + "aa", active: "Có", note: "", by: x.owner, at: now(), sample: "x" }); });
+      var days0 = {}, src = {}, reg = 0, lowE = i === 1, SRC = NP.map(function(n){ return n[0].replace(/ \(mẫu\)/, ""); }).concat(["Fanpage MANI", "Đăng ký trực tiếp"]);
+      for (var k = 34; k >= -1; k--){ var d = new Date(st); d.setDate(d.getDate() - k); var di = iso(d); if (di > iso(T0)) break;
+        var nn = Math.max(0, Math.round(x.target * (k > 21 ? .012 : k > 7 ? .028 : .045) * (lowE ? .55 : 1) + ((i + k) % 3) - 1)); if (!nn) continue; days0[di] = nn; reg += nn;
+        for (var j = 0; j < nn; j++){ var sname = SRC[(i + k + j) % SRC.length]; src[sname] = (src[sname] || 0) + 1; } }
+      if (x.s > 60) { days0 = {}; src = {}; reg = 0; }
+      D.reg[e.id] = reg || x.s <= 60 ? { via: "file", reg: reg, conf: past ? Math.round(reg * .8) : 0, f: { reg: reg, days: days0, src: src, cols: ["time", "phone", "name", "src", "conf"], file: "Đăng ký " + e.name, sheet: "Câu trả lời biểu mẫu 1" }, hist: {}, at: now() } : {};
+      if (x.s > 60) D.reg[e.id] = {};
+      else e.regUrl = "https://docs.google.com/spreadsheets/d/MAU" + i + "/edit";
+    });
+    var e0 = D.events[0], e1 = D.events[1];
+    D.partners.filter(function(p){ return p.eventId === e0.id; }).forEach(function(p, k){ D.pnotice.push({ id: "PNM" + k, key: "", eventId: e0.id, ruleId: "prog", partnerId: p.id, to: p.email, cc: "", subject: "Cập nhật đăng ký — " + e0.name, mode: "confirm", status: "Chờ gửi", due: iso(T0), sentAt: "", by: "Hệ thống", note: "", sample: "x" }); });
+    D.partners.filter(function(p){ return p.eventId === e1.id; }).forEach(function(p, k){ D.pnotice.push({ id: "PNH" + k, key: "", eventId: e1.id, ruleId: "prog", partnerId: p.id, to: p.email, cc: "", subject: "Cập nhật đăng ký — " + e1.name, mode: "confirm", status: "Đã gửi", due: add(-3), sentAt: add(-3) + "T09:12:00", by: e1.Owner, note: "", sample: "x" }); });
     return D;
   }
   var D = window.EH_DEMO_DATA || make();
@@ -220,6 +240,24 @@
   var mail = function(to, kind, ev, task, subj){ if (!to || to === ME.pic) return; if (ev && ev.sample){ N.push({ pic: to, ok: "Dữ liệu mẫu — không gửi email thật" }); return; }
     D.notify.push({ at: now(), to: to, kind: kind, eventId: ev ? ev.id : "", taskId: task ? task.id : "", subject: "[Sự kiện MKT] " + subj, ok: "Đã gửi", by: ME.pic }); N.push({ pic: to, ok: "Đã gửi" }); };
   var reply = function(o){ var m = N.slice(); N = []; var seen = {}; o.mailed = m.filter(function(x){ if (seen[x.pic]) return false; seen[x.pic] = 1; return true; }); return ok(o); };
+  /* v3.0 — số tuyển sinh + email đối tác (giống MKT_EventHubGate.gs) */
+  var PACE = [[35, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
+  function paceAt(e){ var n = Math.round((new Date(e.start + "T00:00:00") - T0) / 864e5); if (n >= 35) return 0; if (n <= 3) return 1; for (var i = 1; i < PACE.length; i++) if (n >= PACE[i][0]){ var a = PACE[i - 1], b = PACE[i]; return a[1] + (b[1] - a[1]) * (a[0] - n) / (a[0] - b[0]); } return 1; }
+  function nk(s){ return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+  function pStats(e){ var R = D.reg[e.id] || {}, src = (R.f && R.f.src) || {}, tgt = +e.target || 0, reg = +R.reg || 0, pace = paceAt(e);
+    return { target: tgt, reg: reg, conf: +R.conf || 0, pct: tgt ? Math.round(reg / tgt * 100) : 0, paceN: Math.round(tgt * pace), dleft: Math.round((new Date(e.start + "T00:00:00") - T0) / 864e5),
+      byP: D.partners.filter(function(p){ return p.eventId === e.id; }).map(function(p){ var key = nk(p.srcKey || p.name), n = 0; Object.keys(src).forEach(function(s){ var k = nk(s); if (k && (k.indexOf(key) >= 0 || key.indexOf(k) >= 0)) n += src[s]; }); return { id: p.id, quota: +p.quota || 0, n: R.f ? n : null }; }) }; }
+  function pMail(e, pt, rule, intro){ var st = pStats(e), mine = st.byP.filter(function(b){ return b.id === pt.id; })[0] || {}, link = new URL("doi-tac.html?k=" + pt.token + "&demo=1", location.href).href;
+    var dmy = function(s){ var d = new Date(s + "T00:00:00"); return ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"][d.getDay()] + ", " + s.slice(8) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4); };
+    var rows = [["Sự kiện", e.name], ["Thời gian", dmy(e.start) + (e.end && e.end !== e.start ? " – " + dmy(e.end) : "") + (st.dleft >= 0 ? " (còn " + st.dleft + " ngày)" : "")], ["Địa điểm", [e.venue, e.city].filter(Boolean).join(", ")],
+      ["Tổng số đăng ký", st.reg + (st.target ? " / mục tiêu " + st.target + " (" + st.pct + "%)" : "")]];
+    if (mine.n != null) rows.push(["Đăng ký qua " + pt.name, mine.n + (mine.quota ? " / chỉ tiêu " + mine.quota + " (" + Math.round(mine.n / mine.quota * 100) + "%)" : "")]);
+    var lead = intro || (rule === "final" ? "MANI Medical Hanoi xin nhắc lịch sự kiện diễn ra vào ngày mai. Kính đề nghị Quý đối tác thông báo lại tới khách hàng đã đăng ký và hỗ trợ đón tiếp theo kế hoạch đã thống nhất." : rule === "low" ? "MANI Medical Hanoi xin cập nhật tình hình đăng ký của sự kiện. Số khách đăng ký qua Quý đối tác hiện chưa đạt nhịp cần thiết so với chỉ tiêu đã thống nhất; kính mong Quý đối tác hỗ trợ đẩy mạnh mời khách trong những ngày tới." : "MANI Medical Hanoi xin gửi Quý đối tác cập nhật tình hình đăng ký tham dự sự kiện đồng tổ chức như sau:");
+    var h = function(x){ return String(x).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+    var html = '<div style="font-family:Aptos,Calibri,Arial,sans-serif;font-size:14px;line-height:1.55;color:#232C36"><p>Kính gửi Quý đối tác ' + h(pt.name) + (pt.contact ? " (" + h(pt.contact) + ")" : "") + ",</p><p>" + h(lead) + '</p><table style="border-collapse:collapse;margin:4px 0 14px">' +
+      rows.map(function(r){ return '<tr><td style="padding:5px 14px 5px 0;color:#4F5B68;border-bottom:1px solid #E3EAF2">' + h(r[0]) + '</td><td style="padding:5px 0;font-weight:600;border-bottom:1px solid #E3EAF2">' + h(r[1]) + "</td></tr>"; }).join("") + "</table><p>Quý đối tác có thể xem số đăng ký cập nhật hằng ngày tại: <a href=\"" + link + "\">" + link + "</a></p><p>Mọi trao đổi xin vui lòng phản hồi email này.</p><p>Trân trọng,<br><b>" + h(e.Owner) + "</b><br>Marketing · MANI Medical Hanoi</p></div>";
+    return { to: pt.email, cc: [pt.cc, e.Owner ? "email của " + e.Owner : ""].filter(Boolean).join(", "), subject: (rule === "final" ? "Nhắc lịch" : "Cập nhật đăng ký") + " — " + e.name, html: html, from: e.Owner,
+      text: "Kính gửi Quý đối tác " + pt.name + ",\n\n" + lead + "\n\n" + rows.map(function(r){ return "- " + r[0] + ": " + r[1]; }).join("\n") + "\n\nXem số đăng ký cập nhật hằng ngày: " + link + "\n\nTrân trọng,\n" + e.Owner + "\nMarketing · MANI Medical Hanoi" }; }
   window.EH_DEMO = { data: D, api: function(action, p){
     N = [];
     if (action === "ehBoot") return ok(Object.assign({}, D, { me: ME }));
@@ -244,8 +282,30 @@
       var f = { id: uid("F"), eventId: e.id, taskId: t ? t.id : "", kind: /^image\//.test(p.mime) ? "image" : "file", name: p.name, url: "#", mime: p.mime, by: ME.pic, at: now(), sample: e.sample };
       D.files.push(f); log("Tải tệp", e.id, f.taskId, p.name); return ok({ file: f });
     }
+    if (action === "ehPartner"){ var pt0 = (D.partners || []).filter(function(x){ return x.token === p.k; })[0]; if (!pt0) return ok({ ok: false, error: "Link không hợp lệ." });
+      var ev0 = by(D.events, "id", pt0.eventId), st0 = pStats(ev0), mine0 = st0.byP.filter(function(b){ return b.id === pt0.id; })[0] || {}, R0 = D.reg[ev0.id] || {};
+      return ok({ partner: { name: pt0.name, quota: mine0.quota, n: mine0.n }, event: { name: ev0.name, start: ev0.start, end: ev0.end, city: ev0.city, venue: ev0.venue, type: ev0.type }, target: st0.target, reg: st0.reg, conf: st0.conf, pct: st0.pct, paceN: st0.paceN, dleft: st0.dleft, days: (R0.f && R0.f.days) || {}, at: R0.at || now(), owner: ev0.Owner, sample: true }); }
     if (action !== "ehSave") return ok({ ok: false, error: "Không rõ lệnh" });
     var d = p.data || {}, op = p.op;
+    if (/^(partner|rules|reg|notice)\./.test(op)){
+      var pe = by(D.events, "id", d.eventId || d.id), pn = d.nid ? by(D.pnotice, "id", d.nid) : null; if (pn) pe = by(D.events, "id", pn.eventId);
+      if (!canEv(pe)) return ok({ ok: false, code: "PERM", error: "Chỉ Owner của sự kiện hoặc quản lý được làm việc này." });
+      var evN = function(){ return D.pnotice.filter(function(n){ return n.eventId === pe.id; }); };
+      if (op === "partner.save"){ if (d.email && !String(d.email).split(/[,;\s]+/).filter(Boolean).every(function(x){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x); })) return ok({ ok: false, error: "Email chưa đúng." });
+        var pp = d.pid ? by(D.partners, "id", d.pid) : null; if (!pp){ pp = { id: uid("P"), eventId: pe.id, token: Math.random().toString(16).slice(2, 10) + Math.random().toString(16).slice(2, 10), sample: pe.sample }; D.partners.push(pp); }
+        ["name", "kind", "contact", "email", "cc", "quota", "srcKey", "active", "note"].forEach(function(k){ if (k in d) pp[k] = d[k]; }); pp.by = ME.pic; pp.at = now(); log("Thêm / sửa đối tác", pe.id, "", pp.name); return ok({ partner: pp }); }
+      if (op === "partner.delete"){ D.partners = D.partners.filter(function(x){ return x.id !== d.pid; }); window.EH_DEMO.data.partners = D.partners; return ok({}); }
+      if (op === "rules.save"){ pe.rules = JSON.stringify(d.rules || {}); return ok({ event: pe }); }
+      if (op === "reg.save"){ if ("target" in d) pe.target = +d.target || ""; pe.regUrl = d.regUrl || "";
+        var chk = !pe.regUrl ? null : /\/forms\//.test(pe.regUrl) ? { issue: "Đây là link Form — mở Form ▸ Câu trả lời ▸ Liên kết với Trang tính, rồi dán link file Sheet đó." } : !/\/d\//.test(pe.regUrl) ? { issue: "Link chưa đúng — dán link Google Sheet câu trả lời của Form đăng ký." } : { issue: "", reg: (D.reg[pe.id] || {}).reg || 0, cols: ["time", "phone", "name", "src"], file: "Đăng ký (bản xem trước)", sheet: "Câu trả lời biểu mẫu 1" };
+        return ok({ event: pe, reg: D.reg[pe.id] || null, check: chk }); }
+      if (op === "notice.preview" || op === "notice.send"){ var ptn = by(D.partners, "id", pn ? pn.partnerId : d.pid), m = pMail(pe, ptn, pn ? pn.ruleId : (d.ruleId || "manual"), d.intro);
+        if (op === "notice.preview") return ok({ mail: m });
+        if (pn){ pn.status = d.self ? "Tự gửi" : "Đã gửi"; pn.sentAt = now(); pn.by = ME.pic; }
+        else D.pnotice.push({ id: uid("PN"), key: "", eventId: pe.id, ruleId: d.ruleId || "manual", partnerId: ptn.id, to: m.to, cc: m.cc, subject: m.subject, mode: d.self ? "self" : "manual", status: d.self ? "Tự gửi" : "Đã gửi", due: iso(T0), sentAt: now(), by: ME.pic, note: "", sample: pe.sample });
+        return ok({ sent: pe.sample ? "Dữ liệu mẫu — không gửi email thật" : "Đã gửi", notices: evN() }); }
+      if (op === "notice.skip"){ pn.status = "Bỏ qua"; pn.sentAt = now(); pn.by = ME.pic; return ok({ notices: evN() }); }
+    }
     if (op === "cfg.save"){ if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được đổi cài đặt." }); D.cfg = Object.assign({}, D.cfg, d); return ok({ cfg: D.cfg }); }
     if (op === "event.add"){ if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được tạo sự kiện mới." });
       var ne = Object.assign({}, d, { id: "EV" + d.start.replace(/-/g, "").slice(2) + "-" + uid("").slice(-4), follow: "Có", src: "APP", updatedAt: now(), updatedBy: ME.pic }); delete ne.template; delete ne.notify;
