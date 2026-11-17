@@ -241,8 +241,8 @@
     D.notify.push({ at: now(), to: to, kind: kind, eventId: ev ? ev.id : "", taskId: task ? task.id : "", subject: "[Sự kiện MKT] " + subj, ok: "Đã gửi", by: ME.pic }); N.push({ pic: to, ok: "Đã gửi" }); };
   var reply = function(o){ var m = N.slice(); N = []; var seen = {}; o.mailed = m.filter(function(x){ if (seen[x.pic]) return false; seen[x.pic] = 1; return true; }); return ok(o); };
   /* v3.0 — số tuyển sinh + email đối tác (giống MKT_EventHubGate.gs) */
-  var PACE = [[35, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
-  function paceAt(e){ var n = Math.round((new Date(e.start + "T00:00:00") - T0) / 864e5); if (n >= 35) return 0; if (n <= 3) return 1; for (var i = 1; i < PACE.length; i++) if (n >= PACE[i][0]){ var a = PACE[i - 1], b = PACE[i]; return a[1] + (b[1] - a[1]) * (a[0] - n) / (a[0] - b[0]); } return 1; }
+  var PACE = [[30, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
+  function paceAt(e){ var n = Math.round((new Date(e.start + "T00:00:00") - T0) / 864e5); if (n >= 30) return 0; if (n <= 3) return 1; for (var i = 1; i < PACE.length; i++) if (n >= PACE[i][0]){ var a = PACE[i - 1], b = PACE[i]; return a[1] + (b[1] - a[1]) * (a[0] - n) / (a[0] - b[0]); } return 1; }
   function nk(s){ return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/gi, "d").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
   function pStats(e){ var R = D.reg[e.id] || {}, src = (R.f && R.f.src) || {}, tgt = +e.target || 0, reg = +R.reg || 0, pace = paceAt(e);
     return { target: tgt, reg: reg, conf: +R.conf || 0, pct: tgt ? Math.round(reg / tgt * 100) : 0, paceN: Math.round(tgt * pace), dleft: Math.round((new Date(e.start + "T00:00:00") - T0) / 864e5),

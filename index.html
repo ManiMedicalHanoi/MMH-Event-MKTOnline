@@ -2748,14 +2748,14 @@ setInterval(function(){ if (document.visibilityState === "visible" && S.D && !S.
 window.EH = { S: S, boot: boot, render: render };
 /* ═════════ v3.0 — QUY TRÌNH 5 GIAI ĐOẠN · 5 CỔNG KIỂM SOÁT · TUYỂN SINH · ĐỐI TÁC / NPP · TỔNG QUAN QUẢN LÝ ═════════
    Backend Event Hub v1.8 (mmh-backend ▸ MKT_EventHubGate.gs): gates() tính GIỐNG HỆT ehgGates_ — sửa 1 nơi phải sửa nơi kia. */
-var GATES = [
-  { k: "G1", name: "Duyệt kế hoạch", phase: "Khởi động", sub: "Đội, mục tiêu, kế hoạch, GĐ duyệt", off: -28 },
-  { k: "G2", name: "Mở đăng ký", phase: "Chuẩn bị", sub: "Form đăng ký, key visual, đối tác", off: -21 },
-  { k: "G3", name: "Sẵn sàng tổ chức", phase: "Tuyển sinh & hoàn thiện", sub: "≥ 80% mục tiêu, việc chuẩn bị xong", off: -3 },
-  { k: "G4", name: "Tổ chức xong", phase: "Ngày D", sub: "Check-in, số khách tham dự", off: 1, end: true },
-  { k: "G5", name: "Báo cáo & đóng", phase: "Follow-up", sub: "Báo cáo, follow-up, đóng sự kiện", off: 14, end: true }
+var GATES = [   /* theo "Quy trình tổ chức sự kiện" 21/10/2026 (file Word trong thư mục Event FY68) */
+  { k: "G1", name: "Chốt kế hoạch · mở tuyển sinh", phase: "Lập kế hoạch", sub: "Kế hoạch, GĐ duyệt, KOL, chia việc NPP, form đăng ký", off: -30 },
+  { k: "G2", name: "Ấn phẩm & hậu cần sẵn sàng", phase: "Chuẩn bị", sub: "Ấn phẩm, in ấn, check-in form, địa điểm, gửi đồ", off: -7 },
+  { k: "G3", name: "Chốt danh sách · họp NPP", phase: "Tuyển sinh & chốt", sub: "Họp NPP, rà soát dữ liệu khách, ≥ 80% mục tiêu", off: -3 },
+  { k: "G4", name: "Tổ chức & check-in", phase: "Ngày D", sub: "Check-in ký tay / báo cáo Zoom, khảo sát", off: 1, end: true },
+  { k: "G5", name: "Báo cáo & đóng", phase: "Sau sự kiện", sub: "Đối chiếu dữ liệu, báo cáo, email nội bộ, follow-up", off: 14, end: true }
 ];
-var PACE = [[35, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
+var PACE = [[30, 0], [21, .3], [14, .5], [7, .8], [3, 1]];   /* mở tuyển sinh D−1 tháng */
 var RULE_VI = { prog: ["Cập nhật tình hình tuyển sinh", "Gửi mọi đối tác: tổng đăng ký / mục tiêu, số của chính đối tác, link trang theo dõi."],
   low: ["Nhắc đối tác chưa đạt chỉ tiêu", "Chỉ gửi đối tác có chỉ tiêu mà số đăng ký đang dưới nhịp cần đạt."],
   final: ["Nhắc lịch trước sự kiện", "Gửi mọi đối tác: nhắc thông báo lại khách đã đăng ký, hỗ trợ đón tiếp."],
@@ -2791,17 +2791,21 @@ function gates(e){
   var find = function(re){ return L.filter(function(t){ return re.test(nrm(t.title)); }); };
   var task = function(label, re){ var a = find(re); return a.length ? { t: label, ok: a.every(function(t){ return t.status === "Xong"; }), ids: a.map(function(t){ return t.id; }) } : null; };
   var st = regStats(e), roles = ["Owner", "Digital", "Design", "Trade", "Sales"].filter(function(r){ return e[r]; }).length;
-  var dS = d0(e.start), dE = d0(e.end || e.start), D3 = dS ? iso(addD(dS, -3)) : "";
-  var prepLeft = L.filter(function(t){ return t.due && t.due <= D3 && t.status !== "Xong"; }).length, nP = partnersOf(e).length;
+  var dS = d0(e.start), dE = d0(e.end || e.start), nP = partnersOf(e).length, web = /webinar|online|zoom/.test(nrm((e.type || "") + " " + (e.format || "")));
+  var left = function(n, role, lab){ var lim = dS ? iso(addD(dS, -n)) : "", k = dS ? L.filter(function(t){ return t.due && t.due <= lim && t.status !== "Xong" && (!role || t.role === role); }).length : 0;
+    return { t: k ? k + " việc " + lab + " (hạn ≤ D−" + n + ") chưa xong" : "Việc " + lab + " đến D−" + n + " đã xong", ok: !k }; };
   var C = {
     G1: [{ t: "Đủ đội sự kiện (Owner + ≥ 2 vai trò)", ok: !!e.Owner && roles >= 3, fix: "team" }, { t: "Có mục tiêu số khách", ok: st.target > 0, fix: "reg" },
-         task("File kế hoạch tổng quan", /ke hoach tong quan|file ke hoach/), task("Giám đốc duyệt kế hoạch + ngân sách", /duyet ke hoach/)],
-    G2: [task("Form đăng ký", /form dang ky/), task("Key visual / poster", /key visual|poster/), expo(e) ? null : { t: "Kết nối file đăng ký (Form)", ok: st.via === "file", fix: "reg" },
+         task("File kế hoạch tổng quan", /ke hoach tong quan|file ke hoach/), task("Giám đốc duyệt kế hoạch + ngân sách", /duyet ke hoach/),
+         task("Chốt KOL (hợp đồng, lịch di chuyển)", /hop dong kol/), task("Chia việc với NPP, Trường / Viện", /chia viec/),
+         task("Form đăng ký (khảo sát trước, đồng ý dữ liệu)", /form dang ky/), expo(e) ? null : { t: "Kết nối file đăng ký (ghi rõ nguồn từng khách)", ok: st.via === "file", fix: "reg" },
          e.npp || nP ? { t: "Khai báo đối tác / NPP nhận thông báo", ok: nP > 0, fix: "partners" } : null],
-    G3: [st.target && st.via === "file" ? { t: "Đăng ký ≥ 80% mục tiêu (" + st.reg + "/" + st.target + ")", ok: st.reg >= st.target * .8, fix: "reg" } : null,
-         { t: prepLeft ? prepLeft + " việc chuẩn bị (hạn ≤ D−3) chưa xong" : "Việc chuẩn bị đến D−3 đã xong", ok: !prepLeft }, task("Rà soát danh sách khách", /ra soat danh sach/)],
-    G4: [task("Check-in có chữ ký / báo cáo Zoom", /check in|check-in/), { t: "Có số khách tham dự", ok: (+e.actual || 0) > 0 || st.conf > 0 }],
-    G5: [task("Báo cáo sự kiện", /bao cao su kien/), L.some(function(t){ return /follow|chuyen doi|lien he lan dau/.test(nrm(t.title)); }) ? { t: "Số follow-up khách đã nhập", ok: L.some(function(t){ return (parseFloat(t.fuTotal) || 0) > 0; }) } : null,
+    G2: [left(7, "Design", "ấn phẩm & in ấn"), web ? null : left(7, "Trade", "hậu cần (địa điểm, đồ MKT, gửi đồ)")],
+    G3: [task("Họp với NPP (muộn nhất D−3)", /hop voi npp/), task("Rà soát dữ liệu khách", /ra soat danh sach|ra soat du lieu/),
+         st.target && st.via === "file" ? { t: "Đăng ký ≥ 80% mục tiêu (" + st.reg + "/" + st.target + ")", ok: st.reg >= st.target * .8, fix: "reg" } : null, left(3, "", "chuẩn bị")],
+    G4: [task(web ? "Báo cáo người tham dự Zoom" : "Check-in có chữ ký", /check in|check-in/), task("Khảo sát sau sự kiện", /khao sat/), { t: "Có số khách tham dự", ok: (+e.actual || 0) > 0 || st.conf > 0 }],
+    G5: [task("Đối chiếu dữ liệu khách", /doi chieu du lieu/), task("Báo cáo sự kiện", /bao cao su kien/), task("Email báo cáo toàn MMH", /email bao cao/),
+         L.some(function(t){ return /follow|chuyen doi|lien he lan dau/.test(nrm(t.title)); }) ? { t: "Số follow-up khách đã nhập", ok: L.some(function(t){ return (parseFloat(t.fuTotal) || 0) > 0; }) } : null,
          { t: "Owner đóng sự kiện", ok: !!e.closedAt, fix: "close" }]
   };
   var prev = true;
@@ -2867,7 +2871,7 @@ function vBoard(){
 
 /* ══════════ TAB TUYỂN SINH ══════════ */
 function cumSeries(e, st){
-  var x = st.x || {}, out = [], s = e.start ? d0(e.start) : TODAY, from = addD(s, -35), days0 = (x.f && x.f.days) || null, run = 0;
+  var x = st.x || {}, out = [], s = e.start ? d0(e.start) : TODAY, from = addD(s, -30), days0 = (x.f && x.f.days) || null, run = 0;
   if (days0 && Object.keys(days0).length){
     var ks = Object.keys(days0).sort(); if (ks[0] < iso(from)) from = d0(ks[0]);
     for (var d = new Date(from); d <= TODAY && d <= addD(s, 1); d = addD(d, 1)){ run += days0[iso(d)] || 0; out.push([iso(d), run]); }
@@ -2881,12 +2885,12 @@ function regChart(e, st){
   var pace = st.target ? PACE.slice().reverse().map(function(p){ var d = iso(addD(d0(e.start), -p[0])); return X(d).toFixed(1) + "," + Y(st.target * p[1]).toFixed(1); }).reverse().join(" ") : "";
   var pts = se.pts.filter(function(p){ return d0(p[0]) >= se.from; }), line = pts.map(function(p){ return X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1); }).join(" ");
   var area = pts.length ? "M" + X(pts[0][0]).toFixed(1) + "," + Y(0) + " L" + line.replace(/ /g, " L") + " L" + X(pts[pts.length - 1][0]).toFixed(1) + "," + Y(0) + "Z" : "";
-  var ticks = [-35, -21, -14, -7, -3, 0].map(function(k){ var d = iso(addD(d0(e.start), k)); if (d0(d) < se.from) return ""; return '<line x1="' + X(d) + '" x2="' + X(d) + '" y1="' + (H - pb) + '" y2="' + (H - pb + 4) + '" class="cg"/><text x="' + X(d) + '" y="' + (H - 8) + '" class="cx">' + (k ? "D" + String(k).replace("-", "−") : "D") + "</text>"; }).join("");
+  var ticks = [-30, -21, -14, -7, -3, 0].map(function(k){ var d = iso(addD(d0(e.start), k)); if (d0(d) < se.from) return ""; return '<line x1="' + X(d) + '" x2="' + X(d) + '" y1="' + (H - pb) + '" y2="' + (H - pb + 4) + '" class="cg"/><text x="' + X(d) + '" y="' + (H - 8) + '" class="cx">' + (k ? "D" + String(k).replace("-", "−") : "D") + "</text>"; }).join("");
   var tx = TODAY >= se.from && TODAY <= se.to ? '<line x1="' + X(TISO) + '" x2="' + X(TISO) + '" y1="' + pt + '" y2="' + (H - pb) + '" class="ct"/><text x="' + X(TISO) + '" y="' + (pt - 3) + '" class="cx">Hôm nay</text>' : "";
   return '<svg class="rchart" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Số đăng ký tích luỹ so với nhịp cần đạt">' + grid +
     (st.target ? '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(st.target) + '" y2="' + Y(st.target) + '" class="ctg"/><text x="' + (W - pr) + '" y="' + (Y(st.target) - 5) + '" class="cx" text-anchor="end">Mục tiêu ' + st.target + "</text>" : "") +
     (pace ? '<polyline points="' + pace + '" class="cp"/>' : "") + (area ? '<path d="' + area + '" class="ca"/><polyline points="' + line + '" class="cl"/>' : "") + ticks + tx + "</svg>" +
-    '<div class="clg"><span><i class="l1"></i>Đăng ký tích luỹ</span>' + (pace ? '<span><i class="l2"></i>Nhịp cần đạt (D−21 30% · D−14 50% · D−7 80% · D−3 100%)</span>' : "") + "</div>";
+    '<div class="clg"><span><i class="l1"></i>Đăng ký tích luỹ</span>' + (pace ? '<span><i class="l2"></i>Nhịp cần đạt (mở tuyển sinh D−30 · D−21 30% · D−14 50% · D−7 80% · D−3 100%)</span>' : "") + "</div>";
 }
 function pReg(e){
   var st = regStats(e), x = st.x || {}, boss = canEv(e), off = (lnk(e) || {}).off || {};

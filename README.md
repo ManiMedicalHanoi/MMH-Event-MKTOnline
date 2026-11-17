@@ -61,11 +61,13 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
   - **Giao diện theo bộ slide MMH Management Practices**: chữ Aptos, navy `#2C4A5E`, xanh `#5A84A6`, nền nhạt `#E3EAF2`, tiêu đề IN HOA + dòng phụ xám, ô vàng = điểm kiểm soát (khối `v30-css`).
   - **Tổng quan** (`#board`, mặc định cho quản lý): sơ đồ 5 giai đoạn (Khởi động → Chuẩn bị → Tuyển sinh & hoàn thiện → Ngày D → Follow-up), 4 số (đang theo dõi · đang tắc ở cổng · tuyển sinh chậm · thông báo đối tác chờ gửi),
     bảng làn: mỗi sự kiện 1 dòng, 5 nút cổng (đã qua · đang tới · sắp tới mốc · quá mốc), thanh tuyển sinh (đã đăng ký / mục tiêu, vạch = nhịp cần đạt hôm nay), **Đang tắc ở** (cổng + điều kiện còn thiếu).
-  - **5 cổng kiểm soát** `gates()` (GIỐNG HỆT backend `ehgGates_`): G1 Duyệt kế hoạch (D−28: đội, mục tiêu, file kế hoạch, GĐ duyệt) · G2 Mở đăng ký (D−21: form đăng ký, key visual, nguồn số đăng ký, khai báo đối tác)
-    · G3 Sẵn sàng (D−3: ≥ 80% mục tiêu, việc hạn ≤ D−3 xong, rà soát danh sách) · G4 Tổ chức xong (D+1: check-in, số khách) · G5 Báo cáo & đóng (D+14: báo cáo, follow-up, đóng sự kiện).
+  - **5 cổng kiểm soát** `gates()` (GIỐNG HỆT backend `ehgGates_`) theo **Quy trình tổ chức sự kiện 21/10/2026** (file Word trong thư mục Drive Event FY68):
+    G1 Chốt kế hoạch · mở tuyển sinh (D−30: đội, mục tiêu, kế hoạch tổng quan, GĐ duyệt, KOL, chia việc NPP / Viện, form đăng ký, file đăng ký ghi nguồn từng khách, khai báo đối tác)
+    · G2 Ấn phẩm & hậu cần (D−7) · G3 Chốt danh sách · họp NPP (D−3: họp NPP, rà soát dữ liệu khách, ≥ 80% mục tiêu, việc chuẩn bị xong)
+    · G4 Tổ chức & check-in (D+1: check-in ký tay / báo cáo Zoom, khảo sát, số khách) · G5 Báo cáo & đóng (D+14: đối chiếu dữ liệu, báo cáo, email nội bộ, follow-up, đóng sự kiện).
     Khung **Quy trình sự kiện** đầu trang sự kiện; cổng quá mốc ⇒ dải đỏ "Đang tắc ở …" bấm vào điều kiện để xử lý.
-  - **Tab Tuyển sinh**: đăng ký / mục tiêu / nhịp cần đạt (D−21 30% · D−14 50% · D−7 80% · D−3 100%) / xác nhận / còn lại, biểu đồ tích luỹ so với nhịp, theo đối tác / NPP, theo nguồn;
-    Owner dán **link Google Sheet câu trả lời của Form đăng ký** (Form ▸ Câu trả lời ▸ Liên kết với Trang tính) — máy chủ đọc SỐ ĐẾM mỗi 20 phút (cột Dấu thời gian · SĐT · Họ tên · NPP / nguồn · Xác nhận), không đọc tên / SĐT về app.
+  - **Tab Tuyển sinh**: đăng ký / mục tiêu / nhịp cần đạt (mở tuyển sinh D−30 · D−21 30% · D−14 50% · D−7 80% · D−3 100%) / xác nhận / còn lại, biểu đồ tích luỹ so với nhịp, theo đối tác / NPP, theo nguồn;
+    Owner dán **link Google Sheet câu trả lời của Form đăng ký** (hoặc file danh sách đăng ký — cột “Anh chị biết đến sự kiện qua” / NPP được đếm theo đối tác) (Form ▸ Câu trả lời ▸ Liên kết với Trang tính) — máy chủ đọc SỐ ĐẾM mỗi 20 phút (cột Dấu thời gian · SĐT · Họ tên · NPP / nguồn · Xác nhận), không đọc tên / SĐT về app.
     Chưa có file ⇒ dùng số CUSTOMER LIST của file MKT Offline (thường chỉ đủ sau sự kiện).
   - **Tab Đối tác & thông báo**: đối tác / NPP cùng tổ chức (email, CC, chỉ tiêu, từ khoá khớp cột NPP của file đăng ký; gợi ý từ cột Partner của REPORT_EVENT) · **luật thông báo theo từng sự kiện**
     (Cập nhật tuyển sinh D−21/14/7/3 · Nhắc đối tác chưa đạt chỉ tiêu · Nhắc lịch D−1 · Báo nội bộ khi tuyển sinh chậm; mỗi luật: mốc + "Chờ bấm Gửi" hoặc "Tự động gửi")
