@@ -62,12 +62,12 @@ var API = "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40M
   var iso = function(d){ return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); };
   var dmy = function(s){ var d = d0(s); return d ? DOW[d.getDay()] + ", " + ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear() : ""; };
   var T = new Date(); T = new Date(T.getFullYear(), T.getMonth(), T.getDate());
-  var PACE = [[35, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
+  var PACE = [[30, 0], [21, .3], [14, .5], [7, .8], [3, 1]];
   function fail(msg){ $("#m").innerHTML = '<div class="err"><b>' + esc(msg) + "</b><p>Vui lòng liên hệ Marketing — MANI Medical Hanoi.</p></div>"; }
   function bar(n, t, pace){ if (!t) return ""; return '<div class="bar"><i style="width:' + Math.min(100, n / t * 100).toFixed(1) + '%"></i>' + (pace ? '<b style="left:calc(' + Math.min(100, pace / t * 100).toFixed(1) + '% - 1px)"></b>' : "") + "</div>"; }
   function chart(d){
     var s = d0(d.event.start); if (!s) return "";
-    var keys = Object.keys(d.days || {}).sort(), from = new Date(s); from.setDate(from.getDate() - 35); if (keys.length && d0(keys[0]) < from) from = d0(keys[0]);
+    var keys = Object.keys(d.days || {}).sort(), from = new Date(s); from.setDate(from.getDate() - 30); if (keys.length && d0(keys[0]) < from) from = d0(keys[0]);
     var to = new Date(s); to.setDate(to.getDate() + 1); var n = Math.round((to - from) / 864e5), run = 0, pts = [];
     for (var x = new Date(from); x <= T && x <= to; x.setDate(x.getDate() + 1)){ run += (d.days || {})[iso(x)] || 0; pts.push([new Date(x), run]); }
     if (!keys.length) return "";
@@ -77,7 +77,7 @@ var API = "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40M
     var line = pts.map(function(p){ return X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1); }).join(" ");
     var area = "M" + X(pts[0][0]) + "," + Y(0) + " L" + line.replace(/ /g, " L") + " L" + X(pts[pts.length - 1][0]) + "," + Y(0) + "Z";
     var pace = d.target ? PACE.map(function(p){ var q = new Date(s); q.setDate(q.getDate() - p[0]); return X(q).toFixed(1) + "," + Y(d.target * p[1]).toFixed(1); }).join(" ") : "";
-    var ticks = [-35, -21, -14, -7, 0].map(function(o){ var q = new Date(s); q.setDate(q.getDate() + o); if (q < from) return ""; return '<text class="cx" x="' + X(q) + '" y="' + (H - 8) + '">' + (o ? "D" + String(o).replace("-", "−") : "Ngày sự kiện") + "</text>"; }).join("");
+    var ticks = [-30, -21, -14, -7, 0].map(function(o){ var q = new Date(s); q.setDate(q.getDate() + o); if (q < from) return ""; return '<text class="cx" x="' + X(q) + '" y="' + (H - 8) + '">' + (o ? "D" + String(o).replace("-", "−") : "Ngày sự kiện") + "</text>"; }).join("");
     return '<div class="card"><h2>Số đăng ký theo ngày (tích luỹ)</h2><svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Số đăng ký tích luỹ">' + g +
       (d.target ? '<line class="ctg" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + Y(d.target) + '" y2="' + Y(d.target) + '"/>' : "") + (pace ? '<polyline class="cp" points="' + pace + '"/>' : "") +
       '<path class="ca" d="' + area + '"/><polyline class="cl" points="' + line + '"/>' + ticks + "</svg>" +
