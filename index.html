@@ -1138,7 +1138,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.4"
+  ver: "3.5"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -3489,6 +3489,64 @@ function instGo(){ if (INST.ev){ var e = INST.ev; INST.ev = null; e.prompt(); re
 document.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest("[data-install]"); if (!b) return; ev.preventDefault(); ev.stopPropagation(); S.pop = null; instGo(); }, true);
 var _mePop34 = mePop;
 mePop = function(){ return _mePop34().replace('<button type="button" role="menuitem" data-act="pwset">', '<button type="button" role="menuitem" data-install="1">' + ic("download") + "Cài app lên máy</button>" + '<button type="button" role="menuitem" data-act="pwset">'); };
+/* ═════════ v3.5 (18/11/2026) — tạo sự kiện ⇒ hệ thống tạo folder (Event FY68 hoặc folder báo cáo viên) + file tổng (Plan) · Event Access · Media · Survey ═════════ */
+var FD = { d: null, at: 0, busy: false };
+try { var fd0 = JSON.parse(LS.get("eh_dirs1") || "null"); if (fd0 && fd0.speakers) { FD.d = fd0; FD.at = +fd0._t || 0; } } catch(x){}
+function fdLoad(force){
+  if (FD.busy || (!force && FD.d && Date.now() - FD.at < 6e5)) return;
+  FD.busy = true;
+  api("ehFolders", force ? { force: "1" } : {}).then(function(d){
+    FD.busy = false; if (!d || !d.ok) return;
+    d._t = Date.now(); FD.d = d; FD.at = d._t; LS.set("eh_dirs1", JSON.stringify(d));
+    if (S.modal && S.modal.k === "event" && !S.modal.id){ var box = $("#f-place"); if (box) box.outerHTML = placeBox(S.modal.v || {}); }
+  }).catch(function(){ FD.busy = false; });
+}
+function placeBox(v){
+  var p = v.place || "root", dr = v.dr || "", nw = v.drNew || "", L = (FD.d && FD.d.speakers) || [];
+  var r = function(val, lab){ return '<label class="tg"><input type="radio" name="f-place" value="' + val + '"' + (p === val ? " checked" : "") + "> " + lab + "</label>"; };
+  return '<fieldset class="fs" id="f-place"><legend>Folder lưu trữ của sự kiện</legend>' +
+    '<p class="small muted" style="margin:0 0 6px">Hệ thống tạo folder gồm <b>Plan</b> (file tổng) · <b>Event Access</b> (ấn phẩm) · <b>Media</b> · <b>Survey</b>' + (FD.d && FD.d.root ? ' trong <a href="' + esc(FD.d.root) + '" target="_blank" rel="noopener">Event FY68</a>' : "") + ".</p>" +
+    r("root", "Folder riêng trong Event FY68") +
+    r("dr", "Trong folder của báo cáo viên") +
+    '<div class="grid2" style="margin:4px 0 0 24px' + (p === "dr" ? "" : ";display:none") + '" id="f-drrow"><select class="in" id="f-dr"><option value="">' + (L.length ? "Chọn báo cáo viên" : FD.busy ? "Đang tải danh sách…" : "Chưa có folder báo cáo viên") + "</option>" +
+      L.map(function(x){ return '<option value="' + esc(x.id) + '"' + (dr === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("") + '<option value="__new"' + (dr === "__new" ? " selected" : "") + ">＋ Báo cáo viên mới…</option></select>" +
+      '<input class="in" id="f-drnew" placeholder="Tên báo cáo viên, ví dụ: Nguyen Van A" value="' + esc(nw) + '"' + (dr === "__new" ? "" : ' style="display:none"') + "></div>" +
+    (FD.d && FD.d.tpl && FD.d.tpl.url ? "" : '<p class="small" style="margin:6px 0 0;color:var(--warn)">Chưa đặt file Google Sheet mẫu ⇒ folder Plan tạm để trống.</p>') + "</fieldset>";
+}
+var _mEvent35 = mEvent;
+mEvent = function(m){
+  var h = _mEvent35(m); if (m.id) return h;
+  fdLoad();
+  return h.replace('<p class="err small" id="f-err"', placeBox(m.v || {}) + '<p class="err small" id="f-err"');
+};
+document.addEventListener("change", function(ev){
+  var x = ev.target, m = S.modal; if (!m || m.k !== "event" || m.id || !x) return;
+  m.v = m.v || {};
+  if (x.name === "f-place"){ m.v.place = x.value; var row = $("#f-drrow"); if (row) row.style.display = x.value === "dr" ? "" : "none"; }
+  if (x.id === "f-dr"){ m.v.dr = x.value; var nw = $("#f-drnew"); if (nw){ nw.style.display = x.value === "__new" ? "" : "none"; if (x.value === "__new") nw.focus(); } }
+});
+document.addEventListener("input", function(ev){ var m = S.modal; if (m && m.k === "event" && ev.target && ev.target.id === "f-drnew"){ m.v = m.v || {}; m.v.drNew = ev.target.value; } });
+function placeOf(){
+  var v = (S.modal && S.modal.v) || {}, p = v.place || "root";
+  if (p !== "dr") return { place: "root" };
+  if (v.dr === "__new"){ var n = String(v.drNew || "").trim(); return n ? { place: "drnew:" + n } : { err: "Gõ tên báo cáo viên mới." }; }
+  return v.dr ? { place: "dr:" + v.dr } : { err: "Chọn folder báo cáo viên (hoặc chọn Folder riêng trong Event FY68)." };
+}
+var _addEvent35 = addEvent;
+addEvent = function(data){
+  var pl = placeOf();
+  if (pl.err) return Promise.reject(new Error(pl.err));
+  data.place = pl.place;
+  return api("ehSave", { op: "event.add", rid: rid(), data: Object.assign({ template: false }, data) }).then(function(d){
+    if (!d || !d.ok) throw new Error(d && d.error || "Không tạo được sự kiện");
+    S.D.events.push(d.event); S.D.tasks = S.D.tasks.concat(d.tasks || []); S.evId = d.event.id; S.tab = "progress";
+    location.hash = "ev-" + d.event.id; S.modal = { k: "pick", ev: d.event.id }; formLoad(); render();
+    var dir = d.dir || {};
+    done(d, "Đã tạo sự kiện" + (dir.folder ? " + folder trong " + dir.where : "") + " — chọn việc theo mẫu", dir.error ? " · " + dir.error : dir.note ? " · " + dir.note : "");
+    if (dir.where && /^drnew:/.test(pl.place)) FD.at = 0;
+    return d.event;
+  });
+};
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
 })();

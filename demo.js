@@ -277,6 +277,7 @@
   window.EH_DEMO = { data: D, api: function(action, p){
     N = [];
     if (action === "ehForm") return ok(FORM9);
+    if (action === "ehFolders") return ok({ root: "https://drive.google.com/drive/folders/demo", online: "https://drive.google.com/drive/folders/demo2", speakers: [{ id: "d1", name: "DR. NGUYEN VAN A (mẫu)" }, { id: "d2", name: "DR. TRAN THI B (mẫu)" }], tpl: { url: "#", name: "MẪU · File kế hoạch sự kiện" } });
     if (action === "ehBoot") return ok(Object.assign({}, D, { me: ME }));
     if (action === "ehSync") return ok({ message: "Bản xem trước — không có file kế hoạch thật để đồng bộ." });
     if (action === "ehLink") return ok({ message: "Bản xem trước — dữ liệu file MKT Offline / Digital là dữ liệu mẫu." });
@@ -340,7 +341,9 @@
       var nt = d.template === false ? [] : tasksFor(ne, null, false), lp = compress(ne, nt); if (lp) ne.latePlan = String(lp);   /* v2.4: dồn hạn (không Bỏ qua) */
       D.events.push(ne); D.tasks = D.tasks.concat(nt); log("Tạo sự kiện", ne.id, "", ne.name + " · " + nt.length + " việc theo mẫu");
       if (d.notify !== false){ var seen = {}; ["Owner", "Digital", "Design", "Trade", "Sales"].forEach(function(r){ var w = ne[r]; if (w && !seen[w]){ seen[w] = 1; mail(w, "team", ne, null, "Sự kiện mới: " + ne.name); } }); }
-      return reply({ event: ne, tasks: nt }); }
+      var pl = String(d.place || ""), where = /^dr:/.test(pl) ? "folder báo cáo viên" : /^drnew:/.test(pl) ? "DR. " + pl.slice(6).toUpperCase() : "Event FY68";
+      if (pl){ ne.folderUrl = "https://drive.google.com/drive/folders/demo"; ne.planUrl = "https://docs.google.com/spreadsheets/d/demo"; }
+      return reply({ event: ne, tasks: nt, dir: pl ? { folder: ne.folderUrl, where: where, plan: ne.planUrl } : null }); }
     if (op === "event.delete"){ var ed = by(D.events, "id", d.id); if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được xoá sự kiện." });
       D.events = D.events.filter(function(x){ return x !== ed; }); D.tasks = D.tasks.filter(function(t){ return t.eventId !== d.id; }); D.files = D.files.filter(function(f){ return f.eventId !== d.id; }); return ok({}); }
     if (op === "event.update"){ var ev = by(D.events, "id", d.id); if (!canEv(ev)) return ok({ ok: false, error: "Chỉ quản lý hoặc Owner của sự kiện được sửa." });
