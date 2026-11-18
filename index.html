@@ -1155,6 +1155,126 @@ dialog.insthow ol{margin:0 0 14px;padding-left:20px}
 .prs-t a{text-decoration:none;color:#2C4A5E}
 @media print{header.top,.fab,.demo-note,.sech .btn{display:none!important}.card{break-inside:avoid}}
 </style>
+<style id="v40-css">
+/* v4.0 (18/11/2026) — người dùng: "clean, clear, đúng điểm trọng tâm". Trang sự kiện 1 khối đầu gọn + 6 tab, không cột phụ; MKT Online cho mọi người; màu trầm (đỏ chỉ cho trễ). */
+.e4{border:1px solid #BCD4E6;border-radius:12px;background:#fff;padding:14px 20px 16px;margin:16px 0 14px}
+.e4-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.e4-bar .sp{flex:1}
+.e4-kick{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:#4F5B68}
+.e4-h{font:700 26px/1.25 var(--f-display);color:#2C4A5E;margin:4px 0 2px}
+.e4-m{margin:0;color:#4F5B68;font-size:14px}
+.e4-warn{margin:4px 0 0;color:var(--crit);font-size:13px}
+.e4-st{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;margin:14px 0 0;border-top:1px solid #E0E3E6;border-bottom:1px solid #E0E3E6}
+.e4-st>div{padding:10px 14px 10px 0;min-width:0}
+.e4-st>div+div{padding-left:14px;border-left:1px solid #E0E3E6}
+.e4-st span{display:block;font-size:12px;color:#7D8894}
+.e4-st b{display:block;font:700 20px/1.3 var(--f-display);color:#232C36;white-space:nowrap}
+.e4-st b.crit{color:var(--crit)}
+.e4-st small{display:block;font-size:12px;color:#7D8894;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e4-st .bar{height:4px;margin:5px 0 3px;background:#E0E3E6;border-radius:2px;overflow:hidden}
+.e4-st .bar i{display:block;height:100%;background:#2C4A5E}
+.e4-row{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:13.5px;color:#4F5B68}
+.e4-row .e4lb{font-size:12px;color:#7D8894;margin-right:-10px}
+.e4-row .e4tm b{color:#232C36;font-weight:600}
+.e4-row .e4tm.none b{color:#7D8894;font-weight:400}
+.e4-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-top:12px;font-size:13px}
+.e4-flow .e4fs{display:flex;align-items:center;gap:6px;color:#7D8894;padding:2px 0}
+.e4-flow .e4fs i{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1px solid #BCD4E6;font-style:normal;font-size:11px;font-weight:700;color:#7D8894;background:#fff}
+.e4-flow .e4fs.pass{color:#4F5B68}.e4-flow .e4fs.pass i{background:#2C4A5E;border-color:#2C4A5E;color:#fff}.e4-flow .e4fs.pass i .ico{width:12px;height:12px;stroke:#fff}
+.e4-flow .e4fs.cur{color:#2C4A5E;font-weight:700}.e4-flow .e4fs.cur i{border:2px solid #2C4A5E;color:#2C4A5E}
+.e4-flow .e4fs.late i{border-color:var(--crit);color:var(--crit)}
+.e4-flow .e4fs small{font-weight:400;color:#7D8894}
+.e4-flow .e4fs.late small{color:var(--crit)}
+.e4-flow .e4sep{width:22px;height:1px;background:#BCD4E6;margin:0 8px}
+.e4-flow .e4lk{margin-left:12px;font-size:12.5px;color:#5A84A6;background:none;border:0;cursor:pointer;padding:0;text-decoration:underline}
+.e4-stk{margin:8px 0 0;font-size:13px;color:#A65A47}
+.e4-stk a{color:#A65A47}
+.e4 .gflow{margin-top:10px}
+.e4 .phx{margin-top:10px}
+.e4 .callout{margin-top:8px}
+.e4tabs{border:1px solid #BCD4E6;border-radius:12px;background:#fff;min-width:0}
+.e4tabs>.tabs{padding:0 12px;border-bottom:1px solid #E0E3E6}
+.e4tabs .pbody{padding:16px 20px}
+.e4sub{font:700 14px var(--f-display);color:#2C4A5E;text-transform:uppercase;letter-spacing:.03em;margin:22px 0 10px;padding-top:16px;border-top:1px solid #E0E3E6}
+.e4sub:first-child{margin-top:0;padding-top:0;border-top:0}
+.e4att{border:1px solid #E0E3E6;border-radius:10px;margin:0 0 14px;background:#FAFBFC}
+.e4att>summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;font-size:13.5px;color:#4F5B68}
+.e4att>summary::-webkit-details-marker{display:none}
+.e4att>summary b{color:#2C4A5E}
+.e4att>summary .crit{color:var(--crit);font-weight:600}
+.e4att>summary .sp{flex:1}
+.e4att>summary .e4more{font-size:12.5px;color:#5A84A6}
+.e4att[open]>summary .e4more::after{content:" ▴"}.e4att:not([open])>summary .e4more::after{content:" ▾"}
+.e4att .card{border:0!important;background:transparent;border-radius:0}
+.e4att .card .panel-h{display:none}
+.e4att .card .panel-b{padding:0 14px 12px}
+.e4acts{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.e4wrap .msbar{display:none}
+.e4wrap .tfilter{margin-top:0}
+.e4wrap .tfilter .btn.pri{display:none}
+.e4foot{padding:10px 20px;border-top:1px solid #E0E3E6;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#7D8894}
+@media (max-width:1100px){.e4-st{grid-template-columns:repeat(3,minmax(0,1fr))}.e4-st>div:nth-child(4){border-left:0;padding-left:0}.e4-st>div:nth-child(n+4){border-top:1px solid #E0E3E6}}
+@media (max-width:640px){.e4{padding:12px 14px}.e4-h{font-size:21px}.e4-st{grid-template-columns:repeat(2,minmax(0,1fr))}.e4-st>div{border-left:0!important;padding-left:0!important}.e4tabs .pbody{padding:12px}}
+/* MKT Online */
+.o4h{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin:18px 0 4px}
+.o4h h1{font:700 26px var(--f-display);color:#2C4A5E;margin:0;text-transform:uppercase;letter-spacing:.01em}
+.o4h p{margin:2px 0 0;color:#4F5B68;font-size:14px}
+.o4h .sp{flex:1}
+.o4me{margin:10px 0 0;font-size:14px;color:#232C36;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border:1px solid #BCD4E6;border-radius:10px;padding:9px 14px;background:#FAFBFC}
+.o4me b{color:#2C4A5E}
+.o4st{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin:14px 0 0;border:1px solid #BCD4E6;border-radius:12px;background:#fff;overflow:hidden}
+.o4st button{all:unset;cursor:pointer;padding:12px 14px;box-sizing:border-box;min-width:0}
+.o4st button+button{border-left:1px solid #E0E3E6}
+.o4st button span{display:block;font-size:12.5px;color:#4F5B68;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.o4st button b{display:block;font:700 22px/1.3 var(--f-display);color:#232C36}
+.o4st button small{display:block;font-size:11.5px;color:#7D8894}
+.o4st button[aria-pressed=true]{background:#EEF4F8;box-shadow:inset 0 -3px 0 #2C4A5E}
+.o4st button.ret b{color:var(--crit)}
+.o4st button:focus-visible{outline:2px solid #5A84A6;outline-offset:-2px}
+.o4f{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 10px}
+.o4f .sp{flex:1}
+.o4f select{height:32px;border:1px solid #BCD4E6;border-radius:8px;padding:0 8px;font:inherit;font-size:13px;color:#232C36;background:#fff}
+.o4seg{display:inline-flex;border:1px solid #BCD4E6;border-radius:8px;overflow:hidden}
+.o4seg button{all:unset;cursor:pointer;padding:6px 12px;font-size:13px;color:#4F5B68}
+.o4seg button+button{border-left:1px solid #E0E3E6}
+.o4seg button[aria-pressed=true]{background:#2C4A5E;color:#fff;font-weight:600}
+.o4card{border:1px solid #BCD4E6;border-radius:12px;background:#fff;overflow-x:auto}
+.o4t{width:100%;border-collapse:collapse;font-size:14px}
+.o4t th{text-align:left;font-size:12px;font-weight:600;color:#7D8894;padding:9px 12px;border-bottom:1px solid #BCD4E6;white-space:nowrap;background:#fff}
+.o4t td{padding:9px 12px;border-bottom:1px solid #E0E3E6;vertical-align:top}
+.o4t tr:last-child td{border-bottom:0}
+.o4t tbody tr.r{cursor:pointer}
+.o4t tbody tr.r:hover td{background:#F7FAFC}
+.o4t tbody tr.r.on td{background:#EEF4F8}
+.o4t td.nm b{color:#232C36;font-weight:600}
+.o4t td small{display:block;color:#7D8894;font-size:12px}
+.o4t td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.o4t td.det{background:#F7FAFC;padding:12px}
+.o4t .crit{color:var(--crit);font-weight:600}
+.o4t .mut{color:#7D8894}
+.o4where{white-space:nowrap}
+.o4where i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#5A84A6;margin-right:6px;vertical-align:1px}
+.o4where.ret i{background:var(--crit)}.o4where.done i{background:#BCD4E6}.o4where.post i{background:#2C4A5E}
+.o4sec{font:700 15px var(--f-display);color:#2C4A5E;text-transform:uppercase;letter-spacing:.02em;margin:26px 0 4px}
+.o4sec+p{margin:0 0 10px;color:#7D8894;font-size:13px}
+.o4grid{display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+.o4grid>div{min-width:0}
+@media (max-width:1100px){.o4grid{grid-template-columns:1fr}.o4st{grid-template-columns:repeat(4,minmax(0,1fr))}.o4st button:nth-child(5){border-left:0}.o4st button:nth-child(n+5){border-top:1px solid #E0E3E6}}
+@media (max-width:640px){.o4st{grid-template-columns:repeat(2,minmax(0,1fr))}.o4st button{border-left:0!important;border-top:1px solid #E0E3E6}}
+@media (max-width:1700px){.nav a .ico{display:none}.nav a{padding-left:9px;padding-right:9px}}
+@media (max-width:1500px){.search{width:150px}}
+.e4wrap .gp .bar i,.e4wrap .pmc .bar i{background:#5A84A6}
+.e4wrap .pbody>.card .panel-h h3{display:none}
+.e4wrap .pbody>.card{border-color:#E0E3E6!important}
+.todo2{background:#F5F8FB!important;border-left:3px solid #BCD4E6!important}
+.e4wrap .rchart{display:block;width:100%;max-width:760px;height:auto}
+/* Tổng quan: chú giải 5 giai đoạn nhẹ hơn */
+.glegend .gl{background:#fff;border:1px solid #E0E3E6}
+.b4mk{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:#4F5B68;border:1px solid #BCD4E6;border-radius:12px;padding:11px 16px;margin:14px 0;background:#fff}
+.b4mk b{color:#2C4A5E}
+.b4mk .crit{color:var(--crit);font-weight:600}
+.b4mk .sp{flex:1}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1164,7 +1284,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.6"
+  ver: "4.0"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -3763,6 +3883,181 @@ route = function(){
 };
 var _vStats36 = vStats;
 vStats = function(){ return _vStats36().replace('</small></div>', '</small><span class="sp"></span><a class="btn" href="#present">' + ic("file") + "Trình bày (họp)</a></div>"); };
+/* ═════════ v4.0 (18/11/2026) — GỌN & RÕ (người dùng: "trang sự kiện liệt kê ô, màu mè, rối mắt"; "mọi người đều thấy luồng việc của nhau, quản lý overview được")
+   ① Trang sự kiện: 1 khối đầu (tên · ngày · 6 con số · đội · 5 giai đoạn 1 dòng) + 6 tab, bỏ cột phụ bên phải; "Cần chú ý" thu gọn trong tab Việc.
+   ② MKT Online (#online) cho MỌI người: đếm theo bước duyệt · bảng ấn phẩm / bài đăng · theo người · việc truyền thông & ấn phẩm trong các sự kiện.
+   ③ Màu trầm: thanh trạng thái 1 tông navy / xanh thép, đỏ chỉ cho trễ. ④ Giao diện thử ui2 nhường các màn MKT Online / Trình bày cho giao diện chính. ═════════ */
+SEG[0][2] = "#2C4A5E"; SEG[1][2] = "#5A84A6"; SEG[2][2] = "#99C1DE"; SEG[3][2] = "#C9B98F"; SEG[4][2] = "#B4735F"; SEG[5][2] = "#E0E3E6";
+if (!LS.get("eh_v40")){ LS.set("eh_v40", "1"); S.tv = "list"; LS.set("eh_tv", "list"); }
+
+/* ── ① TRANG SỰ KIỆN ── */
+var E4_TAB = { progress: "progress", reg: "reg", partners: "reg", files: "files", notes: "notes", talk: "notes", mkt: "mkt", plan: "mkt", log: "log" };
+function e4Att(e, ts, boss){
+  var L = ts.filter(isLeaf), mine = L.filter(function(t){ return t.pic === me() && !/done|skip/.test(stateOf(t)); });
+  var wait = L.filter(function(t){ return t.status === "Chờ duyệt"; }).length, over = L.filter(function(t){ return stateOf(t) === "over"; }).length,
+      blk = L.filter(function(t){ return stateOf(t) === "block"; }).length, none = L.filter(function(t){ return !t.pic && !/done|skip/.test(stateOf(t)); }).length;
+  var parts = boss ? [[wait, "chờ duyệt"], [over, "trễ hạn", 1], [blk, "Pending"], [none, "chưa giao người"]].filter(function(x){ return x[0]; })
+                   : [[mine.length, "việc của bạn chưa xong"], [mine.filter(function(t){ return stateOf(t) === "over"; }).length, "trễ hạn", 1]].filter(function(x){ return x[0]; });
+  var inner = boss ? ownerPanel(e, ts) : myPanel(e, ts);
+  return '<details class="e4att"' + (S.e4att ? " open" : "") + ' data-e4="att"><summary><b>' + (boss ? "Cần xử lý" : "Việc của bạn") + "</b>" +
+    (parts.length ? parts.map(function(x){ return '<span class="' + (x[2] ? "crit" : "") + '">' + x[0] + " " + x[1] + "</span>"; }).join("<span>·</span>") : '<span>Không có việc chờ duyệt, trễ hay chưa giao.</span>') +
+    '<span class="sp"></span><span class="e4more">' + (S.e4att ? "Thu gọn" : "Xem") + "</span></summary>" + inner + "</details>";
+}
+vEvent = function(e){
+  var ts = tasksOf(e.id), s = stat(ts), h = health(e, s), dy = dday(e), boss = canEv(e), files = S.D.files.filter(function(f){ return f.eventId === e.id; });
+  if (S.tab === "board" || S.tab === "timeline"){ S.tv = S.tab === "board" ? "board" : "timeline"; S.tab = "progress"; }
+  var g = E4_TAB[S.tab] || "progress", roles = S.D.roles || ["Owner", "Digital", "Design", "Trade", "Sales"];
+  var r = regStats(e), G = gates(e), sk = stuckOf(G), K = ((S.D && S.D.rhk) || {})[e.id] || [];
+  var AL = apList().filter(function(a){ return a.eventId === e.id; }), apOpen = AL.filter(function(a){ return /Chờ duyệt|Trả lại|Chờ đăng/.test(a.status); }).length;
+  var NT = notesOf(e.id), cm = IX.cmE[e.id] || [], OFF = (lnk(e) || {}).off || {}, act = +e.actual || +OFF.aPart || 0;
+  var links = (e.planUrl ? '<a class="btn sm ghost" href="' + esc(e.planUrl) + '" target="_blank" rel="noopener">' + ic("out") + "File kế hoạch</a>" : "") +
+    (e.folderUrl ? '<a class="btn sm ghost" href="' + esc(e.folderUrl) + '" target="_blank" rel="noopener">' + ic("folder") + "Folder</a>" : "") +
+    '<a class="btn sm ghost" href="https://manimedicalhanoi.github.io/MMH-Report/" target="_blank" rel="noopener" title="' + esc(K.length ? K.map(function(k){ return "Key task " + k.no + " · " + k.pic + " · " + k.n + " sub-task"; }).join("\n") : "Chưa có Key task cho sự kiện này") + '">' + ic("list") + "Report Hub" + (K.length ? " · Key " + esc(K[0].no) : "") + "</a>" +
+    (boss ? '<button class="btn sm" data-act="editevent">' + ic("edit") + "Sửa thông tin</button>" : "");
+  var cell = function(lab, big, sub, cls, bar){ return "<div><span>" + esc(lab) + '</span><b class="num' + (cls ? " " + cls : "") + '">' + big + "</b>" + (bar != null ? '<div class="bar"><i style="width:' + Math.min(100, bar) + '%"></i></div>' : "") + "<small>" + (sub || "&nbsp;") + "</small></div>"; };
+  var stats = '<div class="e4-st">' +
+    cell(dy.up ? "Còn" : "Đã diễn ra", esc(dy.big), esc(dy.txt)) +
+    cell("Việc xong", s.done + "/" + s.total, s.pct + "% · kế hoạch đến nay " + s.planPct + "%", "", s.pct) +
+    cell("Trễ hạn", s.over || "0", (s.block ? s.block + " Pending · " : "") + s.wait + " chờ duyệt", s.over ? "crit" : "") +
+    cell(act ? "Tham dự / mục tiêu" : "Đăng ký / mục tiêu", (act || r.reg || 0) + (r.target ? "/" + r.target : ""), r.target && !act ? (r.low ? '<span style="color:var(--crit)">chậm · cần ≈ ' + r.paceN + "</span>" : "cần ≈ " + r.paceN + " hôm nay") : "") +
+    cell("Ấn phẩm & bài đăng", apOpen || "0", AL.length ? "đang xử lý · " + AL.length + " tổng" : "chưa gửi duyệt") +
+    '<div><span>Tình hình</span><b style="font-size:15px;padding:4px 0 3px"' + (h.k === "crit" ? ' class="crit"' : "") + ">" + esc(h.t) + "</b><small>" + (lastCk(e) ? "tuần " + esc(fmt(lastCk(e).week)) + ": " + esc(lastCk(e).rag) : "chưa cập nhật tuần") + "</small></div></div>";
+  var team = '<div class="e4-row"><span class="e4lb">Đội</span>' + roles.map(function(k){ var v = e[k] || ""; return '<span class="e4tm' + (v ? "" : " none") + '">' + esc(ROLE_VI[k].replace(/ \(.*\)$/, "")) + " <b>" + esc(v || "chưa chọn") + "</b></span>"; }).join("") +
+    (boss ? '<button class="btn sm ghost" data-act="teamedit">' + ic("edit") + "Đổi</button>" : "") + "</div>";
+  var flow = '<div class="e4-flow">' + G.map(function(x, i){ var cls = x.state === "pass" ? "pass" : (x.cur ? "cur" : "") + (x.state === "late" ? " late" : "");
+      return (i ? '<span class="e4sep"></span>' : "") + '<span class="e4fs ' + cls + '" title="' + esc(x.k + " · " + x.name + (x.miss.length ? " — còn thiếu: " + x.miss.map(function(c){ return c.t; }).join("; ") : "")) + '"><i>' + (x.state === "pass" ? ic("check") : i + 1) + "</i>" + esc(x.phase) + (x.due && x.state !== "pass" ? " <small>" + (x.state === "late" ? "quá mốc " : "mốc ") + fmt(x.due) + "</small>" : "") + "</span>"; }).join("") +
+    '<button class="e4lk" data-v3="gtoggle">' + (S.gOpen ? "Ẩn điều kiện" : "Điều kiện từng cổng") + "</button></div>" +
+    (S.gOpen ? gateFlow(e, G, false).replace(/<div class="callout crit">[\s\S]*$/, "") : "") +
+    (sk ? '<p class="e4-stk">Đang tắc ở ' + sk.k + " · " + esc(sk.name) + " (mốc " + fmt(sk.due) + "): thiếu " + sk.miss.map(function(c){ return c.fix ? '<a href="#" data-v3="fix" data-fix="' + c.fix + '">' + esc(c.t) + "</a>" : c.ids && c.ids.length ? '<a href="#" data-open="' + esc(c.ids[0]) + '">' + esc(c.t) + "</a>" : esc(c.t); }).join("; ") + "</p>" : "");
+  var hd = '<section class="e4"><div class="e4-bar"><button class="btn sm ghost" data-act="back">' + ic("left") + 'Sự kiện</button><span class="sp"></span>' + links + "</div>" +
+    '<div class="e4-kick"><span>' + esc(e.type || "Sự kiện") + "</span>" + (e.sample ? '<span class="pill sample">MẪU</span>' : "") + (e.state ? '<span class="pill warn">' + esc(e.state) + "</span>" : "") + (e.Owner ? "<span>· Owner " + esc(e.Owner) + "</span>" : "") + "</div>" +
+    '<h1 class="e4-h">' + esc(e.name) + "</h1>" +
+    '<p class="e4-m"><b class="num">' + esc(evDates(e)) + (e.start ? "/" + e.start.slice(0, 4) : "") + "</b>" + (e.venue ? " · " + esc(e.venue) : "") + (e.city ? " · " + esc(e.city) : "") + (e.organizer ? " · " + esc(e.organizer) : "") + "</p>" +
+    (e.dateWarn ? '<p class="e4-warn">' + esc(e.dateWarn) + "</p>" : "") + stats + team + flow + phaseBox(e, s) + "</section>";
+  var TABS = [["progress", "Việc", s.total], ["reg", "Tuyển sinh & khách", r.reg || ""], ["files", "Ấn phẩm & bài đăng", AL.length + files.length || ""], ["notes", "Họp & trao đổi", NT.length + cm.length || ""], ["mkt", "Dữ liệu MKT & kế hoạch", mkCount(e) || ""], ["log", "Nhật ký", ""]];
+  var body;
+  if (g === "progress") body = e4Att(e, ts, boss) + (boss ? '<div class="e4acts"><button class="btn sm pri" data-act="quickadd">' + ic("plus") + 'Thêm việc</button><button class="btn sm" data-act="pickform" data-ev="' + esc(e.id) + '">' + ic("list") + 'Chọn việc theo mẫu</button><button class="btn sm" data-act="remindteam">' + ic("mail") + "Nhắc cả đội</button></div>" : "") +
+    (S.tv === "map" ? pMap(e, ts) : S.tv === "board" ? pBoard(e, ts) : S.tv === "timeline" ? pTimeline(e, ts) : pProgress(e, ts));
+  else if (g === "reg") body = '<h3 class="e4sub">Tuyển sinh</h3>' + pReg(e) + (followPanel(e) ? '<h3 class="e4sub">Follow-up khách sau sự kiện</h3>' + followPanel(e) : "") + '<h3 class="e4sub">Đối tác / NPP & thông báo</h3>' + pPartners(e);
+  else if (g === "files") body = pFiles(e, files);
+  else if (g === "notes") body = (weekPanel(e) ? '<h3 class="e4sub">Tình hình tuần</h3>' + weekPanel(e) : "") + '<h3 class="e4sub">Biên bản họp</h3>' + pNotes(e) + '<h3 class="e4sub">Thảo luận</h3>' + pTalk(e);
+  else if (g === "mkt") body = '<h3 class="e4sub">Số liệu MKT Offline · Online</h3>' + pMkt(e) + '<h3 class="e4sub">File kế hoạch tổng</h3>' + pPlan(e, (S.D.plan || {})[e.id]);
+  else body = pLog(e);
+  return '<div class="e4wrap">' + hd + '<section class="e4tabs"><div class="tabs" role="tablist">' + TABS.map(function(t){ return '<button class="tab" role="tab" data-tab="' + t[0] + '" aria-selected="' + (g === t[0]) + '">' + esc(t[1]) + (t[2] !== "" && t[2] != null ? ' <span class="n num">' + t[2] + "</span>" : "") + "</button>"; }).join("") + "</div>" +
+    '<div class="pbody" role="tabpanel">' + body + "</div>" +
+    '<div class="e4foot"><span>Mã ' + esc(e.id) + "</span><span>Nguồn: " + ({ OFFLINE: "file MKT Offline", APP: "tạo trên app", SAMPLE: "dữ liệu mẫu", "OFFLINE+FILE": "file kế hoạch + file MKT Offline" }[e.src] || "file kế hoạch") + "</span>" +
+    (e.updatedAt ? "<span>Cập nhật " + esc(ago(e.updatedAt)) + (e.updatedBy ? " · " + esc(e.updatedBy) : "") + "</span>" : "") + "</div></section></div>";
+};
+document.addEventListener("toggle", function(ev){ var d = ev.target; if (d && d.dataset && d.dataset.e4 === "att"){ S.e4att = d.open; var m = d.querySelector(".e4more"); if (m) m.textContent = d.open ? "Thu gọn" : "Xem"; } }, true);
+
+/* ── ② MKT ONLINE — ai cũng xem được luồng ấn phẩm / bài đăng của nhau ── */
+var A4 = { st: "open", kind: "all", scope: "all", who: "", open: "", seen: AP.tab };
+function a4St(a){ if (a.status === "Chờ duyệt") return "s" + (+a.step || 1); if (a.status === "Trả lại") return "ret"; if (a.status === "Chờ đăng") return "post"; if (/^Đã/.test(a.status)) return "done"; return "draft"; }
+function a4Where(a){
+  var k = a4St(a), st = apSteps(), s = st[(+a.step || 1) - 1];
+  if (/^s/.test(k)) return '<span class="o4where">' + "<i></i>" + esc(s ? s.label : "Chờ duyệt") + "</span>";
+  if (k === "ret") return '<span class="o4where ret"><i></i>Trả lại · ' + esc(a.by) + " đang sửa</span>";
+  if (k === "post") return '<span class="o4where post"><i></i>Chờ đăng bài</span>';
+  if (k === "done") return '<span class="o4where done"><i></i>' + esc(a.status) + "</span>";
+  return '<span class="o4where done"><i></i>Nháp</span>';
+}
+function a4Recent(a){ return tsOf(a.updatedAt || a.createdAt) >= Date.now() - 30 * 864e5; }
+function a4MktTasks(){
+  var lim = iso(addD(TODAY, 14));
+  return (S.D.tasks || []).filter(function(t){
+    if (!isLeaf(t) || /done|skip/.test(stateOf(t)) || !t.due || t.due > lim) return false;
+    var e = evById(t.eventId); if (!e || (S.hideSample && e.sample) || e.closedAt || e.state === "Huỷ") return false;
+    return t.role === "Digital" || t.role === "Design" || (e.Digital && t.pic === e.Digital) || (e.Design && t.pic === e.Design);
+  }).sort(byDue);
+}
+vApv = function(){
+  if (A4.seen !== AP.tab){ A4.seen = AP.tab; if (AP.tab === "online"){ A4.kind = "all"; A4.st = "open"; } else if (AP.tab === "design"){ A4.kind = "design"; A4.st = "all"; } else if (AP.tab === "mine"){ A4.st = "mine"; } }
+  var L = apList(), T = apTodo(), st = apSteps(), MT = a4MktTasks();
+  var base = L.filter(function(a){ return (A4.kind === "all" || (A4.kind === "post" ? a.kind === "post" : a.kind !== "post")) && (A4.scope === "all" || a.scope === A4.scope) && (!A4.who || a.by === A4.who); });
+  var cnt = function(k){ return base.filter(function(a){ var x = a4St(a); return k === "open" ? /^s|ret|post/.test(x) : k === "done" ? x === "done" && a4Recent(a) : x === k; }).length; };
+  var STG = [["open", "Đang xử lý", cnt("open"), "mọi bước"]].concat(st.map(function(s, i){ return ["s" + (i + 1), s.label, cnt("s" + (i + 1)), "bước " + (i + 1)]; }))
+    .concat([["ret", "Trả lại · đang sửa", cnt("ret"), ""], ["post", "Chờ đăng bài", cnt("post"), ""], ["done", "Đã xong", cnt("done"), "30 ngày qua"]]);
+  var F = base.filter(function(a){ var x = a4St(a); return A4.st === "all" ? true : A4.st === "mine" ? T.indexOf(a) >= 0 : A4.st === "open" ? /^s|ret|post/.test(x) : A4.st === "done" ? x === "done" : x === A4.st; })
+    .sort(function(a, b){ return String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || "")); });
+  var who = []; L.forEach(function(a){ if (a.by && who.indexOf(a.by) < 0) who.push(a.by); });
+  tracked().forEach(function(e){ ["Digital", "Design"].forEach(function(k){ if (e[k] && who.indexOf(e[k]) < 0) who.push(e[k]); }); });
+  st.forEach(function(x){ if (x.who && who.indexOf(x.who) < 0) who.push(x.who); });
+  who.sort(function(a, b){ return a.localeCompare(b, "vi"); });
+  var seg = function(key, opts){ return '<span class="o4seg" role="group">' + opts.map(function(o){ return '<button data-a4="' + key + '" data-v="' + o[0] + '" aria-pressed="' + (A4[key] === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; };
+  var rows = F.length ? F.map(function(a){
+      var on = A4.open === a.id;
+      return '<tr class="r' + (on ? " on" : "") + '" data-a4="open" data-id="' + esc(a.id) + '"><td class="nm"><b>' + esc(a.title) + "</b><small>" + (a.kind === "post" ? "Bài đăng" : esc(AP_DOC[a.docType] || "Thiết kế") + (a.external === "x" ? " · designer ngoài" : "")) + "</small></td>" +
+        "<td>" + esc(apScope(a)) + "</td><td>" + esc(a.by || "") + "</td><td>" + a4Where(a) + '</td><td class="num">' + esc(ago(a.updatedAt || a.createdAt)) + "</td></tr>" +
+        (on ? '<tr><td class="det" colspan="5">' + apCard(a) + "</td></tr>" : ""); }).join("")
+    : '<tr><td colspan="5"><p class="empty" style="margin:10px 0">' + (A4.st === "mine" ? "Không có việc nào chờ bạn." : "Không có ấn phẩm / bài đăng khớp bộ lọc.") + "</p></td></tr>";
+  var P = who.map(function(p){
+    var A = L.filter(function(a){ return a.by === p; }), M = MT.filter(function(t){ return t.pic === p; });
+    var n = function(k){ return A.filter(function(a){ var x = a4St(a); return k === "s" ? /^s/.test(x) : k === "done" ? x === "done" && a4Recent(a) : x === k; }).length; };
+    var ov = M.filter(function(t){ return stateOf(t) === "over"; }).length, rv = L.filter(function(a){ return apWho(a) === p; }).length;
+    return '<tr class="r" data-a4="who" data-v="' + esc(p) + '"><td class="nm"><span style="display:flex;align-items:center;gap:8px">' + av(p, "s") + "<b>" + esc(p) + "</b></span></td>" +
+      '<td class="num">' + (n("s") || "·") + '</td><td class="num">' + (n("ret") ? '<span class="crit">' + n("ret") + "</span>" : "·") + '</td><td class="num">' + (n("post") || "·") + '</td><td class="num">' + (n("done") || "·") + "</td>" +
+      '<td class="num">' + (rv || "·") + '</td><td class="num">' + (M.length || "·") + (ov ? ' <span class="crit">· ' + ov + " trễ</span>" : "") + "</td></tr>"; }).join("");
+  var tk = MT.slice(0, A4.allT ? 200 : 15).map(function(t){ var e = evById(t.eventId), dl = dueLabel(t);
+    return '<tr class="r" data-open="' + esc(t.id) + '"><td class="nm"><b>' + esc(t.title) + "</b><small>" + esc(e ? e.name : "") + "</small></td><td>" + esc(t.pic || "chưa giao") + "</td>" +
+      '<td class="num' + (dl.c === "crit" ? " crit" : "") + '">' + esc(dl.t) + (dl.s ? "<small>" + esc(dl.s) + "</small>" : "") + "</td><td>" + esc(t.status || "Chưa làm") + "</td></tr>"; }).join("");
+  return '<div class="o4h"><div><h1>MKT Online</h1><p>Ấn phẩm & bài đăng của cả nhóm — ai cũng xem được. Duyệt: ' + st.map(function(s){ return esc(s.label); }).join(" → ") + (L.some(function(a){ return a.kind === "post"; }) || true ? " → đăng bài" : "") + ".</p></div><span class=\"sp\"></span>" +
+      (S.D.online ? '<a class="btn" href="' + esc(S.D.online) + '" target="_blank" rel="noopener">' + ic("folder") + "Folder MKT Online</a>" : "") +
+      '<button class="btn pri" data-ap="new">' + ic("plus") + "Gửi duyệt</button></div>" +
+    (T.length ? '<div class="o4me"><b>Cần bạn xử lý: ' + T.length + "</b><span>" + esc(T.slice(0, 3).map(function(a){ return a.title; }).join(" · ")) + (T.length > 3 ? " …" : "") + '</span><span style="flex:1"></span><button class="btn sm" data-a4="st" data-v="mine">Xem</button></div>' : "") +
+    '<div class="o4st">' + STG.map(function(x){ return '<button data-a4="st" data-v="' + x[0] + '" aria-pressed="' + (A4.st === x[0]) + '"' + (x[0] === "ret" && x[2] ? ' class="ret"' : "") + "><span>" + esc(x[1]) + '</span><b class="num">' + x[2] + "</b><small>" + esc(x[3]) + "</small></button>"; }).join("") + "</div>" +
+    '<div class="o4f">' + seg("kind", [["all", "Tất cả"], ["post", "Bài đăng"], ["design", "Thiết kế"]]) + seg("scope", [["all", "Mọi nhóm"], ["event", "Sự kiện"], ["product", "Sản phẩm"], ["other", "Khác"]]) +
+      '<select data-a4sel="who" aria-label="Người làm"><option value="">Mọi người làm</option>' + who.map(function(p){ return '<option value="' + esc(p) + '"' + (A4.who === p ? " selected" : "") + ">" + esc(p) + "</option>"; }).join("") + "</select>" +
+      '<span class="sp"></span>' + (A4.st !== "all" ? '<button class="btn sm ghost" data-a4="st" data-v="all">Xem tất cả (' + base.length + ")</button>" : "") + "</div>" +
+    '<div class="o4card"><table class="o4t"><thead><tr><th>Ấn phẩm / bài đăng</th><th>Thuộc</th><th>Người làm</th><th>Đang ở</th><th style="text-align:right">Cập nhật</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+    '<div class="o4grid"><div><h2 class="o4sec">Theo người</h2><p>Bấm tên để lọc bảng trên.</p><div class="o4card"><table class="o4t"><thead><tr><th>Người</th><th style="text-align:right">Đang duyệt</th><th style="text-align:right">Trả lại</th><th style="text-align:right">Chờ đăng</th><th style="text-align:right">Xong 30 ngày</th><th style="text-align:right">Chờ người này duyệt</th><th style="text-align:right">Việc sự kiện ≤ 14 ngày</th></tr></thead><tbody>' +
+      (P || '<tr><td colspan="7"><p class="empty" style="margin:10px 0">Chưa có dữ liệu.</p></td></tr>') + "</tbody></table></div></div>" +
+    '<div><h2 class="o4sec">Việc truyền thông & ấn phẩm trong sự kiện</h2><p>Việc vai trò Truyền thông / Ấn phẩm chưa xong, hạn trong 14 ngày tới hoặc đã trễ — bấm để mở việc.</p><div class="o4card"><table class="o4t"><thead><tr><th>Việc</th><th>Người</th><th style="text-align:right">Hạn</th><th>Trạng thái</th></tr></thead><tbody>' +
+      (tk || '<tr><td colspan="4"><p class="empty" style="margin:10px 0">Không có việc nào trong 14 ngày tới.</p></td></tr>') + "</tbody></table></div>" +
+      (MT.length > 15 ? '<p style="margin:8px 0 0"><button class="btn sm ghost" data-a4="allT">' + (A4.allT ? "Thu gọn" : "Hiện tất cả " + MT.length + " việc") + "</button></p>" : "") + "</div></div>";
+};
+document.addEventListener("click", function(ev){
+  var a = ev.target.closest && ev.target.closest("[data-a4]"); if (!a || ev.target.closest(".apc")) return;
+  ev.preventDefault(); var k = a.dataset.a4, v = a.dataset.v;
+  if (k === "allT"){ A4.allT = !A4.allT; render(); return; }
+  if (k === "open"){ A4.open = A4.open === a.dataset.id ? "" : a.dataset.id; }
+  else if (k === "who"){ A4.who = A4.who === v ? "" : v; A4.st = "all"; window.scrollTo(0, 0); }
+  else if (k === "st" || k === "kind" || k === "scope") A4[k] = v;
+  render();
+}, true);
+document.addEventListener("change", function(ev){ var x = ev.target; if (x && x.dataset && x.dataset.a4sel === "who"){ A4.who = x.value; render(); } });
+
+/* menu: "Duyệt" ⇒ "MKT Online" (ai cũng thấy; số đỏ = việc chờ bạn) */
+var _shell40 = shell;
+shell = function(){
+  var h = _shell40(), n = 0; try { n = apTodo().length; } catch(x){}
+  return h.replace(/<a href="#apv"([^>]*)>([\s\S]*?)Duyệt(?: <span class="badge">\d+<\/span>)?<\/a>/, function(m, at, icon){ return '<a href="#online"' + at + ">" + icon + "MKT Online" + (n ? ' <span class="badge">' + n + "</span>" : "") + "</a>"; })
+;
+};
+
+/* Tổng quan: thêm 1 dòng MKT Online */
+var _vBoard40 = vBoard;
+vBoard = function(){
+  var h = _vBoard40(), L = apList(), c = function(re){ return L.filter(function(a){ return re.test(a4St(a)); }).length; };
+  var line = '<div class="b4mk"><b>MKT Online</b><span>' + c(/^s/) + " đang duyệt</span><span>·</span><span" + (c(/^ret$/) ? ' class="crit"' : "") + ">" + c(/^ret$/) + " trả lại</span><span>·</span><span>" + c(/^post$/) + " chờ đăng</span><span>·</span><span>" +
+    L.filter(function(a){ return a4St(a) === "done" && a4Recent(a); }).length + ' xong 30 ngày qua</span><span class="sp"></span><a class="btn sm" href="#online">Xem MKT Online</a></div>';
+  var i = h.indexOf('<section class="card">'); return i > 0 ? h.slice(0, i) + line + h.slice(i) : h + line;
+};
+
+/* ④ giao diện thử ui2: các màn MKT Online / Trình bày dùng giao diện chính */
+if (window.EH_UI2 && window.EH_UI2.render){
+  var _u2r = window.EH_UI2.render;
+  window.EH_UI2.render = function(){
+    if (S.view === "apv" || S.view === "present"){ document.body.classList.remove("u2"); return false; }
+    var ok = _u2r.apply(this, arguments);
+    var sp = ok && document.querySelector(".u2top .u2sp");
+    if (sp && !document.querySelector('.u2top a[href="#online"]')) sp.insertAdjacentHTML("beforebegin", '<a class="btn sm" href="#online">MKT Online' + (apTodo().length ? ' <span class="badge">' + apTodo().length + "</span>" : "") + "</a>");
+    return ok;
+  };
+}
+window.addEventListener("hashchange", function(){
+  var h = decodeURIComponent(location.hash.replace(/^#/, ""));
+  if (/^apv-/.test(h)){ A4.open = h.slice(4); A4.st = "all"; A4.kind = "all"; A4.scope = "all"; A4.who = ""; render(); }
+});
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
 })();
