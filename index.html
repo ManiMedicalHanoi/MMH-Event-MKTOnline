@@ -1064,6 +1064,28 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px}
 .ring-row .big,.dbox .big{color:var(--navy)}
 </style>
 
+<style id="v33-css">
+/* v3.3 — bảng chọn việc theo mẫu Event form_Task */
+.mbox.pkbox{width:min(880px,calc(100vw - 24px))}
+.pk{gap:14px}
+.pk-top{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.pk-top>div:first-child{flex:1;min-width:220px}
+.pk-seg{display:flex;gap:6px;flex-wrap:wrap}
+.pk-ph{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.pk-ph header{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.pk-no{display:inline-grid;place-items:center;min-width:26px;height:22px;padding:0 6px;border-radius:6px;background:var(--surface,#fff);border:1px solid var(--line);font-size:12px;font-weight:600}
+.pk-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto minmax(120px,170px);gap:10px;align-items:center;padding:7px 12px;border-top:1px solid var(--line);cursor:pointer}
+.pk-row:first-of-type{border-top:0}
+.pk-row.has{opacity:.6;cursor:default}
+.pk-row input[type=checkbox]{width:16px;height:16px;margin:0}
+.pk-t{font-size:14px;line-height:1.35}
+.pk-d{font-size:12.5px;color:var(--ink2);white-space:nowrap}
+.pk-p.in{padding:4px 8px;font-size:13px;height:auto}
+.pk-reg{margin-bottom:6px}
+.pk-ph header .sp{flex:1}
+.pk-d.past{color:var(--crit)}
+@media (max-width:640px){.pk-row{grid-template-columns:20px minmax(0,1fr);row-gap:4px}.pk-d,.pk-p{grid-column:2}}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1073,7 +1095,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.2"
+  ver: "3.3"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -1890,7 +1912,7 @@ function vEvent(e){
     '<div><div class="small muted" style="margin-bottom:6px;display:flex;align-items:center">Đội sự kiện' + (boss ? '<button class="btn sm ghost" style="margin-left:auto;padding:2px 8px" data-act="teamedit">' + ic("edit") + 'Đổi</button>' : "") + '</div><div class="team2">' + roles.map(function(r){
       var v = e[r] || ""; return '<span class="tmc' + (v ? "" : " none") + '">' + av(v, "s") + "<span><small>" + esc(ROLE_VI[r].replace(/ \(.*\)$/, "")) + "</small><b>" + esc(v || "Chưa chọn") + "</b></span></span>"; }).join("") + "</div></div>" +
     phaseBox(e, s) +
-    '<div class="hacts">' + (boss ? '<button class="btn pri sm" data-act="quickadd">' + ic("plus") + 'Thêm việc</button><button class="btn sm" data-act="remindteam">' + ic("mail") + "Nhắc cả đội</button>" : "") +
+    '<div class="hacts">' + (boss ? '<button class="btn pri sm" data-act="quickadd">' + ic("plus") + 'Thêm việc</button><button class="btn sm" data-act="pickform" data-ev="' + esc(e.id) + '">' + ic("list") + 'Chọn việc theo mẫu</button><button class="btn sm" data-act="remindteam">' + ic("mail") + "Nhắc cả đội</button>" : "") +
     (e.planUrl ? '<a class="btn sm" href="' + esc(e.planUrl) + '" target="_blank" rel="noopener">' + ic("out") + "File kế hoạch</a>" : "") + (e.folderUrl ? '<a class="btn sm" href="' + esc(e.folderUrl) + '" target="_blank" rel="noopener">' + ic("folder") + "Thư mục tệp</a>" : "") + "</div></div></div>";
   var cm = (IX.cmE[e.id] || []);
   if (S.tab === "board" || S.tab === "timeline"){ S.tv = S.tab === "board" ? "board" : "timeline"; S.tab = "progress"; }
@@ -3281,6 +3303,123 @@ function v3Click(a, ev){
   if (k === "nskip"){ a.disabled = true; v3Save("notice.skip", { eventId: S.evId, nid: a.dataset.nid }).then(function(d){ setNotices(S.evId, d.notices); render(); }).catch(function(err){ a.disabled = false; toast(err.message, true); }); return; }
 }
 S.gOpen = LS.get("eh_gopen") === "1";
+
+/* ═════════ v3.3 (18/11/2026) — họp Marketing với Thương: việc theo mẫu "Event form_Task" (Report Hub Marketing), 3 giai đoạn, tick chọn,
+   PIC theo mẫu (đổi được), hạn = ngày thật tính từ ngày D; tuyển sinh từ file Data đăng ký tổng; trả lại ⇒ file nộp vào Thùng rác ═════════ */
+var FORM = { d: null, at: 0, busy: false, err: "" };
+try { var f0 = JSON.parse(LS.get("eh_form1") || "null"); if (f0 && f0.forms) { FORM.d = f0; FORM.at = +f0._t || 0; } } catch(x){}
+function formLoad(force){
+  if (FORM.busy || (!force && FORM.d && Date.now() - FORM.at < 6e5)) return;
+  FORM.busy = true; FORM.err = "";
+  api("ehForm", force ? { force: "1" } : {}).then(function(d){
+    FORM.busy = false;
+    if (!d || !d.ok){ FORM.err = (d && d.error) || "Không đọc được mẫu việc."; render(); return; }
+    d._t = Date.now(); FORM.d = d; FORM.at = d._t; LS.set("eh_form1", JSON.stringify(d)); if (S.modal && S.modal.k === "pick") render();
+  }).catch(function(e){ FORM.busy = false; FORM.err = e.message; if (S.modal && S.modal.k === "pick") render(); });
+}
+var FK = [["EXHIBITION", "Triển lãm"], ["SEMINAR", "Hội thảo"], ["WORKSHOP", "Workshop"]];
+function fkOf(type){ var t = norm(type); return /trien lam|exhib|booth/.test(t) ? "EXHIBITION" : /workshop|thuc hanh|hands/.test(t) ? "WORKSHOP" : "SEMINAR"; }
+function fDue(e, off){ if (off == null || !e.start) return ""; var b = d0(off > 0 ? (e.end || e.start) : e.start); return b ? iso(addD(b, off)) : ""; }
+function fPic(name){ var n = norm(String(name || "").replace(/\(.*?\)/g, "")).trim(), hit = ""; people().forEach(function(p){ if (!hit && norm(p).trim() === n) hit = p; }); return hit || String(name || "").replace(/\s*\(.*?\)\s*/g, " ").trim(); }
+function fHave(e){ var h = {}; tasksOf(e.id).forEach(function(t){ h[(t.phase || "") + "|" + norm(t.title).replace(/[^a-z0-9]+/g, " ").trim()] = 1; }); return h; }
+function fRows(m, e){
+  var F = FORM.d && FORM.d.forms && FORM.d.forms[m.fk], have = fHave(e);
+  if (!F) return [];
+  return F.phases.map(function(ph){
+    var pn = ph.no + " · " + ph.name;
+    return { ph: ph, pn: pn, tasks: ph.tasks.map(function(t){
+      var dueOff = t.e != null ? t.e : (t.eText ? null : t.s);
+      return { t: t, has: !!have[pn + "|" + norm(t.title).replace(/[^a-z0-9]+/g, " ").trim()], s: fDue(e, t.s), d: dueOff == null ? "" : fDue(e, dueOff) };
+    }) };
+  });
+}
+function mPick(m){
+  var e = evById(m.ev); if (!e) return mHead("Chọn việc theo mẫu") + '<div class="mb">Không thấy sự kiện.</div>';
+  if (!FORM.d){ formLoad(); return mHead("Chọn việc theo mẫu") + '<div class="mb">' + (FORM.err ? '<p style="color:var(--crit)">' + esc(FORM.err) + '</p><button class="btn" data-pk="reload">Thử lại</button>' : '<p class="muted">Đang đọc mẫu việc từ sheet Event form_Task…</p>') + "</div>"; }
+  if (!m.fk) m.fk = fkOf(e.type);
+  var R = fRows(m, e), P = people();
+  if (!m.sel){ m.sel = {}; m.pic = {}; R.forEach(function(g){ g.tasks.forEach(function(x){ if (!x.has) m.sel[x.t.key] = 1; }); }); }
+  var n = Object.keys(m.sel).filter(function(k){ return m.sel[k]; }).length;
+  var head = '<div class="pk-top"><div><b>' + esc(e.name) + '</b><div class="small muted">Ngày D = ' + fmt(e.start) + (e.end && e.end !== e.start ? " – " + fmt(e.end) : "") + " · hạn tính từ ngày D, đổi ngày sự kiện thì hạn tự dời</div></div>" +
+    '<div class="pk-seg" role="tablist">' + FK.map(function(k){ return '<button class="chip" data-pk="fk" data-k="' + k[0] + '" aria-pressed="' + (m.fk === k[0]) + '">' + k[1] + "</button>"; }).join("") + "</div></div>";
+  var body = R.length ? R.map(function(g, gi){
+    var free = g.tasks.filter(function(x){ return !x.has; }), on = free.filter(function(x){ return m.sel[x.t.key]; }).length;
+    return '<section class="pk-ph"><header><span class="pk-no">' + esc(g.ph.no) + "</span><b>" + esc(g.ph.name) + '</b><small class="muted">' + g.tasks.length + " việc</small><span class=\"sp\"></span>" +
+      (free.length ? '<button class="btn sm ghost" data-pk="all" data-g="' + gi + '" data-on="' + (on < free.length ? 1 : 0) + '">' + (on < free.length ? "Chọn hết" : "Bỏ hết") + "</button>" : "") + "</header>" +
+      g.tasks.map(function(x){ var t = x.t, k = esc(t.key), pv = m.pic[t.key] != null ? m.pic[t.key] : fPic(t.pic), opts = P.indexOf(pv) < 0 && pv ? [pv].concat(P) : P;
+        return '<label class="pk-row' + (x.has ? " has" : "") + '"><input type="checkbox" data-pk="sel" data-k="' + k + '"' + (x.has ? " disabled checked" : m.sel[t.key] ? " checked" : "") + ">" +
+          '<span class="pk-t">' + esc(t.title) + (x.has ? ' <small class="muted">· đã có</small>' : "") + "</span>" +
+          '<span class="pk-d num' + (!x.has && x.d && x.d < TISO ? ' past" title="Hạn đã qua — tạo xong hãy đổi hạn' : "") + '">' + (x.s && x.s !== x.d ? fmt(x.s) + " → " : "") + (x.d ? fmt(x.d) : '<i class="muted">' + esc(t.eText || "—") + "</i>") + "</span>" +
+          (x.has ? '<span class="pk-p small muted">' + esc(pv) + "</span>" : '<select class="in pk-p" data-pk="pic" data-k="' + k + '"><option value="">Chưa giao</option>' + opts.map(function(p){ return '<option' + (p === pv ? " selected" : "") + ">" + esc(p) + "</option>"; }).join("") + "</select>") + "</label>"; }).join("") + "</section>";
+  }).join("") : '<p class="muted">Sheet Event form_Task chưa có khối cho loại này.</p>';
+  return mHead("Chọn việc theo mẫu") + '<div class="mb pk">' + head + body +
+    '<p class="small muted" style="margin:0">Mẫu đọc từ sheet <b>' + esc(FORM.d.sheet || "Event form_Task") + "</b> (Report Hub Marketing) · cập nhật " + esc(String(FORM.d.at || "").slice(0, 16).replace("T", " ")) + ' · <a href="#" data-pk="reload">đọc lại</a></p>' +
+    '<p class="err small" id="pk-err" style="color:var(--crit);margin:0"></p></div><div class="mf"><span class="small muted" id="pk-n">Đã chọn ' + n + ' việc</span><span class="sp"></span><button class="btn" data-act="mclose">Để sau</button><button class="btn pri" data-pk="go"' + (n ? "" : " disabled") + ">" + ic("plus") + "Tạo " + n + " việc</button></div>";
+}
+function pkCount(){ var m = S.modal, n = Object.keys(m.sel).filter(function(k){ return m.sel[k]; }).length, b = $('[data-pk="go"]'), s = $("#pk-n"); if (s) s.textContent = "Đã chọn " + n + " việc"; if (b){ b.disabled = !n; b.innerHTML = ic("plus") + "Tạo " + n + " việc"; } }
+document.addEventListener("change", function(ev){
+  var x = ev.target, m = S.modal; if (!m || m.k !== "pick" || !x.dataset || !x.dataset.pk) return;
+  if (x.dataset.pk === "sel"){ m.sel[x.dataset.k] = x.checked ? 1 : 0; pkCount(); }
+  if (x.dataset.pk === "pic") m.pic[x.dataset.k] = x.value;
+});
+document.addEventListener("click", function(ev){
+  var a = ev.target.closest && ev.target.closest("[data-pk]"), m = S.modal; if (!a || !m || m.k !== "pick") return;
+  var k = a.dataset.pk; if (k === "sel" || k === "pic") return;
+  ev.preventDefault(); ev.stopPropagation();
+  if (k === "reload"){ FORM.d = null; formLoad(true); render(); return; }
+  if (k === "fk"){ m.fk = a.dataset.k; m.sel = null; render(); return; }
+  if (k === "all"){ var g = fRows(m, evById(m.ev))[+a.dataset.g], on = a.dataset.on === "1"; g.tasks.forEach(function(x){ if (!x.has) m.sel[x.t.key] = on ? 1 : 0; }); render(); return; }
+  if (k === "go"){
+    var e = evById(m.ev), picks = [];
+    fRows(m, e).forEach(function(g){ g.tasks.forEach(function(x){ if (!x.has && m.sel[x.t.key]) picks.push({ key: x.t.key, pic: m.pic[x.t.key] != null ? m.pic[x.t.key] : fPic(x.t.pic) }); }); });
+    if (!picks.length) return;
+    a.disabled = true; a.textContent = "Đang tạo…";
+    api("ehSave", { op: "event.pick", rid: rid(), data: { eventId: e.id, picks: picks } }).then(function(d){
+      if (!d || !d.ok) throw new Error(d && d.error || "Không tạo được việc");
+      S.D.tasks = S.D.tasks.concat(d.tasks || []); S.modal = null; S.evId = e.id; S.tab = "progress"; render();
+      done(d, "Đã tạo " + (d.tasks || []).filter(function(t){ return t.parentId; }).length + " việc theo mẫu");
+    }).catch(function(err){ a.disabled = false; pkCount(); var t = $("#pk-err"); if (t) t.textContent = err.message; });
+  }
+}, true);
+var _modal33 = modal;
+modal = function(){
+  var m = S.modal; if (!m || m.k !== "pick") return _modal33();
+  return '<div class="modal" data-act="mclose"><div class="mbox pkbox" role="dialog" aria-modal="true" data-stop="1">' + mPick(m) + "</div></div>";
+};
+/* tạo sự kiện ⇒ không sinh mẫu cũ, mở ngay bảng chọn việc */
+addEvent = function(data){
+  data.template = false;
+  return api("ehSave", { op: "event.add", rid: rid(), data: data }).then(function(d){
+    if (!d || !d.ok) throw new Error(d && d.error || "Không tạo được sự kiện");
+    S.D.events.push(d.event); S.D.tasks = S.D.tasks.concat(d.tasks || []); S.evId = d.event.id; S.tab = "progress";
+    location.hash = "ev-" + d.event.id; S.modal = { k: "pick", ev: d.event.id }; formLoad(); render(); done(d, "Đã tạo sự kiện — chọn việc theo mẫu"); return d.event;
+  });
+};
+/* ô "Tạo sẵn việc theo mẫu SOP" cũ ⇒ chú thích bước chọn việc */
+var _mEvent33 = mEvent;
+mEvent = function(m){
+  return _mEvent33(m).replace(/<label class="tg"><input type="checkbox" id="f-tpl"[^>]*>[^<]*<\/label>/, '<p class="small muted" style="margin:0">' + ic("list") + " Tạo xong sẽ mở bảng <b>chọn việc theo mẫu</b> (Event form_Task · 3 giai đoạn trước / trong / sau sự kiện).</p>");
+};
+/* trả lại việc chờ duyệt ⇒ nhắc file vào Thùng rác */
+var _mReturn33 = mReturn;
+mReturn = function(m){
+  var t = taskById(m.id), nf = t ? (S.D.files || []).filter(function(f){ return f.taskId === t.id && f.driveId; }).length : 0;
+  return _mReturn33(m).replace('<div class="mf">', (nf ? '<p class="small" style="margin:0 18px 10px;color:var(--warn)">' + ic("trash") + " " + nf + " file đã nộp sẽ chuyển vào Thùng rác Drive (khôi phục được trong 30 ngày).</p>" : "") + '<div class="mf">');
+};
+/* tuyển sinh từ file tổng: thêm Done / Pending / Cancel + MANI / NPP */
+var _pReg33 = pReg;
+pReg = function(e){
+  var h = _pReg33(e), x = regOf(e) || {}, f = x.f;
+  if (!f || !f.master) return h;
+  var box = '<div class="rtiles pk-reg">' + [["Done", f.conf], ["Pending", f.pending], ["Cancel", f.cancel], ["MANI tuyển", f.mani], ["NPP tuyển", f.npp]].map(function(t){ return '<div><span>' + t[0] + '</span><b class="num">' + (t[1] || 0) + "</b><small></small></div>"; }).join("") + "</div>" +
+    '<p class="small muted" style="margin:0 0 6px">Số đếm từ file <b>Data đăng ký sự kiện (tổng)</b>, khớp theo tên sự kiện ở cột EVENT NAME · không hiện họ tên / SĐT.</p>';
+  return h.replace('<div class="pbody3">', '<div class="pbody3">' + box);
+};
+/* nút "Chọn việc theo mẫu" trong khung sự kiện (Owner / quản lý) */
+document.addEventListener("click", function(ev){
+  var a = ev.target.closest && ev.target.closest('[data-act="pickform"]'); if (!a) return;
+  ev.preventDefault(); ev.stopPropagation(); S.modal = { k: "pick", ev: a.dataset.ev || S.evId }; formLoad(); render();
+}, true);
 
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);

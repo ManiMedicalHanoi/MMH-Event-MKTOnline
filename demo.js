@@ -258,8 +258,25 @@
       rows.map(function(r){ return '<tr><td style="padding:5px 14px 5px 0;color:#4F5B68;border-bottom:1px solid #E3EAF2">' + h(r[0]) + '</td><td style="padding:5px 0;font-weight:600;border-bottom:1px solid #E3EAF2">' + h(r[1]) + "</td></tr>"; }).join("") + "</table><p>Quý đối tác có thể xem số đăng ký cập nhật hằng ngày tại: <a href=\"" + link + "\">" + link + "</a></p><p>Mọi trao đổi xin vui lòng phản hồi email này.</p><p>Trân trọng,<br><b>" + h(e.Owner) + "</b><br>Marketing · MANI Medical Hanoi</p></div>";
     return { to: pt.email, cc: [pt.cc, e.Owner ? "email của " + e.Owner : ""].filter(Boolean).join(", "), subject: (rule === "final" ? "Nhắc lịch" : "Cập nhật đăng ký") + " — " + e.name, html: html, from: e.Owner,
       text: "Kính gửi Quý đối tác " + pt.name + ",\n\n" + lead + "\n\n" + rows.map(function(r){ return "- " + r[0] + ": " + r[1]; }).join("\n") + "\n\nXem số đăng ký cập nhật hằng ngày: " + link + "\n\nTrân trọng,\n" + e.Owner + "\nMarketing · MANI Medical Hanoi" }; }
+  /* v3.3 — mẫu việc giả lập theo bố cục sheet Event form_Task (3 khối, 3 giai đoạn) */
+  var FORM9 = (function(){
+    var mk = function(key, rows){ var phases = [], ph = null; rows.forEach(function(r){ if (/^(I|II|III)$/.test(r[0])){ ph = { no: r[0], name: r[1], tasks: [] }; phases.push(ph); return; }
+      var off = function(x){ var m = /^D\s*([+-–]\s*\d+)?$/.exec(x); return m ? (m[1] ? +m[1].replace(/[–\s]/g, "").replace(/^-/, "-") : 0) : null; };
+      ph.tasks.push({ no: r[0], title: r[1], pic: r[2], s: off(r[3]), e: off(r[4]), sText: r[3], eText: r[4], key: key + "|" + ph.no + "|" + r[1] }); }); return { label: key, phases: phases }; };
+    return { ok: true, sheet: "Event form_Task", at: "2026-11-18T09:00:00", forms: {
+      EXHIBITION: mk("EXHIBITION", [["I", "CHUẨN BỊ"], ["1", "Đăng ký gian hàng với BTC", "Thuong", "D -120", "D -90"], ["2", "Lên kế hoạch tổng thể, ngân sách", "Thuong", "D -90", "D -75"],
+        ["3", "Thiết kế gian hàng (booth)", "Duc Anh", "D -60", "Theo hạn BTC"], ["4", "Đặt in ấn phẩm, standee", "Duc Anh", "D -30", "D -14"], ["5", "Chuẩn bị hàng trưng bày, quà tặng", "Trang", "D -21", "D -7"],
+        ["6", "Bài đăng thông báo tham gia triển lãm", "Minh Trang", "D -14", "D -7"], ["II", "TRONG TRIỂN LÃM"], ["1", "Setup gian hàng", "Trang", "D -1", "D -1"], ["2", "Trực gian hàng, thu thông tin khách", "Thuong", "D", "D"],
+        ["3", "Chụp ảnh, livestream", "Minh Trang", "D", "D"], ["III", "SAU TRIỂN LÃM"], ["1", "Tổng hợp danh sách khách, chuyển Sales", "Thuong", "D +1", "D +3"], ["2", "Báo cáo kết quả, chi phí", "Thuong", "D +3", "D +7"], ["3", "Bài đăng tổng kết", "Minh Trang", "D +1", "D +5"]]),
+      SEMINAR: mk("SEMINAR", [["I", "TRƯỚC SỰ KIỆN"], ["1", "Chốt KOL, chủ đề, địa điểm", "Thuong", "D -60", "D -45"], ["2", "Key visual, poster", "Duc Anh", "D -40", "D -30"], ["3", "Form đăng ký + bài đăng mở đăng ký", "Minh Trang", "D -30", "D -28"],
+        ["4", "Chia chỉ tiêu tuyển sinh cho NPP", "Thuong", "D -30", "D -25"], ["5", "Chuẩn bị quà, tài liệu", "Trang", "D -14", "D -3"], ["II", "TRONG SỰ KIỆN"], ["1", "Check-in, ký tay", "Trang", "D", "D"], ["2", "Chụp ảnh, quay video", "Minh Trang", "D", "D"],
+        ["III", "SAU SỰ KIỆN"], ["1", "Gửi thư cảm ơn, khảo sát", "Thuong", "D +1", "D +3"], ["2", "Follow up khách cùng NPP", "Thuong", "D +1", "D +14"], ["3", "Báo cáo sự kiện", "Thuong", "D +3", "D +7"]]),
+      WORKSHOP: mk("WORKSHOP", [["I", "TRƯỚC SỰ KIỆN"], ["1", "Chốt giảng viên, nội dung thực hành", "Thuong", "D -45", "D -30"], ["2", "Chuẩn bị hàng thực hành", "Trang", "D -21", "D -7"], ["3", "Poster + form đăng ký", "Duc Anh", "D -30", "D -25"],
+        ["II", "TRONG SỰ KIỆN"], ["1", "Setup phòng, dụng cụ", "Trang", "D -1", "D"], ["III", "SAU SỰ KIỆN"], ["1", "Follow up, ra đơn", "Thuong", "D +1", "D +14"], ["2", "Báo cáo sự kiện", "Thuong", "D +3", "D +7"]]) } };
+  })();
   window.EH_DEMO = { data: D, api: function(action, p){
     N = [];
+    if (action === "ehForm") return ok(FORM9);
     if (action === "ehBoot") return ok(Object.assign({}, D, { me: ME }));
     if (action === "ehSync") return ok({ message: "Bản xem trước — không có file kế hoạch thật để đồng bộ." });
     if (action === "ehLink") return ok({ message: "Bản xem trước — dữ liệu file MKT Offline / Digital là dữ liệu mẫu." });
@@ -307,6 +324,17 @@
       if (op === "notice.skip"){ pn.status = "Bỏ qua"; pn.sentAt = now(); pn.by = ME.pic; return ok({ notices: evN() }); }
     }
     if (op === "cfg.save"){ if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được đổi cài đặt." }); D.cfg = Object.assign({}, D.cfg, d); return ok({ cfg: D.cfg }); }
+    if (op === "event.pick"){ var pe9 = by(D.events, "id", d.eventId); if (!canEv(pe9)) return ok({ ok: false, error: "Chỉ Owner sự kiện hoặc quản lý được thêm việc theo mẫu." });
+      var F9 = FORM9.forms[/trien lam|triển lãm|exhib/i.test(pe9.type) ? "EXHIBITION" : /workshop/i.test(pe9.type) ? "WORKSHOP" : "SEMINAR"], want9 = {}, out9 = [], par9 = {}, ord9 = 0;
+      (d.picks || []).forEach(function(x){ want9[x.key] = x; });
+      var due9 = function(o){ if (o == null) return ""; var b = new Date((o > 0 ? (pe9.end || pe9.start) : pe9.start) + "T00:00:00"); b.setDate(b.getDate() + o); return b.getFullYear() + "-" + ("0" + (b.getMonth() + 1)).slice(-2) + "-" + ("0" + b.getDate()).slice(-2); };
+      D.tasks.forEach(function(t){ if (t.eventId === pe9.id){ ord9 = Math.max(ord9, +t.order || 0); if (!t.parentId && t.phase) par9[t.phase] = t.id; } });
+      F9.phases.forEach(function(ph){ var pn = ph.no + " · " + ph.name, ch = ph.tasks.filter(function(t){ return want9[t.key]; }); if (!ch.length) return;
+        if (!par9[pn]){ par9[pn] = uid("T"); out9.push({ id: par9[pn], eventId: pe9.id, parentId: "", group: pn, title: ph.name, pic: "", due: "", status: "Chưa làm", order: ++ord9, phase: pn, updatedAt: now(), updatedBy: ME.pic }); }
+        ch.forEach(function(t){ var dO = t.e != null ? t.e : (t.eText ? null : t.s); out9.push({ id: uid("T"), eventId: pe9.id, parentId: par9[pn], group: pn, title: t.title, pic: want9[t.key].pic || "", due: due9(dO), offset: dO == null ? "" : dO,
+          startAt: due9(t.s), hint: t.eText && t.e == null ? t.eText : "", status: "Chưa làm", proof: "", order: ++ord9, phase: pn, formKey: "x", milestone: "-", updatedAt: now(), updatedBy: ME.pic }); }); });
+      D.tasks = D.tasks.concat(out9); log("Thêm việc theo mẫu", pe9.id, "", out9.length + " việc");
+      return reply({ tasks: out9 }); }
     if (op === "event.add"){ if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được tạo sự kiện mới." });
       var ne = Object.assign({}, d, { id: "EV" + d.start.replace(/-/g, "").slice(2) + "-" + uid("").slice(-4), follow: "Có", src: "APP", updatedAt: now(), updatedBy: ME.pic }); delete ne.template; delete ne.notify;
       var nt = d.template === false ? [] : tasksFor(ne, null, false), lp = compress(ne, nt); if (lp) ne.latePlan = String(lp);   /* v2.4: dồn hạn (không Bỏ qua) */
