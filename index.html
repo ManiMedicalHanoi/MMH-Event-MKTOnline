@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2C4A5E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sự kiện MKT">
+<link rel="apple-touch-icon" href="img/icon-192.png">
+<link rel="icon" type="image/png" href="img/icon-192.png">
 <title>Sự kiện MKT · MMH</title>
 <meta name="description" content="Kế hoạch, giao việc và tiến độ sự kiện Marketing MMH FY68">
 <link rel="preconnect" href="https://script.google.com" crossorigin>
@@ -1086,6 +1092,43 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px}
 .pk-d.past{color:var(--crit)}
 @media (max-width:640px){.pk-row{grid-template-columns:20px minmax(0,1fr);row-gap:4px}.pk-d,.pk-p{grid-column:2}}
 </style>
+<style id="v34-stylem">
+/* v3.4 (18/11/2026) — theo Style M (brand MMH, deck MA 11/2026): Aptos mọi chữ · navy #2C4A5E · steel #5A84A6 · đường kẻ #BCD4E6 / #E0E3E6 ·
+   nền trắng, card viền mảnh không bóng · nav đang chọn = nền #99C1DE · logo MANI ô vàng ở thanh trên · chỉ giao diện sáng */
+:root{color-scheme:light;
+  --f-display:Aptos,"Segoe UI",Inter,Roboto,Arial,sans-serif;--f-body:Aptos,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+  --paper:#FFFFFF;--surface:#FFFFFF;--sunk:#F3F5F8;--ink:#232C36;--ink2:#4F5B68;--ink3:#7D8894;--line:#E0E3E6;--line2:#BCD4E6;
+  --navy:#2C4A5E;--blue:#5A84A6;--blue-s:#D6E2E9;--prog:#5A84A6;--prog-bg:#E7EFF5;--focus:#5A84A6;--mani:#FFE100;--mani-ink:#232C36;
+  --ok:#3F7F76;--ok-bg:#E3F0EE;--warn:#8A6A1F;--warn-bg:#FBE9B7;--crit:#A65A47;--crit-bg:#F6E6E1;--wait:#4E7BA2;--wait-bg:#E4EDF5;
+  --t-exh:#2C4A5E;--t-sem:#5A84A6;--t-ws:#5B9A91;--t-web:#6B95B8;--t-oth:#4F5B68;
+  --shadow:0 0 0 1px #BCD4E6;--shadow-s:none;--y-bg:#FBE9B7;--y-line:#EDD9A3}
+html,body{background:#FFFFFF;color:var(--ink);font-family:var(--f-body)}
+.card,.evc,.kpi,.mbox,.pop,.drawer,.cockpit .card{box-shadow:none!important;border-color:#BCD4E6}
+.mbox,.drawer,.pop{border:1px solid #BCD4E6}
+.evc:hover{transform:none;box-shadow:none;border-color:#5A84A6}
+header.top{background:#FFFFFF;border-bottom:1px solid #BCD4E6;box-shadow:none}
+header.top .wrap::after{content:"";flex:0 0 auto;width:58px;height:25px;margin-left:10px;background:url(img/mani_logo_box.png) center/contain no-repeat}
+.brand i{display:none}
+.brand b{font-family:var(--f-display);font-weight:700;color:#2C4A5E;letter-spacing:.02em}
+.nav a{color:#4F5B68}
+.nav a[aria-current="page"]{background:#99C1DE;color:#2C4A5E;font-weight:700;box-shadow:none}
+.h2,.sech h1,.sech h2{font-family:var(--f-display);color:#2C4A5E}
+.btn.pri,.u2pri{background:#5A84A6;border-color:#5A84A6;color:#fff}
+.btn.pri:hover{filter:none;background:#4E7698}
+.tbl thead th,table.tbl th{background:#D6E2E9;color:#2C4A5E;border-bottom:1px solid #5A84A6}
+.tbtn.inst{width:auto;padding:0 10px;gap:6px;font-size:13px;font-weight:600;color:#2C4A5E;border:1px solid #BCD4E6;border-radius:8px}
+html.standalone .tbtn.inst{display:none}
+dialog.insthow{border:1px solid #BCD4E6;border-radius:12px;padding:20px 22px;max-width:420px;font:14px/1.55 var(--f-body);color:#232C36}
+dialog.insthow::backdrop{background:rgba(35,44,54,.35)}
+dialog.insthow h3{margin:0 0 8px;font:700 16px var(--f-display);color:#2C4A5E;text-transform:uppercase;letter-spacing:.02em}
+dialog.insthow ol{margin:0 0 14px;padding-left:20px}
+.brand{flex:0 0 auto}.brand b{font-size:20px;white-space:nowrap}.brand span{white-space:nowrap}
+.tbtn.inst span,.me span,.nav a{white-space:nowrap}
+.me,.me>*,.top-r>*{flex-shrink:0}.nav{min-width:0}.me>.av{display:inline-flex!important}
+@media (max-width:1560px){.brand span{display:none}.search{width:190px}.me>span{display:none}}
+@media (max-width:1380px){.tbtn.inst span{display:none}.tbtn.inst{width:34px;padding:0;justify-content:center}.search{width:160px}}
+@media (max-width:860px){.search{width:auto}}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1095,7 +1138,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.3"
+  ver: "3.4"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -1139,7 +1182,7 @@ function ic(n){
     check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', alert:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.01"/>',
     file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', image:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>',
     link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
-    upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6L6 18"/>',
+    download:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>', upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6L6 18"/>',
     chev:'<path d="M6 9l6 6 6-6"/>', left:'<path d="M15 6l-6 6 6 6"/>', right:'<path d="M9 6l6 6-6 6"/>', search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>',
     refresh:'<path d="M20 11a8 8 0 0 0-14.6-4.4L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.6 4.4L20 16"/><path d="M20 20v-4h-4"/>',
     trash:'<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13M9 7V4h6v3"/>', grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
@@ -1552,7 +1595,7 @@ function shell(){
     '<span style="position:relative"><button class="tbtn" data-act="bell" title="Thông báo" aria-label="Thông báo">' + ic("bell") + (unseen ? '<span class="badge">' + Math.min(unseen, 99) + "</span>" : "") + "</button>" + (S.pop === "bell" ? bellPop(N, seen) : "") + "</span>" +
     (S.me && S.me.manager ? '<button class="tbtn" data-act="settings" title="Cài đặt email, nhắc việc, dữ liệu mẫu" aria-label="Cài đặt">' + ic("gear") + "</button>" : "") +
     (S.syncing && S.fromCache ? '<span class="synct" title="Đang hiện dữ liệu lưu trên máy lúc ' + new Date(S.fromCache).toTimeString().slice(0, 5) + '">Đang cập nhật…</span>' : "") +
-    '<button class="tbtn' + (S.syncing ? " spin" : "") + '" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
+    '<button class="tbtn inst" data-install="1" title="Cài app lên máy tính / điện thoại">' + ic("download") + '<span>Cài app</span></button>' + '<button class="tbtn' + (S.syncing ? " spin" : "") + '" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
     (S.me ? '<span style="position:relative"><button type="button" class="me" data-act="me" aria-haspopup="menu" aria-expanded="' + (S.pop === "me") + '" title="Tài khoản · đổi mật khẩu · đăng xuất">' + av(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></button>" + (S.pop === "me" ? mePop() : "") + "</span>" : "") +
     "</div></div></header>" +
     (smp ? '<div class="samplebar"><div class="wrap"><span><b>' + smp + ' sự kiện mẫu</b> (nhãn MẪU) để thử mọi thao tác — không gửi email thật.</span><button data-act="togglesample">' + (S.hideSample ? "Hiện dữ liệu mẫu" : "Ẩn dữ liệu mẫu") + "</button>" +
@@ -3421,6 +3464,31 @@ document.addEventListener("click", function(ev){
   ev.preventDefault(); ev.stopPropagation(); S.modal = { k: "pick", ev: a.dataset.ev || S.evId }; formLoad(); render();
 }, true);
 
+/* ═════════ v3.4 — cài thành app (manifest + service worker) ═════════ */
+/* Style M: chỉ giao diện sáng ⇒ bỏ mọi khối CSS @media (prefers-color-scheme: dark) */
+(function(){ try { Array.prototype.forEach.call(document.styleSheets, function(sh){ var R; try { R = sh.cssRules; } catch(e){ return; }
+  for (var i = R.length - 1; i >= 0; i--){ var r = R[i]; if (r.media && /prefers-color-scheme:\s*dark/.test(r.media.mediaText || r.conditionText || "")) sh.deleteRule(i); } }); } catch(e){} })();
+var INST = { ev: null };
+if (window.matchMedia && (matchMedia("(display-mode: standalone)").matches || navigator.standalone === true)) document.documentElement.classList.add("standalone");
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); INST.ev = e; });
+window.addEventListener("appinstalled", function(){ INST.ev = null; document.documentElement.classList.add("standalone"); toast("Đã cài app Sự kiện MKT"); });
+if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(function(){});
+function instHow(){
+  var ua = navigator.userAgent, ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var saf = /^((?!chrome|android|crios|fxios|edg|coc_coc).)*safari/i.test(ua), inapp = /zalo|fban|fbav|instagram|line\/|gsa\//i.test(ua);
+  var S = (inapp ? ["Đang mở trong Zalo / Messenger / Gmail: bấm <b>Mở bằng trình duyệt</b> trước."] : []).concat(ios
+    ? ["Mở trang bằng <b>Safari</b>.", "Bấm nút <b>Chia sẻ</b> (ô vuông có mũi tên lên).", "Chọn <b>Thêm vào MH chính</b>, rồi bấm <b>Thêm</b>."]
+    : saf ? ["Menu <b>Tệp</b> ▸ <b>Thêm vào Dock</b>.", "Bấm <b>Thêm</b>."]
+    : ["Mở menu <b>⋮</b> của trình duyệt (Chrome, Edge, Cốc Cốc).", "Chọn <b>Cài đặt ứng dụng</b> / <b>Thêm vào màn hình chính</b>.", "Bấm <b>Cài đặt</b>."]);
+  var d = document.getElementById("insthow");
+  if (!d){ d = document.createElement("dialog"); d.id = "insthow"; d.className = "insthow"; document.body.appendChild(d); }
+  d.innerHTML = "<h3>Cài app Sự kiện MKT</h3><ol>" + S.map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ol><div style="text-align:right"><button class="btn" type="button" onclick="this.closest(\'dialog\').close()">Đã hiểu</button></div>';
+  try { d.showModal(); } catch(e){ d.setAttribute("open", ""); }
+}
+function instGo(){ if (INST.ev){ var e = INST.ev; INST.ev = null; e.prompt(); return; } instHow(); }
+document.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest("[data-install]"); if (!b) return; ev.preventDefault(); ev.stopPropagation(); S.pop = null; instGo(); }, true);
+var _mePop34 = mePop;
+mePop = function(){ return _mePop34().replace('<button type="button" role="menuitem" data-act="pwset">', '<button type="button" role="menuitem" data-install="1">' + ic("download") + "Cài app lên máy</button>" + '<button type="button" role="menuitem" data-act="pwset">'); };
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
 })();
