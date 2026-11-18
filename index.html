@@ -1514,7 +1514,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "4.1.1"
+  ver: "4.1.2"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -1576,7 +1576,7 @@ function ic(n){
 
 /* ═════════ TRẠNG THÁI ═════════ */
 var S = { tv: LS.get("eh_tv") || "map", D: null, me: null, view: "dash", evId: null, tab: "progress", tfilter: "all", ptab: "info", evf: "up", type: "all", q: "", drawer: null, modal: null, closed: {}, loadedAt: 0,
-          cal: null, calMode: LS.get("eh_calmode") || "month", calSel: null, hideSample: LS.get("eh_hidesample") === "1", pop: null, lb: null, kanDrag: null,
+          cal: null, calMode: LS.get("eh_calmode") || "month", calSel: null, hideSample: window.EH_DEMO ? LS.get("eh_hidesample") === "1" : LS.get("eh_smp_show") !== "1",   /* v4.1.2: app thật mặc định ẩn sự kiện MẪU (số liệu / tiến độ chỉ tính dữ liệu thật) */ pop: null, lb: null, kanDrag: null,
           wkv: LS.get("eh_wkv") || "list", wkf: "", wkMine: false, otp: "month" };   /* v2.4: Tuần này (danh sách / lộ trình, lọc việc), Phân tích (kỳ đúng hạn) */
 try { S.closed = JSON.parse(LS.get("eh_closed") || "{}") || {}; } catch(e){}
 var STATUSES = ["Chưa làm", "Đang làm", "Pending", "Chờ duyệt", "Xong", "Bỏ qua"];   /* v2.4: "Pending" = cần Owner hỗ trợ (bắt buộc ghi lý do) */
@@ -1975,7 +1975,7 @@ function shell(){
     '<button class="tbtn inst" data-install="1" title="Cài app lên máy tính / điện thoại">' + ic("download") + '<span>Cài app</span></button>' + '<button class="tbtn' + (S.syncing ? " spin" : "") + '" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
     (S.me ? '<span style="position:relative"><button type="button" class="me" data-act="me" aria-haspopup="menu" aria-expanded="' + (S.pop === "me") + '" title="Tài khoản · đổi mật khẩu · đăng xuất">' + av(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></button>" + (S.pop === "me" ? mePop() : "") + "</span>" : "") +
     "</div></div></header>" +
-    (smp ? '<div class="samplebar"><div class="wrap"><span><b>' + smp + ' sự kiện mẫu</b> (nhãn MẪU) để thử mọi thao tác — không gửi email thật.</span><button data-act="togglesample">' + (S.hideSample ? "Hiện dữ liệu mẫu" : "Ẩn dữ liệu mẫu") + "</button>" +
+    (smp && (!S.hideSample || window.EH_DEMO) ? '<div class="samplebar"><div class="wrap"><span><b>' + smp + ' sự kiện mẫu</b> (nhãn MẪU) để thử mọi thao tác — không gửi email thật.</span><button data-act="togglesample">' + (S.hideSample ? "Hiện dữ liệu mẫu" : "Ẩn dữ liệu mẫu") + "</button>" +
       (S.me && S.me.admin ? '<button data-act="settings">Xoá / nạp lại dữ liệu mẫu</button>' : "") + "</div></div>" : "");
 }
 function bellPop(N, seen){
@@ -3126,7 +3126,7 @@ document.addEventListener("click", function(ev){
   if (act === "logout"){ S.meOut = true; render(); return; }
   if (act === "logout2"){ S.meOut = false; AUTH.logout(); return; }
   if (act === "bell"){ S.pop = S.pop === "bell" ? null : "bell"; if (S.pop) LS.set("eh_seen_" + me(), String(Date.now() + 1000)); render(); return; }
-  if (act === "togglesample"){ S.hideSample = !S.hideSample; LS.set("eh_hidesample", S.hideSample ? "1" : null); render(); return; }
+  if (act === "togglesample"){ S.hideSample = !S.hideSample; LS.set("eh_hidesample", S.hideSample ? "1" : null); LS.set("eh_smp_show", S.hideSample ? null : "1"); render(); return; }
   if (act === "back"){ location.hash = "events"; return; }
   if (act === "newevent"){ S.modal = { k: "event" }; render(); setTimeout(function(){ var x = $("#f-name"); if (x) x.focus(); }, 30); return; }
   if (act === "editevent"){ S.modal = { k: "event", id: S.evId }; render(); return; }
@@ -3195,7 +3195,7 @@ document.addEventListener("click", function(ev){
   if (act === "syncnow"){ a.disabled = true; a.textContent = "Đang đồng bộ…"; api("ehSync", { force: 1 }).then(function(d){ if (!d || !d.ok) throw new Error(d && d.error || "Không đồng bộ được"); toast(d.message || "Đã đồng bộ"); S.modal = null; boot(false); }).catch(function(x){ toast(x.message, true); render(); }); return; }
   if (act === "sample"){ var op = a.dataset.op; if (op === "clear" && !a.dataset.confirm){ a.dataset.confirm = "1"; a.innerHTML = ic("trash") + "Bấm lần nữa để xoá"; return; }
     a.disabled = true; a.textContent = "Đang xử lý…"; api("ehSample", { op: op }).then(function(d){ if (!d || !d.ok) throw new Error(d && d.error || "Không thực hiện được");
-      toast(op === "seed" ? "Đã nạp " + (d.seeded ? d.seeded.events + " sự kiện, " + d.seeded.tasks + " việc mẫu" : "dữ liệu mẫu") : "Đã xoá dữ liệu mẫu"); S.modal = null; S.hideSample = false; LS.set("eh_hidesample", null); boot(false); }).catch(function(x){ toast(x.message, true); render(); }); return; }
+      toast(op === "seed" ? "Đã nạp " + (d.seeded ? d.seeded.events + " sự kiện, " + d.seeded.tasks + " việc mẫu" : "dữ liệu mẫu") : "Đã xoá dữ liệu mẫu"); S.modal = null; S.hideSample = false; LS.set("eh_hidesample", null); LS.set("eh_smp_show", "1"); boot(false); }).catch(function(x){ toast(x.message, true); render(); }); return; }
 });
 document.addEventListener("change", function(ev){
   var el = ev.target;
@@ -3866,6 +3866,10 @@ function instGo(){ if (INST.ev){ var e = INST.ev; INST.ev = null; e.prompt(); re
 document.addEventListener("click", function(ev){ var b = ev.target.closest && ev.target.closest("[data-install]"); if (!b) return; ev.preventDefault(); ev.stopPropagation(); S.pop = null; instGo(); }, true);
 var _mePop34 = mePop;
 mePop = function(){ return _mePop34().replace('<button type="button" role="menuitem" data-act="pwset">', '<button type="button" role="menuitem" data-install="1">' + ic("download") + "Cài app lên máy</button>" + '<button type="button" role="menuitem" data-act="pwset">'); };
+/* v4.1.2: Hiện / Ẩn sự kiện MẪU ở menu tài khoản (dải vàng chỉ hiện khi đang xem mẫu) */
+var _mePop412 = mePop;
+mePop = function(){ var n = S.D ? S.D.events.filter(function(e){ return e.sample; }).length : 0, h = _mePop412();
+  return n ? h.replace('<button type="button" role="menuitem" data-act="pwset">', '<button type="button" role="menuitem" data-act="togglesample">' + ic("eye") + (S.hideSample ? "Hiện " + n + " sự kiện mẫu (để thử thao tác)" : "Ẩn " + n + " sự kiện mẫu") + '</button><button type="button" role="menuitem" data-act="pwset">') : h; };
 /* ═════════ v3.5 (18/11/2026) — tạo sự kiện ⇒ hệ thống tạo folder (Event FY68 hoặc folder báo cáo viên) + file tổng (Plan) · Event Access · Media · Survey ═════════ */
 var FD = { d: null, at: 0, busy: false };
 try { var fd0 = JSON.parse(LS.get("eh_dirs1") || "null"); if (fd0 && fd0.speakers) { FD.d = fd0; FD.at = +fd0._t || 0; } } catch(x){}
@@ -4335,13 +4339,13 @@ boot(false);
     if (bn.innerHTML !== h) bn.innerHTML = h;
   }
   function drawMore(){
-    var cur = curKey(), S = X("S") || {}, rl = app.querySelector("#reload"), sb = app.querySelector('.samplebar [data-act="togglesample"]');
+    var cur = curKey(), S = X("S") || {}, rl = app.querySelector("#reload"), nS = S.D ? S.D.events.filter(function(e){ return e.sample; }).length : 0;
     sheet.innerHTML = '<div class="msh-h"><span>Thêm</span><button type="button" class="msh-x" data-m="close" aria-label="Đóng">' + ic("x") + "</button></div>" +
       MORE.map(function(m){ return '<a href="#' + m[0] + '"' + (cur === m[0] ? ' aria-current="page"' : "") + ">" + ic(m[2]) + "<span>" + m[1] + "<small>" + m[3] + "</small></span></a>"; }).join("") + "<hr>" +
       '<button type="button" class="mi" data-m="reload">' + ic("refresh") + "<span>Tải lại dữ liệu<small>" + esc(rl ? (rl.getAttribute("title") || "").replace(/^Tải lại dữ liệu ?·? ?/, "") || "Lấy bản mới nhất từ máy chủ" : "") + "</small></span></button>" +
       '<button type="button" class="mi" data-install="1">' + ic("download") + "<span>Cài app lên điện thoại<small>Mở như ứng dụng, không cần gõ địa chỉ</small></span></button>" +
       (app.querySelector('header.top [data-act="settings"]') ? '<button type="button" class="mi" data-act="settings">' + ic("gear") + "<span>Cài đặt<small>Email, nhắc việc, dữ liệu mẫu</small></span></button>" : "") +
-      (sb ? '<button type="button" class="mi" data-act="togglesample">' + ic("eye") + "<span>" + esc(sb.textContent) + "<small>Sự kiện có nhãn MẪU</small></span></button>" : "");
+      (nS ? '<button type="button" class="mi" data-act="togglesample">' + ic("eye") + "<span>" + (S.hideSample ? "Hiện " + nS + " sự kiện mẫu" : "Ẩn " + nS + " sự kiện mẫu") + "<small>" + (S.hideSample ? "Đang ẩn — số liệu chỉ tính dữ liệu thật" : "Sự kiện có nhãn MẪU, để thử thao tác") + "</small></span></button>" : "");
   }
   function openMore(){ drawMore(); root.classList.add("m-more"); drawNav(); var f = sheet.querySelector("a,button"); if (f) try { f.focus({ preventScroll: true }); } catch(e){} }
   function closeMore(){ if (!root.classList.contains("m-more")) return; root.classList.remove("m-more"); drawNav(); }
@@ -4364,8 +4368,9 @@ boot(false);
   });
 
   /* ⑦ bàn phím mở ⇒ ẩn thanh dưới + nút tròn (khỏi che ô đang gõ) */
-  var kbT = 0;
-  document.addEventListener("focusin", function(ev){ var t = ev.target; if (MQ.matches && t && t.matches && t.matches("input:not([type]),input[type=text],input[type=search],input[type=email],input[type=tel],input[type=url],input[type=number],input[type=password],textarea")){ clearTimeout(kbT); root.classList.add("m-kb"); } });
+  var kbT = 0, lastTap = 0;   /* v4.1.2: chỉ khi người dùng vừa chạm vào ô (con trỏ tự đặt vào ô thì điện thoại không bật bàn phím) */
+  document.addEventListener("pointerdown", function(){ lastTap = Date.now(); }, true);
+  document.addEventListener("focusin", function(ev){ var t = ev.target; if (MQ.matches && Date.now() - lastTap < 1500 && t && t.matches && t.matches("input:not([type]),input[type=text],input[type=search],input[type=email],input[type=tel],input[type=url],input[type=number],input[type=password],textarea")){ clearTimeout(kbT); root.classList.add("m-kb"); } });
   document.addEventListener("focusout", function(){ clearTimeout(kbT); kbT = setTimeout(function(){ var a = document.activeElement; if (!a || !a.matches || !a.matches("input,textarea")) root.classList.remove("m-kb"); }, 120); });
 
   /* ③ dòng việc: dòng tóm tắt đọc từ các ô chọn (ô chọn bị ẩn trên điện thoại) */
