@@ -1268,6 +1268,7 @@ dialog.insthow ol{margin:0 0 14px;padding-left:20px}
 .e4wrap .pbody>.card{border-color:#E0E3E6!important}
 .todo2{background:#F5F8FB!important;border-left:3px solid #BCD4E6!important}
 .e4wrap .rchart{display:block;width:100%;max-width:760px;height:auto}
+.brand .bver{font-size:11px;color:#7D8894;font-weight:600;align-self:flex-end;margin:0 0 4px -4px}
 /* Tổng quan: chú giải 5 giai đoạn nhẹ hơn */
 .glegend .gl{background:#fff;border:1px solid #E0E3E6}
 .b4mk{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:13.5px;color:#4F5B68;border:1px solid #BCD4E6;border-radius:12px;padding:11px 16px;margin:14px 0;background:#fff}
@@ -1284,12 +1285,13 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "4.0"
+  ver: "4.0.1"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
 <script>/* giao diện thử ui2 (kiểu Tender Map): ?ui=2 bật, ?ui=1 tắt — nhớ ở localStorage.eh_ui */
-(function(){ try { var q = location.search; if (/[?&]ui=2/.test(q)) localStorage.setItem("eh_ui", "2"); if (/[?&]ui=1/.test(q)) localStorage.removeItem("eh_ui"); if (localStorage.getItem("eh_ui") === "2") document.write('<script src="ui2.js?v=2"><\/script>'); } catch(e){} })();</script>
+(function(){ try { var q = location.search; if (!localStorage.getItem("eh_ui40")){ localStorage.setItem("eh_ui40", "1"); localStorage.removeItem("eh_ui"); }   /* v4.0.1: mọi máy về giao diện chính 1 lần */
+  if (/[?&]ui=2/.test(q)) localStorage.setItem("eh_ui", "2"); if (/[?&]ui=1/.test(q)) localStorage.removeItem("eh_ui"); if (localStorage.getItem("eh_ui") === "2") document.write('<script src="ui2.js?v=2"><\/script>'); } catch(e){} })();</script>
 <script id="eh-js">
 "use strict";
 (function(){
@@ -1733,7 +1735,7 @@ function shell(){
   var cur = S.view === "event" ? "events" : S.view;
   var smp = S.D ? S.D.events.filter(function(e){ return e.sample; }).length : 0;
   return (window.EH_DEMO ? '<div class="demo-note">Bản xem trước — dữ liệu mẫu, thao tác chỉ lưu trên máy này, không gửi email thật.</div>' : "") +
-    '<header class="top"><div class="wrap"><a class="brand" href="#board"><i></i><b>Sự kiện MKT</b><span>MMH · FY68</span></a>' +
+    '<header class="top"><div class="wrap"><a class="brand" href="#board"><i></i><b>Sự kiện MKT</b><small class="bver">v' + esc(EH_CFG.ver) + '</small><span>MMH · FY68</span></a>' +
     '<nav class="nav" aria-label="Màn hình">' + nav.map(function(n){
       var b = n[0] === "mine" && my.length ? ' <span class="badge' + (myOver ? "" : " n") + '">' + my.length + "</span>" : "";
       return '<a href="#' + n[0] + '"' + (cur === n[0] ? ' aria-current="page"' : "") + ">" + n[2] + n[1] + b + "</a>"; }).join("") + "</nav>" +
