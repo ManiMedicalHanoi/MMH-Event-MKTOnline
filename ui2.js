@@ -32,7 +32,7 @@ function css(){
   ".u2ib .badge{position:absolute;top:-4px;right:-5px;min-width:16px;height:16px;font-size:10px}",
   ".u2pri{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px;border-radius:999px;background:var(--navy);color:#fff;font-weight:600;font-size:13.5px;white-space:nowrap;flex:none}",
   ".u2pri .ico{stroke:#fff}",
-  ".u2me{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.2;white-space:nowrap}",
+  ".u2me{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.2;white-space:nowrap;border:0;background:transparent;cursor:pointer;text-align:left;font-family:inherit;color:inherit;border-radius:8px;padding:3px 6px}",
   ".u2me small{color:var(--ink3)}",
   ".u2main{display:grid;grid-template-columns:minmax(0,1fr) clamp(430px,35vw,540px);gap:16px;padding:16px 20px;height:calc(100vh - 56px)}",
   /* bản đồ thời gian */
@@ -339,7 +339,7 @@ function top(){
     (S.me && S.me.manager ? '<button class="u2ib" data-act="settings" title="Cài đặt" aria-label="Cài đặt">' + ic("gear") + "</button>" : "") +
     '<button class="u2ib" id="reload" title="Tải lại dữ liệu" aria-label="Tải lại">' + ic("refresh") + "</button>" +
     (S.me && S.me.manager ? '<button class="u2pri" data-act="newevent">' + ic("plus") + "Sự kiện mới</button>" : "") +
-    (S.me ? '<span class="u2me">' + X("av")(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></span>" : "") + "</header>";
+    (S.me ? '<span style="position:relative"><button type="button" class="u2me" data-act="me" aria-haspopup="menu" title="Tài khoản · đổi mật khẩu · đăng xuất">' + X("av")(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></button>" + (S.pop === "me" ? X("mePop")() : "") + "</span>" : "") + "</header>";
 }
 
 U.render = function(){

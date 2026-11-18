@@ -16,7 +16,10 @@ App theo dõi kế hoạch, giao việc và tiến độ sự kiện Marketing F
 - **Thông báo** (chuông): việc mới giao cho bạn, việc chờ bạn duyệt, bình luận nhắc tên bạn / ở việc của bạn — mỗi dòng ghi rõ bình luận ở việc nào. Không phải khung chat.
 - **Việc của tôi**: việc xếp theo hạn — tải file / dán link / gửi duyệt / xong ngay tại chỗ.
 - Email (backend): giao việc, chờ duyệt, trả lại, bình luận / @nhắc, nhắc cả đội, nhắc việc hằng ngày + tổng hợp thứ Hai. Cài đặt (bánh răng, quản lý).
-- Đăng nhập: email công ty + mã 6 số (dùng chung phiên với Report Hub / CRM).
+- Đăng nhập (v3.1): **email công ty + mật khẩu** (Training Hub `rhAuthPw`, POST). Lần đầu / quên mật khẩu ⇒ "Nhận mã qua email" (mã 6 số, `rhAuthStart` / `rhAuthVerify`)
+  ⇒ đặt mật khẩu ngay (`rhAuthPwSet`, ≥ 8 ký tự; quên mật khẩu không cần mật khẩu cũ). Phiên `mmh_tk` dùng chung Report Hub / CRM / Tender Map, còn < 25 ngày ⇒ tự gia hạn (`rhAuthRenew`).
+  Trình duyệt nhớ mật khẩu (PasswordCredential ⇒ tự đăng nhập lại). Menu tên ▸ Đặt / Đổi mật khẩu · Đăng xuất. Đọc Training Hub bằng `fetch` không kèm cookie
+  (thẻ `<script>` lỗi trên điện thoại / Chrome đăng nhập Gmail khác ⇒ "Không kết nối được máy chủ đăng nhập"), lỗi mạng mới quay về thẻ `<script>`.
 - Backend: `ManiMedicalHanoi/mmh-backend` ▸ `backends/marketing/MKT_EventHub.gs` + `MKT_EventHubPlus.gs`. Dữ liệu: Google Sheet "MMH · Event Hub FY68" trong thư mục Drive Event FY68.
 - Xem thử với dữ liệu mẫu: `index.html?demo=1` (`&as=Đức Anh` để xem như thành viên). `sample/tai-lieu-mau.pdf` = file PDF của dữ liệu mẫu.
 - App Quiz cũ: `quiz.html`.

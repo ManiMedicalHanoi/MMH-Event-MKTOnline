@@ -543,6 +543,34 @@ table.t td.g{font-weight:600;color:var(--navy);white-space:nowrap}
 .login p{margin:0 0 18px;color:var(--ink2);font-size:14px}
 .login .row2{display:flex;flex-direction:column;gap:10px}
 .login .err{color:var(--crit);font-size:13.5px;min-height:20px}
+/* v3.1 — đăng nhập mật khẩu */
+.login .lgpw,.pwdlg .lgpw{position:relative}
+.login .lgpw .in{padding-right:42px}
+.lgeye{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--ink3);width:34px;height:30px;border-radius:6px;cursor:pointer;display:grid;place-items:center}
+.lgeye:hover{background:var(--sunk);color:var(--ink)}
+.login .row2 .btn.pri{margin-top:6px}
+.lgalt{margin-top:12px;font-size:13.5px;color:var(--ink2)}
+.lnk{border:0;background:none;padding:0;color:var(--mmh-blue,#3A5CAA);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.pwacc{font-size:13.5px;color:var(--ink2);margin-bottom:10px}
+.pwshow{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);cursor:pointer}
+label.fl small{font-weight:400;color:var(--ink3)}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0}
+.pwdlg{position:fixed;inset:0;background:rgba(10,25,40,.38);display:grid;place-items:center;z-index:90;padding:16px}
+.pwbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:min(420px,100%);padding:20px 22px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.pwbox h3{margin:0;font-size:18px;color:var(--navy)}
+.pwbox p{margin:0 0 4px;color:var(--ink2);font-size:13.5px}
+.pwbox .err{color:var(--crit);font-size:13px;min-height:18px}
+.pwbtn{display:flex;justify-content:flex-end;gap:8px}
+button.me{border:0;background:transparent;cursor:pointer;text-align:left;font:inherit;color:inherit;border-radius:8px;padding:3px 6px}
+button.me:hover{background:var(--sunk)}
+.mepop{width:min(300px,92vw);padding:6px}
+.mepop .umh{padding:8px 10px 10px;border-bottom:1px solid var(--line);margin-bottom:4px;display:flex;flex-direction:column}
+.mepop .umh span{font-size:12px;color:var(--ink3);word-break:break-all}
+.mepop button[role=menuitem]{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;text-align:left;padding:9px 10px;border-radius:8px;font:inherit;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.mepop button[role=menuitem]:hover{background:var(--sunk)}
+.mepop button.warn{color:var(--crit);background:var(--crit-bg)}
+.mepop svg{width:16px;height:16px;flex:none}
+@media (max-width:760px){.mepop{position:fixed;left:12px;right:12px;top:64px;width:auto}}
 .codein{letter-spacing:.4em;font-size:22px!important;text-align:center;font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:10px;font-size:14px;z-index:70;box-shadow:var(--shadow);max-width:min(560px,92vw)}
 .toast.err{background:var(--crit);color:#fff}
@@ -985,12 +1013,12 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.0"
+  ver: "3.1"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
 <script>/* giao diện thử ui2 (kiểu Tender Map): ?ui=2 bật, ?ui=1 tắt — nhớ ở localStorage.eh_ui */
-(function(){ try { var q = location.search; if (/[?&]ui=2/.test(q)) localStorage.setItem("eh_ui", "2"); if (/[?&]ui=1/.test(q)) localStorage.removeItem("eh_ui"); if (localStorage.getItem("eh_ui") === "2") document.write('<script src="ui2.js?v=1"><\/script>'); } catch(e){} })();</script>
+(function(){ try { var q = location.search; if (/[?&]ui=2/.test(q)) localStorage.setItem("eh_ui", "2"); if (/[?&]ui=1/.test(q)) localStorage.removeItem("eh_ui"); if (localStorage.getItem("eh_ui") === "2") document.write('<script src="ui2.js?v=2"><\/script>'); } catch(e){} })();</script>
 <script id="eh-js">
 "use strict";
 (function(){
@@ -1024,6 +1052,7 @@ var AVC = ["#3A5CAA", "#0E7A6A", "#9A5A12", "#6B4FA0", "#2F6E8F", "#8A4B6E", "#4
 function av(n, cls){ if (!n) return '<span class="av none ' + (cls || "") + '" title="Chưa giao">?</span>'; return '<span class="av ' + (cls || "") + '" style="background:' + AVC[hash(n) % AVC.length] + '" title="' + esc(n) + '">' + esc(initials(n)) + "</span>"; }
 function ic(n){
   var P = {
+    lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>', logout:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/>',
     check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', alert:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.01"/>',
     file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', image:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>',
     link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/>',
@@ -1080,22 +1109,59 @@ function coverHtml(e, extra){
 function fileThumb(f, w){ if (f.thumb) return R(f.thumb); if (f.kind === "image" && f.driveId) return "https://drive.google.com/thumbnail?id=" + encodeURIComponent(f.driveId) + "&sz=w" + (w || 600); if (f.kind === "image" && /^(https?:|data:|blob:)/.test(f.url || "") && !/drive\.google/.test(f.url)) return R(f.url); return ""; }
 
 /* ═════════ MÁY CHỦ ═════════ */
+/* v3.1 — đăng nhập email + MẬT KHẨU (Training Hub rhAuthPw); mã 6 số qua email chỉ dùng lần đầu / khi quên mật khẩu, xong thì đặt mật khẩu.
+   Đọc Training Hub bằng fetch KHÔNG kèm cookie Google (thẻ <script> bị Google chuyển sang trang chọn tài khoản khi điện thoại / Chrome đăng nhập
+   Gmail khác hoặc nhiều tài khoản ⇒ "Không kết nối được máy chủ đăng nhập"); mật khẩu gửi bằng POST, không nằm trên URL.
+   Phiên dùng chung Report Hub / CRM / Tender Map (localStorage mmh_tk cùng tên miền). Phiên còn < 25 ngày ⇒ tự gia hạn (rhAuthRenew). */
 var AUTH = {
   get: function(){ var o = null; try { o = JSON.parse(LS.get("mmh_tk") || "null"); } catch(e){} if (!o || !o.tk) return null; if (o.exp && Date.now() > o.exp){ LS.set("mmh_tk", null); return null; } return o; },
   tk: function(){ var o = AUTH.get(); return o ? o.tk : ""; },
   save: function(r){ LS.set("mmh_tk", JSON.stringify({ tk: r.token, exp: r.exp, user: r.user, at: Date.now() })); if (r.user && r.user.email) LS.set("mmh_last_email", r.user.email); },
   clear: function(){ LS.set("mmh_tk", null); },
+  qs: function(o){ return Object.keys(o).map(function(k){ return encodeURIComponent(k) + "=" + encodeURIComponent(o[k] == null ? "" : o[k]); }).join("&"); },
+  net: function(e){ return new Error(e && e.name === "AbortError" ? "Máy chủ đăng nhập phản hồi chậm. Thử lại." : "Không kết nối được máy chủ đăng nhập — kiểm tra mạng rồi thử lại."); },
+  /* đọc: fetch GET (không cookie) ⇒ lỗi mạng thì thử lại bằng thẻ <script> như cũ */
   hub: function(action, params){
+    var url = EH_CFG.hub + "?" + AUTH.qs(Object.assign({ action: action }, params || {}));
+    var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function(){ if (ctl) ctl.abort(); }, 30000);
+    return fetch(url, { credentials: "omit", redirect: "follow", signal: ctl ? ctl.signal : undefined })
+      .then(function(r){ clearTimeout(to); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .catch(function(e){ clearTimeout(to); if (e && e.name === "AbortError") throw AUTH.net(e); return AUTH.jsonp(action, params); });
+  },
+  jsonp: function(action, params){
     return new Promise(function(res, rej){
       var cb = "__eh_cb" + Date.now() + Math.floor(Math.random() * 1e5), sc = document.createElement("script");
-      var q = Object.assign({ action: action, callback: cb }, params || {});
-      var t = setTimeout(function(){ done(); rej(new Error("Máy chủ đăng nhập phản hồi chậm. Thử lại.")); }, 30000);
+      var t = setTimeout(function(){ done(); rej(AUTH.net({ name: "AbortError" })); }, 30000);
       function done(){ clearTimeout(t); try { delete window[cb]; } catch(e){} if (sc.parentNode) sc.parentNode.removeChild(sc); }
       window[cb] = function(d){ done(); res(d || { ok: false, error: "Không có phản hồi." }); };
-      sc.onerror = function(){ done(); rej(new Error("Không kết nối được máy chủ đăng nhập.")); };
-      sc.src = EH_CFG.hub + "?" + Object.keys(q).map(function(k){ return encodeURIComponent(k) + "=" + encodeURIComponent(q[k]); }).join("&");
+      sc.onerror = function(){ done(); rej(AUTH.net()); };
+      sc.src = EH_CFG.hub + "?" + AUTH.qs(Object.assign({ action: action, callback: cb }, params || {}));
       document.body.appendChild(sc);
     });
+  },
+  /* lệnh có mật khẩu / phiên: POST form */
+  post: function(action, params){
+    var ctl = window.AbortController ? new AbortController() : null, to = setTimeout(function(){ if (ctl) ctl.abort(); }, 30000);
+    return fetch(EH_CFG.hub, { method: "POST", body: new URLSearchParams(Object.assign({ action: action }, params || {})), credentials: "omit", redirect: "follow", signal: ctl ? ctl.signal : undefined })
+      .then(function(r){ clearTimeout(to); if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }, function(e){ clearTimeout(to); throw AUTH.net(e); });
+  },
+  pwKey: function(){ var o = AUTH.get(), u = o && o.user || {}; return "tm_haspw:" + String(u.local || u.email || "").split("@")[0]; },   /* cùng khoá với Tender Map */
+  hasPw: function(){ return LS.get(AUTH.pwKey()) === "1"; },
+  setHasPw: function(v){ if (v != null) LS.set(AUTH.pwKey(), v ? "1" : "0"); },
+  credStore: function(email, pw, u){ try { if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) navigator.credentials.store(new PasswordCredential({ id: email, password: pw, name: (u && u.pic) || email })).catch(function(){}); } catch(e){} },
+  renewing: false,
+  renew: function(){
+    var a = AUTH.get(); if (!a || AUTH.renewing || window.EH_DEMO || (a.exp || 0) - Date.now() > 25 * 864e5) return;
+    AUTH.renewing = true;
+    AUTH.post("rhAuthRenew", { tk: a.tk }).then(function(d){
+      AUTH.renewing = false; var b = AUTH.get();
+      if (d && d.ok && d.token && b && b.tk === a.tk){ LS.set("mmh_tk", JSON.stringify({ tk: d.token, exp: d.exp, user: Object.assign({}, d.user, a.user), at: a.at || Date.now() })); AUTH.setHasPw(d.hasPw); }
+    }, function(){ AUTH.renewing = false; });
+  },
+  logout: function(){
+    AUTH.clear(); BC.drop(); S.D = null; S.me = null; S.routed = false; S.pop = null;
+    try { if (navigator.credentials && navigator.credentials.preventSilentAccess) navigator.credentials.preventSilentAccess().catch(function(){}); } catch(e){}
+    LG.step = "pw"; renderLogin("Đã đăng xuất.");
   }
 };
 function api(action, params){
@@ -1125,7 +1191,7 @@ function index(){
   IX = ix;
 }
 function evById(id){ return IX.ev[id]; }
-function taskById(id){ return IX.t[id]; }
+function taskById(id){ return IX && IX.t[id]; }
 function tasksOf(evId){ return IX.byEv[evId] || []; }
 function subsOf(t){ return (IX.kids[t.id] || []).slice().sort(byDue); }
 function filesOf(id){ return IX.files[id] || []; }
@@ -1402,7 +1468,7 @@ function shell(){
     (S.me && S.me.manager ? '<button class="tbtn" data-act="settings" title="Cài đặt email, nhắc việc, dữ liệu mẫu" aria-label="Cài đặt">' + ic("gear") + "</button>" : "") +
     (S.syncing && S.fromCache ? '<span class="synct" title="Đang hiện dữ liệu lưu trên máy lúc ' + new Date(S.fromCache).toTimeString().slice(0, 5) + '">Đang cập nhật…</span>' : "") +
     '<button class="tbtn' + (S.syncing ? " spin" : "") + '" id="reload" title="Tải lại dữ liệu' + (S.loadedAt ? " · cập nhật " + ago(new Date(S.loadedAt).toISOString()) : "") + '" aria-label="Tải lại">' + ic("refresh") + "</button>" +
-    (S.me ? '<span class="me">' + av(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></span>" : "") +
+    (S.me ? '<span style="position:relative"><button type="button" class="me" data-act="me" aria-haspopup="menu" aria-expanded="' + (S.pop === "me") + '" title="Tài khoản · đổi mật khẩu · đăng xuất">' + av(S.me.pic) + "<span>" + esc(S.me.pic) + "<br><small>" + (S.me.manager ? "Quản lý" : "Thành viên") + "</small></span></button>" + (S.pop === "me" ? mePop() : "") + "</span>" : "") +
     "</div></div></header>" +
     (smp ? '<div class="samplebar"><div class="wrap"><span><b>' + smp + ' sự kiện mẫu</b> (nhãn MẪU) để thử mọi thao tác — không gửi email thật.</span><button data-act="togglesample">' + (S.hideSample ? "Hiện dữ liệu mẫu" : "Ẩn dữ liệu mẫu") + "</button>" +
       (S.me && S.me.admin ? '<button data-act="settings">Xoá / nạp lại dữ liệu mẫu</button>' : "") + "</div></div>" : "");
@@ -2506,7 +2572,7 @@ document.addEventListener("paste", function(ev){
   ev.preventDefault(); upload(fs.map(function(f, i){ return new File([f], "Anh_dan_" + new Date().toISOString().slice(0, 19).replace(/\D/g, "") + "_" + (i + 1) + ".png", { type: f.type || "image/png" }); }), t.eventId, t.id);
 });
 document.addEventListener("click", function(ev){
-  if (S.pop && !ev.target.closest(".pop,[data-act=bell]")){ S.pop = null; render(); }
+  if (S.pop && !ev.target.closest(".pop,[data-act=bell],[data-act=me]")){ S.pop = null; render(); }
   if (ev.target.closest("[data-stop]") && !ev.target.closest("[data-act],[data-prod],[data-cover],[data-op],button,a,input,select,textarea,label")) return;
   var a = ev.target.closest("[data-act],[data-open],[data-tab],[data-tf],[data-type],[data-ptab],[data-delfile],[data-status],td.c[data-ev],#reload,[data-kpi],[data-evf],[data-cal],[data-calmode],[data-day],[data-month],[data-approve],[data-return],[data-remind],[data-setst],[data-lb],[data-lbgo],[data-jump],[data-go],[data-delc],[data-mention],[data-sendc],[data-prod],[data-cover],[data-uselink],[data-wkv],[data-wkmine],[data-otp],[data-rag],[data-tv],[data-v3]");
   if (!a) return;
@@ -2551,6 +2617,10 @@ document.addEventListener("click", function(ev){
   if (act === "close"){ S.drawer = null; if (/^#t-/.test(location.hash)) history.replaceState(null, "", "#ev-" + S.evId); render(); return; }
   if (act === "mclose"){ if (a.classList.contains("modal") && ev.target !== a) return; S.modal = null; render(); return; }
   if (act === "lbclose"){ if (ev.target.closest("[data-stop]")) return; S.lb = null; render(); return; }
+  if (act === "me"){ S.pop = S.pop === "me" ? null : "me"; S.meOut = false; render(); return; }
+  if (act === "pwset"){ S.pop = null; render(); pwDialog(false); return; }
+  if (act === "logout"){ S.meOut = true; render(); return; }
+  if (act === "logout2"){ S.meOut = false; AUTH.logout(); return; }
   if (act === "bell"){ S.pop = S.pop === "bell" ? null : "bell"; if (S.pop) LS.set("eh_seen_" + me(), String(Date.now() + 1000)); render(); return; }
   if (act === "togglesample"){ S.hideSample = !S.hideSample; LS.set("eh_hidesample", S.hideSample ? "1" : null); render(); return; }
   if (act === "back"){ location.hash = "events"; return; }
@@ -2679,30 +2749,158 @@ document.addEventListener("drop", function(ev){ var col = ev.target.closest && e
 window.addEventListener("hashchange", route);
 
 /* ═════════ ĐĂNG NHẬP ═════════ */
+/* ═════════ ĐĂNG NHẬP (v3.1): email + mật khẩu · quên / chưa có mật khẩu ⇒ mã 6 số qua email ⇒ đặt mật khẩu ═════════ */
+var LG = { step: "pw", email: "", busy: false, auto: false, forgot: false, autoTried: false };
+var EYE = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+function lgEmail(v){ var e = String(v || "").trim().toLowerCase().replace(/\s+/g, ""); if (e && e.indexOf("@") < 0) e += "@manimedicalhanoi.com"; return e; }
+function lgOkEmail(e){ return /^[a-z0-9._%+\-]+@(mani\.inc|manimedicalhanoi\.com)$/.test(e); }
+function pwFields(chg){
+  return (chg ? '<label class="fl" for="pw-old">Mật khẩu hiện tại</label><input class="in" id="pw-old" type="password" autocomplete="current-password">' : "") +
+    '<label class="fl" for="pw-n1">Mật khẩu mới <small>(ít nhất 8 ký tự)</small></label><input class="in" id="pw-n1" type="password" autocomplete="new-password" minlength="8">' +
+    '<label class="fl" for="pw-n2">Nhập lại mật khẩu mới</label><input class="in" id="pw-n2" type="password" autocomplete="new-password" minlength="8">' +
+    '<label class="pwshow"><input type="checkbox" id="pw-sh"> Hiện mật khẩu</label>';
+}
+function pwWire(root){
+  var sh = $("#pw-sh", root); if (sh) sh.onchange = function(){ $$("#pw-old,#pw-n1,#pw-n2", root).forEach(function(i){ i.type = sh.checked ? "text" : "password"; }); };
+}
+/* lưu mật khẩu (sau đăng nhập bằng mã, hoặc menu tên) — trả Promise<bool> */
+function pwSave(root, err, btn){
+  var a = AUTH.get(); if (!a) return Promise.resolve(false);
+  var v = function(id){ var i = $("#" + id, root); return i ? String(i.value || "") : ""; }, n1 = v("pw-n1"), n2 = v("pw-n2"), old = v("pw-old");
+  if (n1.length < 8){ err.textContent = "Mật khẩu cần ít nhất 8 ký tự."; return Promise.resolve(false); }
+  if (n1 !== n2){ err.textContent = "Hai lần nhập mật khẩu chưa giống nhau."; return Promise.resolve(false); }
+  btn.disabled = true; btn.textContent = "Đang lưu…"; err.textContent = "";
+  return AUTH.post("rhAuthPwSet", { tk: a.tk, pw: n1, old: old }).then(function(d){
+    btn.disabled = false; btn.textContent = "Lưu mật khẩu";
+    if (d && d.ok){ AUTH.setHasPw(true); AUTH.credStore((a.user && a.user.email) || LG.email, n1, a.user); toast(d.message || "Đã lưu mật khẩu. Lần sau đăng nhập bằng email + mật khẩu."); return true; }
+    err.textContent = (d && d.error) || "Chưa lưu được mật khẩu."; return false;
+  }, function(e){ btn.disabled = false; btn.textContent = "Lưu mật khẩu"; err.textContent = e.message; return false; });
+}
+function lgDone(d, how){
+  AUTH.save(d); LS.set("mmh_last_email", LG.email || (d.user && d.user.email) || "");
+  AUTH.setHasPw(how === "pw" ? true : d.hasPw);
+  /* đăng nhập bằng mã ⇒ đặt mật khẩu ngay (chưa có, hoặc quên mật khẩu) */
+  if (how === "code"){ LG.forgot = d.hasPw === true; LG.step = "set"; renderLogin(); return; }   /* đăng nhập bằng mã = lần đầu hoặc quên mật khẩu ⇒ luôn đặt mật khẩu */
+  LG.step = "pw"; LG.forgot = false; boot(false);
+}
 function renderLogin(msg){
-  var email = LS.get("mmh_last_email") || "";
-  $("#app").innerHTML = '<div class="login"><div class="art"><img src="' + esc(img("ws-comp-2.jpg")) + '" alt=""><div><i></i><b>Sự kiện MKT</b><span>Kế hoạch · giao việc · tiến độ sự kiện Marketing MMH</span></div></div><div class="fm"><form class="card2" id="lg" novalidate><h1>Đăng nhập</h1><p>Dùng email công ty. Mã 6 số sẽ gửi vào hộp thư của bạn. Đã đăng nhập Report Hub hoặc CRM trên trình duyệt này thì không cần đăng nhập lại.</p>' +
-    '<div class="row2" id="lg-s1"><label class="fl" for="lg-email">Email công ty</label><input class="in" id="lg-email" type="email" autocomplete="email" value="' + esc(email) + '" placeholder="ten@manimedicalhanoi.com"><button class="btn pri" id="lg-send" type="submit">Gửi mã đăng nhập</button></div>' +
-    '<div class="row2" id="lg-s2" hidden><label class="fl" for="lg-code">Mã 6 số trong email</label><input class="in codein" id="lg-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><button class="btn pri" id="lg-ok" type="submit">Đăng nhập</button><button class="btn ghost" type="button" id="lg-back">Đổi email</button></div>' +
-    '<p class="err" id="lg-err">' + esc(msg || "") + "</p></form></div></div>";
-  var step = 1;
-  $("#lg-back").onclick = function(){ step = 1; $("#lg-s1").hidden = false; $("#lg-s2").hidden = true; };
-  $("#lg").onsubmit = function(ev){
-    ev.preventDefault(); var err = $("#lg-err"), em = $("#lg-email").value.trim(); err.textContent = "";
-    if (step === 1){
-      if (!/@/.test(em)){ err.textContent = "Nhập email công ty."; return; }
-      $("#lg-send").disabled = true; $("#lg-send").textContent = "Đang gửi…";
-      AUTH.hub("rhAuthStart", { email: em }).then(function(d){ $("#lg-send").disabled = false; $("#lg-send").textContent = "Gửi mã đăng nhập";
-        if (!d.ok){ err.textContent = d.error || "Không gửi được mã."; return; } step = 2; $("#lg-s1").hidden = true; $("#lg-s2").hidden = false; $("#lg-code").focus(); })
-        .catch(function(e){ $("#lg-send").disabled = false; $("#lg-send").textContent = "Gửi mã đăng nhập"; err.textContent = e.message; });
-    } else {
-      var code = $("#lg-code").value.replace(/\D/g, ""); if (code.length !== 6){ err.textContent = "Mã gồm 6 chữ số."; return; }
-      $("#lg-ok").disabled = true;
-      AUTH.hub("rhAuthVerify", { email: em, code: code }).then(function(d){ $("#lg-ok").disabled = false;
-        if (!d.ok){ err.textContent = d.error || "Mã không đúng."; return; } AUTH.save(d); boot(false); })
-        .catch(function(e){ $("#lg-ok").disabled = false; err.textContent = e.message; });
-    }
+  var em = LG.email || LS.get("mmh_last_email") || "", a = AUTH.get(), H = "";
+  if (LG.step === "set" && a){
+
+    H = '<h1>' + (LG.forgot ? "Đặt mật khẩu mới" : "Đặt mật khẩu") + '</h1><p>Đăng nhập bằng mã thành công. ' + (LG.forgot ? "Đặt mật khẩu mới thay mật khẩu đã quên." : "Đặt mật khẩu để <b>lần sau chỉ cần email + mật khẩu</b> — không phải chờ mã qua email.") + ' Dùng chung cho Report Hub, CRM, Tender Map.</p>' +
+      '<input class="sr" type="email" name="username" autocomplete="username" value="' + esc((a.user && a.user.email) || em) + '" readonly tabindex="-1" aria-hidden="true">' +
+      '<div class="pwacc">Tài khoản: <b>' + esc((a.user && a.user.email) || em) + '</b></div><div class="row2">' + pwFields(false) +
+      '<button class="btn pri" id="lg-go" type="submit">Lưu mật khẩu</button></div><div class="lgalt"><button class="lnk" type="button" id="lg-later">Để sau, vào app</button></div>';
+
+  } else if (LG.step === "code"){
+    H = '<h1>Nhập mã</h1><p>Mã 6 số đã gửi tới <b>' + esc(LG.email) + '</b>. Xác nhận mã xong bạn đặt mật khẩu để lần sau đăng nhập bằng mật khẩu.</p><div class="row2">' +
+      '<label class="fl" for="lg-code">Mã 6 số trong email</label><input class="in codein" id="lg-code" name="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code">' +
+      '<button class="btn pri" id="lg-go" type="submit">Xác nhận mã</button></div>' +
+      '<div class="lgalt"><button class="lnk" type="button" id="lg-resend">Gửi lại mã</button> · <button class="lnk" type="button" id="lg-back">Đăng nhập bằng mật khẩu</button></div>';
+  } else {
+    H = '<h1>Đăng nhập</h1><p>Email công ty + mật khẩu. Đã đăng nhập Report Hub, CRM hoặc Tender Map trên trình duyệt này thì không cần đăng nhập lại.</p><div class="row2">' +
+      '<label class="fl" for="lg-email">Email công ty</label><input class="in" id="lg-email" name="username" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" value="' + esc(em) + '" placeholder="ten@manimedicalhanoi.com">' +
+      '<label class="fl" for="lg-pw">Mật khẩu</label><div class="lgpw"><input class="in" id="lg-pw" name="password" type="password" autocomplete="current-password" placeholder="Mật khẩu"><button class="lgeye" type="button" id="lg-eye" aria-label="Hiện / ẩn mật khẩu" title="Hiện / ẩn mật khẩu">' + EYE + '</button></div>' +
+      '<button class="btn pri" id="lg-go" type="submit">' + (LG.busy ? (LG.auto ? "Đang tự đăng nhập…" : "Đang đăng nhập…") : "Đăng nhập") + '</button></div>' +
+      '<div class="lgalt">Lần đầu dùng, chưa có hoặc quên mật khẩu? <button class="lnk" type="button" id="lg-send">Nhận mã qua email</button></div>';
+  }
+  $("#app").innerHTML = '<div class="login"><div class="art"><img src="' + esc(img("ws-comp-2.jpg")) + '" alt=""><div><i></i><b>Sự kiện MKT</b><span>Kế hoạch · giao việc · tiến độ sự kiện Marketing MMH</span></div></div><div class="fm"><form class="card2" id="lg" autocomplete="on" novalidate>' + H +
+    '<p class="err" id="lg-err" role="alert">' + esc(msg || "") + "</p></form></div></div>";
+  var err = $("#lg-err"), go = $("#lg-go"), f = $("#lg");
+  if (LG.busy && go) go.disabled = true;
+  var busy = function(on, txt){ LG.busy = on; if (go){ go.disabled = on; if (txt) go.textContent = txt; } };
+  var sendCode = function(again){
+    var i = $("#lg-email"); if (i) LG.email = lgEmail(i.value);
+    if (!lgOkEmail(LG.email)){ err.textContent = "Nhập email công ty (…@manimedicalhanoi.com hoặc …@mani.inc) rồi bấm Nhận mã."; if (i) i.focus(); return; }
+    LS.set("mmh_last_email", LG.email); err.textContent = "Đang gửi mã…";
+    AUTH.hub("rhAuthStart", { email: LG.email }).then(function(d){
+      if (d && (d.ok || d.code === "WAIT")){ LG.step = "code"; renderLogin(d.ok ? (again ? "Đã gửi mã mới." : "") : (d.error || "")); var c = $("#lg-code"); if (c) c.focus(); }
+      else err.textContent = (d && d.error) || "Chưa gửi được mã.";
+    }, function(e){ err.textContent = e.message; });
   };
+  if (LG.step === "set"){
+    pwWire(f); var n1 = $("#pw-n1"); if (n1) n1.focus();
+    $("#lg-later").onclick = function(){ if (!LG.forgot) LS.set("eh_pw_later", String(Date.now())); LG.step = "pw"; LG.forgot = false; boot(false); };
+    f.onsubmit = function(ev){ ev.preventDefault(); pwSave(f, err, go).then(function(ok){ if (ok){ LG.step = "pw"; LG.forgot = false; boot(false); } }); };
+    return;
+  }
+  if (LG.step === "code"){
+    $("#lg-back").onclick = function(){ LG.step = "pw"; renderLogin(); };
+    $("#lg-resend").onclick = function(){ sendCode(true); };
+    f.onsubmit = function(ev){
+      ev.preventDefault(); if (LG.busy) return;
+      var code = $("#lg-code").value.replace(/\D/g, ""); if (code.length !== 6){ err.textContent = "Mã gồm 6 chữ số."; return; }
+      busy(true, "Đang kiểm tra…"); err.textContent = "";
+      AUTH.hub("rhAuthVerify", { email: LG.email, code: code }).then(function(d){
+        busy(false, "Xác nhận mã");
+        if (d && d.ok && d.token){ lgDone(d, "code"); return; }
+        err.textContent = (d && d.error) || "Mã chưa đúng.";
+      }, function(e){ busy(false, "Xác nhận mã"); err.textContent = e.message; });
+    };
+    return;
+  }
+  /* bước mật khẩu */
+  $("#lg-eye").onclick = function(){ var p = $("#lg-pw"); p.type = p.type === "password" ? "text" : "password"; p.focus(); };
+  $("#lg-send").onclick = function(){ sendCode(false); };
+  f.onsubmit = function(ev){
+    ev.preventDefault(); if (LG.busy) return;
+    var i = $("#lg-email"), pw = String($("#lg-pw").value || ""); LG.email = lgEmail(i.value);
+    if (!lgOkEmail(LG.email)){ err.textContent = "Nhập email công ty: …@manimedicalhanoi.com hoặc …@mani.inc"; i.focus(); return; }
+    if (!pw){ err.textContent = "Nhập mật khẩu. Lần đầu / quên mật khẩu ⇒ bấm \"Nhận mã qua email\"."; $("#lg-pw").focus(); return; }
+    LS.set("mmh_last_email", LG.email); busy(true, "Đang đăng nhập…"); err.textContent = "";
+    AUTH.post("rhAuthPw", { email: LG.email, pw: pw }).then(function(d){
+      busy(false, "Đăng nhập");
+      if (d && d.ok && d.token){ AUTH.credStore(LG.email, pw, d.user); LG.forgot = false; lgDone(d, "pw"); return; }
+      err.textContent = d && d.code === "NOPW" ? "Tài khoản này chưa đặt mật khẩu — bấm \"Nhận mã qua email\" để đăng nhập lần đầu rồi đặt mật khẩu." : ((d && d.error) || "Chưa đăng nhập được.");
+      if (d && /^(NOPW|PWLOCK)$/.test(d.code)) $("#lg-pw").value = "";
+    }, function(e){ busy(false, "Đăng nhập"); err.textContent = e.message; });
+  };
+  if (!em) $("#lg-email").focus(); else if (!LG.busy) $("#lg-pw").focus();
+  lgAuto();
+}
+/* tự đăng nhập bằng mật khẩu trình duyệt đã lưu (Chrome / Edge / Android — 1 lần mỗi lần mở trang, không hỏi) */
+function lgAuto(){
+  if (LG.autoTried || AUTH.get() || window.EH_DEMO || !(window.PasswordCredential && navigator.credentials && navigator.credentials.get)) return;
+  LG.autoTried = true;
+  navigator.credentials.get({ password: true, mediation: "silent" }).then(function(c){
+    if (!c || !c.password || !lgOkEmail(String(c.id || "").toLowerCase()) || AUTH.get()) return;
+    LG.email = String(c.id).toLowerCase(); LG.busy = true; LG.auto = true; renderLogin();
+    return AUTH.post("rhAuthPw", { email: LG.email, pw: c.password }).then(function(d){
+      LG.busy = false; LG.auto = false;
+      if (d && d.ok && d.token){ lgDone(d, "pw"); return; }
+      renderLogin(d && d.code === "PW" ? "Mật khẩu đã lưu trên máy không còn đúng — nhập lại mật khẩu." : ((d && d.error) || ""));
+    });
+  }).catch(function(){ if (LG.busy){ LG.busy = false; LG.auto = false; renderLogin(); } });
+}
+/* hộp Đặt / Đổi mật khẩu từ menu tên (trong app) */
+function pwDialog(offer){
+  var a = AUTH.get(); if (!a) return;
+  var old = $("#pwdlg"); if (old) old.remove();
+  var chg = !offer && AUTH.hasPw(), em = (a.user && a.user.email) || LS.get("mmh_last_email") || "";
+  var el = document.createElement("div"); el.id = "pwdlg"; el.className = "pwdlg"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "pwd-t");
+  el.innerHTML = '<form class="pwbox" autocomplete="on" novalidate><h3 id="pwd-t">' + (offer ? "Đặt mật khẩu cho lần sau" : chg ? "Đổi mật khẩu" : "Đặt mật khẩu đăng nhập") + '</h3>' +
+    '<p>' + (offer ? "Lần sau chỉ cần <b>email + mật khẩu</b> — không phải chờ mã qua email." : "Dùng chung cho Report Hub, CRM, Tender Map (cùng tài khoản email công ty).") + (chg ? " Quên mật khẩu hiện tại ⇒ đăng xuất, bấm \"Nhận mã qua email\"." : "") + '</p>' +
+    '<input class="sr" type="email" name="username" autocomplete="username" value="' + esc(em) + '" readonly tabindex="-1" aria-hidden="true">' +
+    '<div class="pwacc">Tài khoản: <b>' + esc(em) + '</b></div>' + pwFields(chg) +
+    '<p class="err" role="alert"></p><div class="pwbtn"><button class="btn ghost" type="button" data-pwx>' + (offer ? "Để sau" : "Đóng") + '</button><button class="btn pri" type="submit">Lưu mật khẩu</button></div></form>';
+  document.body.appendChild(el); pwWire(el);
+  var close = function(){ if (offer) LS.set("eh_pw_later", String(Date.now())); el.remove(); };
+  el.addEventListener("click", function(e){ if (e.target === el || e.target.closest("[data-pwx]")) close(); });
+  el.addEventListener("keydown", function(e){ if (e.key === "Escape"){ e.stopPropagation(); close(); } });
+  el.querySelector("form").onsubmit = function(ev){ ev.preventDefault(); pwSave(el, el.querySelector(".err"), el.querySelector("button[type=submit]")).then(function(ok){ if (ok){ el.remove(); render(); } }); };
+  var f1 = $(chg ? "#pw-old" : "#pw-n1", el); if (f1) f1.focus();
+}
+/* đã vào app mà tài khoản chưa có mật khẩu (đăng nhập bằng mã ở Report Hub / CRM) ⇒ mời đặt, nhắc lại sau 7 ngày */
+function pwOffer(){
+  if (window.EH_DEMO || !AUTH.get() || AUTH.hasPw() || $("#pwdlg") || S.modal) return;
+  if (Date.now() - (+LS.get("eh_pw_later") || 0) < 7 * 864e5) return;
+  pwDialog(true);
+}
+function mePop(){
+  var a = AUTH.get(), u = (a && a.user) || {};
+  return '<div class="pop mepop" role="menu" aria-label="Tài khoản"><div class="umh"><b>' + esc(S.me.pic) + "</b><span>" + esc(u.email || "") + "</span></div>" +
+    '<button type="button" role="menuitem" data-act="pwset">' + ic("lock") + (AUTH.hasPw() ? "Đổi mật khẩu" : "Đặt mật khẩu đăng nhập") + "</button>" +
+    '<button type="button" role="menuitem" data-act="' + (S.meOut ? "logout2" : "logout") + '"' + (S.meOut ? ' class="warn"' : "") + ">" + ic("logout") + (S.meOut ? "Bấm lần nữa để đăng xuất (Report Hub / CRM trên máy này cũng đăng xuất)" : "Đăng xuất") + "</button></div>";
 }
 
 /* ═════════ KHỞI ĐỘNG ═════════ */
@@ -2735,7 +2933,7 @@ function boot(manual){
     if (!d || !d.ok) throw new Error(d && d.error || "Không tải được dữ liệu");
     var keepPending = S.D ? S.D.files.filter(function(f){ return /^tmp-/.test(f.id); }) : [];
     d.files = (d.files || []).concat(keepPending); d.comments = d.comments || []; d.log = d.log || []; d.notify = d.notify || [];
-    S.D = d; S.me = d.me; S.loadedAt = Date.now(); S.fromCache = 0; S.syncing = false; clearInterval(bootScreen.h); BC.put(d);
+    S.D = d; S.me = d.me; S.loadedAt = Date.now(); S.fromCache = 0; S.syncing = false; clearInterval(bootScreen.h); BC.put(d); AUTH.renew(); setTimeout(pwOffer, 1500);
     if (!S.routed){ S.routed = true; route(); } else render();
     if (manual) toast("Đã tải dữ liệu mới");
   }).catch(function(err){
