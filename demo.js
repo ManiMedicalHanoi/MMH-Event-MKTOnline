@@ -278,6 +278,13 @@
     N = [];
     if (action === "ehForm") return ok(FORM9);
     if (action === "ehFolders") return ok({ root: "https://drive.google.com/drive/folders/demo", online: "https://drive.google.com/drive/folders/demo2", speakers: [{ id: "d1", name: "DR. NGUYEN VAN A (mẫu)" }, { id: "d2", name: "DR. TRAN THI B (mẫu)" }], tpl: { url: "#", name: "MẪU · File kế hoạch sự kiện" } });
+    if (action === "ehBoot" && !D.apv){ var e9 = D.events.filter(function(x){ return x.sample || true; })[2] || D.events[0];
+      D.apvSteps = [{ who: "Thuong", label: "Thương duyệt" }, { who: "Giang", label: "Giang xác nhận nội dung" }, { who: "Tuyen", label: "Chị Tuyên duyệt cuối" }];
+      D.pdCats = ["Dental_Hand Files", "Dental_Rotary Files", "Dental_Composite", "Dental_Bond", "Ophthalmic_Suture", "Ophthalmic_Knife", "Surgical_Skin Stapler"]; D.online = "https://drive.google.com/drive/folders/demo";
+      D.rhk = {}; D.rhk[e9.id] = [{ no: "140", name: e9.name, pic: "Thuong", st: "In Progress", n: 6, d: 2 }];
+      D.apv = [{ id: "A1", kind: "design", scope: "event", eventId: e9.id, title: "Standee 80x200 (mẫu)", docType: "standee", external: "", by: "Duc Anh", files: [{ name: "standee_v1.pdf", url: "#" }], step: 2, status: "Chờ duyệt", hist: [{ at: "2026-11-17T09:00:00", by: "Duc Anh", act: "Nộp bản nháp" }, { at: "2026-11-17T15:00:00", by: "Thuong", act: "Thương duyệt" }], createdAt: "2026-11-17T09:00:00", updatedAt: "2026-11-17T15:00:00" },
+        { id: "A2", kind: "post", scope: "product", product: "Dental_Composite", title: "Bài đăng Composite thẩm mỹ (mẫu)", docType: "post", by: "Minh Trang", files: [{ name: "Link Canva", url: "#" }], step: 4, status: "Đã đăng", postUrl: "https://www.facebook.com/ManiDentalVietnam/posts/1", hist: [], createdAt: "2026-11-15T09:00:00", updatedAt: "2026-11-16T10:00:00" },
+        { id: "A3", kind: "post", scope: "event", eventId: e9.id, title: "Bài mở đăng ký (mẫu)", docType: "post", by: "Minh Trang", files: [{ name: "post.png", url: "#" }], step: 1, status: "Trả lại", hist: [{ at: "2026-11-18T08:00:00", by: "Thuong", act: "Trả lại ở bước 1", note: "Đổi ảnh bìa, thêm QR đăng ký" }], createdAt: "2026-11-17T08:00:00", updatedAt: "2026-11-18T08:00:00" }]; }
     if (action === "ehBoot") return ok(Object.assign({}, D, { me: ME }));
     if (action === "ehSync") return ok({ message: "Bản xem trước — không có file kế hoạch thật để đồng bộ." });
     if (action === "ehLink") return ok({ message: "Bản xem trước — dữ liệu file MKT Offline / Digital là dữ liệu mẫu." });
@@ -294,6 +301,8 @@
         if (t.status === "Pending"){ if (e.Owner && e.Owner !== t.pic) X(e.Owner).block++; return; }
         if (!t.pic || !t.due || t.due > lim) return; var x = X(t.pic); if (t.due < iso(T0)) x.late++; else x.soon++; });
       return ok({ dry: true, items: Object.keys(per).map(function(k){ var x = per[k]; return { to: k, subject: "[Sự kiện MKT] Việc cần làm " + iso(T0).slice(8) + "/" + iso(T0).slice(5, 7) + ": " + [x.late ? x.late + " quá hạn" : "", x.soon ? x.soon + " sắp đến hạn" : "", x.wait ? x.wait + " chờ bạn duyệt" : "", x.block ? x.block + " Pending" : ""].filter(String).join(" · "), ok: "Xem trước" }; }) }); }
+    if (action === "ehUpload" && p.apvId){ var ap9 = (D.apv || []).filter(function(x){ return x.id === p.apvId; })[0]; if (!ap9) return ok({ ok: false, error: "Không thấy yêu cầu" });
+      ap9.files.push({ name: p.name, driveId: uid("D"), url: "#" }); ap9.updatedAt = now(); return ok({ apv: ap9 }); }
     if (action === "ehUpload"){
       var e = by(D.events, "id", p.eventId), t = p.taskId ? by(D.tasks, "id", p.taskId) : null;
       if (!canEv(e) && !(t && t.pic === ME.pic) && ["Owner", "Digital", "Design", "Trade", "Sales"].every(function(r){ return e[r] !== ME.pic; })) return ok({ ok: false, error: "Chỉ người trong đội sự kiện được tải tệp lên." });
@@ -325,6 +334,17 @@
       if (op === "notice.skip"){ pn.status = "Bỏ qua"; pn.sentAt = now(); pn.by = ME.pic; return ok({ notices: evN() }); }
     }
     if (op === "cfg.save"){ if (!ME.manager) return ok({ ok: false, error: "Chỉ quản lý được đổi cài đặt." }); D.cfg = Object.assign({}, D.cfg, d); return ok({ cfg: D.cfg }); }
+    if (/^apv\./.test(op)){ D.apv = D.apv || []; var ST9 = [["Thuong", "Thương duyệt"], ["Giang", "Giang xác nhận nội dung"], ["Tuyen", "Chị Tuyên duyệt cuối"]], ax = D.apv.filter(function(x){ return x.id === d.id; })[0];
+      if (op === "apv.add"){ ax = { id: uid("A"), kind: d.kind, scope: d.scope, eventId: d.eventId || "", title: d.title, product: d.product || "", docType: d.kind === "post" ? "post" : d.docType, external: d.external ? "x" : "", by: ME.pic, files: d.link ? [{ name: "Link", url: d.link }] : [], step: 1, status: "Chờ duyệt", hist: [{ at: now(), by: ME.pic, act: "Nộp bản nháp", note: d.note || "" }], createdAt: now(), updatedAt: now() }; D.apv.push(ax); return ok({ apv: ax }); }
+      if (!ax) return ok({ ok: false, error: "Không thấy yêu cầu duyệt." });
+      if (op === "apv.submit") return ok({ apv: ax });
+      if (op === "apv.decide"){ var st9 = ST9[ax.step - 1]; if (!st9 || ax.status !== "Chờ duyệt") return ok({ ok: false, error: "Không ở trạng thái chờ duyệt." });
+        if (ME.pic !== st9[0] && !ME.admin) return ok({ ok: false, error: "Bước này do " + st9[0] + " duyệt." });
+        if (d.act === "return"){ ax.status = "Trả lại"; ax.hist.push({ at: now(), by: ME.pic, act: "Trả lại ở bước " + ax.step, note: d.note }); return ok({ apv: ax }); }
+        ax.hist.push({ at: now(), by: ME.pic, act: st9[1], note: d.note || "" }); ax.step++; if (ax.step > 3){ ax.status = ax.kind === "post" ? "Chờ đăng" : "Đã duyệt"; if (ax.kind !== "post") ax.finalUrl = "#"; } return ok({ apv: ax }); }
+      if (op === "apv.resubmit"){ ax.step = 1; ax.status = "Chờ duyệt"; ax.hist.push({ at: now(), by: ME.pic, act: "Nộp lại" }); return ok({ apv: ax }); }
+      if (op === "apv.post"){ ax.postUrl = d.url; ax.status = "Đã đăng"; ax.hist.push({ at: now(), by: ME.pic, act: "Đã đăng bài", note: d.url }); return ok({ apv: ax }); }
+      if (op === "apv.delete"){ D.apv = D.apv.filter(function(x){ return x.id !== d.id; }); return ok({}); } }
     if (op === "event.pick"){ var pe9 = by(D.events, "id", d.eventId); if (!canEv(pe9)) return ok({ ok: false, error: "Chỉ Owner sự kiện hoặc quản lý được thêm việc theo mẫu." });
       var F9 = FORM9.forms[/trien lam|triển lãm|exhib/i.test(pe9.type) ? "EXHIBITION" : /workshop/i.test(pe9.type) ? "WORKSHOP" : "SEMINAR"], want9 = {}, out9 = [], par9 = {}, ord9 = 0;
       (d.picks || []).forEach(function(x){ want9[x.key] = x; });
