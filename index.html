@@ -1004,6 +1004,66 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px}
   .glegend .gl{min-width:200px}
 }
 </style>
+<style id="v32-calm">
+/* v3.2 (18/11/2026) — giao diện sáng, dịu mắt theo video luồng dữ liệu: không ảnh bìa / ảnh sản phẩm, icon nét mảnh, màu xanh xám nhẹ */
+@media not all and (prefers-color-scheme: dark){:root{
+  --paper:#F7F9FB; --sunk:#F1F5F8; --ink:#232C36; --ink2:#4F5B68; --ink3:#8A96A3; --line:#E3E8EE; --line2:#D2DBE3;
+  --navy:#2C4A5E; --blue:#4F7FA8; --blue-s:#EAF1F7; --prog:#4F7FA8; --prog-bg:#EAF1F7; --focus:#4F7FA8;
+  --t-exh:#4F7FA8; --t-ws:#3E8C7E; --t-sem:#A9773B; --t-web:#7B68A8; --t-oth:#6E7E8C;
+  --shadow:0 10px 28px rgba(44,74,94,.10); --shadow-s:0 1px 2px rgba(44,74,94,.04)}}
+:root{--f-display:"Be Vietnam Pro","Segoe UI",Roboto,Arial,sans-serif}
+.ico{stroke-width:1.6}
+.h2{font-weight:700;font-size:16.5px;letter-spacing:.02em}
+.evc:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(44,74,94,.08)}
+/* ô sự kiện không ảnh */
+.cov.noimg{aspect-ratio:auto;height:92px;background:linear-gradient(135deg,#F5F8FB 0%,#EAF1F7 100%);border-bottom:1px solid var(--line)}
+.cov.noimg .cico{position:absolute;left:14px;top:50%;translate:0 -50%;width:52px;height:52px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--blue)}
+.cov.noimg .cico .ico{width:26px;height:26px;stroke-width:1.4}
+.cov.noimg.k-ws .cico{color:var(--t-ws)} .cov.noimg.k-sem .cico{color:var(--t-sem)} .cov.noimg.k-web .cico{color:var(--t-web)} .cov.noimg.k-oth .cico{color:var(--t-oth)}
+.cov.noimg .dd{left:80px;bottom:auto;top:50%;translate:0 -50%;color:var(--navy);text-shadow:none}
+.cov.noimg .dd span{color:var(--ink2)}
+.cov.noimg .tag .pill{box-shadow:none}
+.cov.noimg .dbadge{font-family:var(--f-body);font-size:13px;font-weight:700}
+.cov.noimg .dbadge.past{background:var(--surface);border:1px solid var(--line);color:var(--ink2)}
+/* đầu trang chi tiết sự kiện */
+.hero .cov.noimg{height:auto;min-height:0;background:linear-gradient(150deg,#F7FAFC 0%,#EAF1F7 100%);border-bottom:0;border-right:1px solid var(--line)}
+.hero .cov.noimg .cico{left:auto;right:22px;top:auto;bottom:22px;translate:none;width:72px;height:72px}
+.hero .cov.noimg .cico .ico{width:34px;height:34px}
+.hero .cov.noimg .htxt{color:var(--ink);right:110px}
+.hero .cov.noimg h1{color:var(--navy);text-shadow:none;font-weight:700;font-size:clamp(22px,2.4vw,32px);line-height:1.15;text-transform:none}
+.hero .cov.noimg .htxt p{color:var(--ink2)}
+.hero .cov.noimg .htxt p[style]{color:var(--warn)!important}
+.hero .cov.noimg .kick .pill:not(.sample):not(.warn){color:var(--ink2)!important}
+.hero .cov.noimg .kick .pill[style]{background:var(--surface)!important;border:1px solid var(--line);color:var(--navy)!important;padding:2px 10px}
+.hero .back,.hero .editc .btn{border:1px solid var(--line)!important;background:var(--surface)!important;color:var(--ink)!important}
+/* icon tròn nhỏ thay ảnh trong danh sách */
+.evchip{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--blue-s);color:var(--blue);flex:none}
+.evchip .ico{width:18px;height:18px;stroke-width:1.6}
+.evchip.k-ws{background:#E8F3F0;color:var(--t-ws)} .evchip.k-sem{background:#F6EEE3;color:var(--t-sem)} .evchip.k-web{background:#EFEBF6;color:var(--t-web)} .evchip.k-oth{background:var(--sunk);color:var(--t-oth)}
+.evchip.md{width:40px;height:40px} .evchip.ti{width:40px;height:40px}
+.evchip.xs{width:16px;height:16px;background:transparent!important;color:inherit!important} .evchip.xs .ico{width:14px;height:14px}
+.tcard{grid-template-columns:auto 40px minmax(0,1fr) auto}
+/* màn đăng nhập: không ảnh */
+.login .art{background:linear-gradient(160deg,#F5F8FB 0%,#E6EEF5 100%)}
+.login .art div{color:var(--navy)}
+.login .art span{color:var(--ink2)}
+.login .art .artflow{top:32%;bottom:auto;display:flex;align-items:center;gap:0}
+.login .art .af{width:78px;height:78px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--blue);flex:none}
+.login .art .af .ico{width:34px;height:34px;stroke-width:1.4}
+.login .art .afl{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line2) 0 8px,transparent 8px 14px)}
+.hero .cov.noimg{display:flex;flex-direction:column;justify-content:center}
+.hero .cov.noimg .htxt{position:relative;left:auto;right:auto;bottom:auto;padding:64px 130px 40px 28px}
+.hero .cov.noimg .cico{right:28px;bottom:auto;top:50%;translate:0 -50%;width:84px;height:84px}
+.hero .cov.noimg .cico .ico{width:40px;height:40px}
+.login .art b{line-height:1.12;margin-bottom:10px}
+.login .art .af{position:relative}
+.login .art .af em{position:absolute;top:calc(100% + 10px);left:50%;translate:-50% 0;white-space:nowrap;font-style:normal;font-size:14px;font-weight:600;color:var(--navy)}
+.cov.noimg .dbadge{background:var(--surface);border:1px solid var(--line2);color:var(--navy)}
+.cov.noimg .dbadge:not(.past){border-color:var(--blue);color:var(--blue)}
+.pill.sample{background:#FFF4CC!important;color:#7A5B00!important}
+.ring-row .big,.dbox .big{color:var(--navy)}
+</style>
+
 </head>
 <body>
 <div id="app"></div>
@@ -1013,7 +1073,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "3.1"
+  ver: "3.2"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -1052,6 +1112,7 @@ var AVC = ["#3A5CAA", "#0E7A6A", "#9A5A12", "#6B4FA0", "#2F6E8F", "#8A4B6E", "#4
 function av(n, cls){ if (!n) return '<span class="av none ' + (cls || "") + '" title="Chưa giao">?</span>'; return '<span class="av ' + (cls || "") + '" style="background:' + AVC[hash(n) % AVC.length] + '" title="' + esc(n) + '">' + esc(initials(n)) + "</span>"; }
 function ic(n){
   var P = {
+    monitor:'<rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/>', mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>', users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="17" cy="9" r="2.4"/><path d="M16 14c3 0 5 2 5 5"/>', booth:'<path d="M3 9l2-5h14l2 5"/><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M5 13v7h14v-7M10 20v-4h4v4"/>', star:'<path d="M12 4l2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6z"/>',
     lock:'<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>', logout:'<path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4M6 12h10"/>',
     check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>', clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>', alert:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.01"/>',
     file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>', image:'<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 16l-5-5-8 8.5"/>',
@@ -1102,9 +1163,11 @@ function coverName(e){
   if (ps.length) return PRODUCT_COVER[ps[hash(e.id) % ps.length]];
   var pool = TYPE_COVER[e.type] || TYPE_COVER["Khác"]; return pool[hash(e.id) % pool.length];
 }
+/* v3.2 — bỏ ảnh bìa / ảnh sản phẩm (người dùng: rối mắt) ⇒ ô màu sáng + icon nét mảnh theo loại sự kiện */
+function evIcon(e){ var t = String((e && e.type) || "").toLowerCase(); return /webinar|online/.test(t) ? "monitor" : /triển lãm|exhibit/.test(t) ? "booth" : /workshop|thực hành/.test(t) ? "users" : /hội thảo|seminar|hội nghị/.test(t) ? "mic" : "cal"; }
+function evChip(e, cls){ return '<span class="evchip ' + (cls || "") + " k-" + tc(e && e.type) + '" aria-hidden="true">' + ic(evIcon(e)) + "</span>"; }
 function coverHtml(e, extra){
-  var n = coverName(e), cut = CUT[n];
-  return '<div class="cov' + (cut ? " contain" : "") + '"><img src="' + esc(img(n)) + '" alt="" loading="lazy"' + (TALL[n] ? ' style="object-position:50% 18%"' : "") + ' onerror="this.style.visibility=\'hidden\'"><span class="shade"></span>' + (extra || "") + "</div>";
+  return '<div class="cov noimg k-' + tc(e.type) + '"><span class="cico">' + ic(evIcon(e)) + "</span>" + (extra || "") + "</div>";
 }
 function fileThumb(f, w){ if (f.thumb) return R(f.thumb); if (f.kind === "image" && f.driveId) return "https://drive.google.com/thumbnail?id=" + encodeURIComponent(f.driveId) + "&sz=w" + (w || 600); if (f.kind === "image" && /^(https?:|data:|blob:)/.test(f.url || "") && !/drive\.google/.test(f.url)) return R(f.url); return ""; }
 
@@ -1748,7 +1811,7 @@ function vCal(){
       if (lane > 3) return;
       var cont = d0(e.start) < ws, cut = d0(e.end || e.start) > we, st = stat(tasksOf(e.id));
       bars += '<a class="cal-ev c-' + tc(e.type) + (e.state === "Chờ chốt" ? " tbc" : "") + (cont ? " cont" : "") + (cut ? " cut" : "") + '" href="#ev-' + esc(e.id) + '" style="left:calc(' + (c0 / 7 * 100) + "% + 3px);width:calc(" + ((c1 - c0 + 1) / 7 * 100) + "% - 6px);top:" + (34 + lane * 27) + 'px" title="' + esc(e.name + " · " + evDates(e) + " · " + (e.city || "") + " · " + st.pct + "% việc xong") + '">' +
-        (cont ? "" : '<img src="' + esc(img(coverName(e))) + '" alt="" loading="lazy">') + "<span>" + esc((e.sample ? "MẪU · " : "") + e.name) + "</span></a>";
+        (cont ? "" : evChip(e, "xs")) + "<span>" + esc((e.sample ? "MẪU · " : "") + e.name) + "</span></a>";
     });
     var rowh = Math.max(110, 34 + Math.min(4, lanes.length) * 27 + 28);
     g += '<div class="cal-w" style="--rowh:' + rowh + "px;--rowh-m:" + Math.max(80, 30 + Math.min(4, lanes.length) * 22 + 24) + 'px">';
@@ -1766,7 +1829,7 @@ function dayPanel(k, E){
   var day = d0(k), ev = E.filter(function(e){ return e.start <= k && (e.end || e.start) >= k; });
   var T = visTasks().filter(function(t){ return isLeaf(t) && t.due === k && stateOf(t) !== "skip"; }).sort(function(a, b){ return (a.pic === me() ? -1 : 0) - (b.pic === me() ? -1 : 0); });
   return '<aside class="card cardp"><div class="sech"><h2 class="h2">' + DOW[day.getDay()] + ", " + fmt(k) + "/" + day.getFullYear() + "</h2>" + (k === TISO ? '<span class="pill" style="background:var(--mani);color:#111">Hôm nay</span>' : "") + "</div>" +
-    (ev.length ? ev.map(function(e){ var s = stat(tasksOf(e.id)); return '<a href="#ev-' + esc(e.id) + '" style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;text-decoration:none;color:var(--ink);margin-bottom:10px"><img src="' + esc(img(coverName(e))) + '" alt="" style="width:64px;height:48px;object-fit:cover;border-radius:6px"><span><b style="font-size:13.5px;display:block;line-height:1.3">' + esc(e.name) + '</b><span class="small muted">' + esc(e.type) + " · " + esc(e.city || "") + " · " + s.pct + "% xong</span></span></a>"; }).join("") : '<p class="small muted" style="margin:0 0 10px">Không có sự kiện.</p>') +
+    (ev.length ? ev.map(function(e){ var s = stat(tasksOf(e.id)); return '<a href="#ev-' + esc(e.id) + '" style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;text-decoration:none;color:var(--ink);margin-bottom:10px">' + evChip(e, "md") + '<span><b style="font-size:13.5px;display:block;line-height:1.3">' + esc(e.name) + '</b><span class="small muted">' + esc(e.type) + " · " + esc(e.city || "") + " · " + s.pct + "% xong</span></span></a>"; }).join("") : '<p class="small muted" style="margin:0 0 10px">Không có sự kiện.</p>') +
     '<h3 class="small" style="margin:12px 0 4px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)">Việc đến hạn · ' + T.length + "</h3>" +
     (T.length ? '<ul class="todo">' + T.slice(0, 30).map(function(t){ var st = stateOf(t), e = evById(t.eventId); return '<li><button class="r" data-open="' + esc(t.id) + '"><i class="dot ' + (st === "done" ? "ok" : st === "over" ? "crit" : t.status === "Chờ duyệt" ? "wait" : t.status === "Đang làm" ? "prog" : "none") + '"></i><span><span class="t">' + esc(t.title) + '</span><span class="s">' + esc(e.name) + " · " + esc(t.pic || "chưa giao") + "</span></span><span class=\"d\">" + (t.pic === me() ? "Của tôi" : "") + "</span></button></li>"; }).join("") + "</ul>" : '<p class="small muted">Không có việc đến hạn.</p>') + "</aside>";
 }
@@ -2027,7 +2090,7 @@ function pBoard(e, ts){
     var cs = L.filter(function(t){ return (t.status || "Chưa làm") === c[0]; }).sort(byDue);
     return '<div class="kcol" data-kcol="' + c[0] + '"><h4 style="color:' + c[1] + '"><i class="dot" style="background:' + c[1] + ';margin:0"></i>' + c[0] + '<span class="n num">' + cs.length + "</span></h4>" + cs.slice(0, 60).map(function(t){
       var dl = dueLabel(t), F = filesOf(t.id), th = F.map(function(f){ return fileThumb(f, 400); }).filter(Boolean)[0];
-      return '<div class="kc" draggable="' + (canTask(t) ? "true" : "false") + '" data-kid="' + esc(t.id) + '" data-open="' + esc(t.id) + '">' + (th ? '<img class="kimg" src="' + esc(th) + '" alt="" loading="lazy">' : "") +
+      return '<div class="kc" draggable="' + (canTask(t) ? "true" : "false") + '" data-kid="' + esc(t.id) + '" data-open="' + esc(t.id) + '">' + "" +
         '<span class="kg">' + esc(shortG(t.group)) + '</span><span class="kt">' + (t.priority === "Cao" ? '<span class="prio">GẤP · </span>' : "") + esc(t.title) + '</span><span class="km"><span class="due ' + dl.c + '">' + ic("clock") + " " + esc(dl.t) + (dl.c === "crit" ? " · " + esc(dl.s) : "") + "</span>" +
         (t.proof && !proofOk(t) ? needChip(t) : "") + av(t.pic, "s") + "</span></div>"; }).join("") + (cs.length > 60 ? '<span class="small muted">+' + (cs.length - 60) + " việc</span>" : "") + "</div>"; }).join("") + "</div>";
 }
@@ -2220,7 +2283,7 @@ function vMine(){
   var side = '<aside style="display:flex;flex-direction:column;gap:16px"><section class="card cardp"><div class="ring-row">' + ring(s.pct, s.over ? "crit" : "ok") + '<div class="dbox"><b style="font-size:15px">' + esc(me()) + '</b><span class="small muted">' + s.done + "/" + s.total + " việc đã xong</span>" +
     (s.over ? '<span class="pill crit">' + s.over + " việc trễ</span>" : '<span class="pill ok">Không trễ việc nào</span>') + "</div></div></section>" +
     '<section class="card"><div class="panel-h"><h3>Sự kiện bạn tham gia</h3></div><div class="panel-b">' + (mineEv.length ? mineEv.map(function(e){ var st = stat(tasksOf(e.id)), my = stat(tasksOf(e.id).filter(function(t){ return t.pic === me(); }));
-      return '<a href="#ev-' + esc(e.id) + '" style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;text-decoration:none;color:var(--ink);padding:8px 0;border-top:1px solid var(--line)"><img src="' + esc(img(coverName(e))) + '" alt="" style="width:64px;height:48px;object-fit:cover;border-radius:6px"><span style="min-width:0"><b style="font-size:13px;display:block;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(e.name) + '</b><span class="small muted">' + esc(dday(e).big) + " · " + (e.Owner === me() ? "bạn là Owner · " : "") + "việc của bạn " + my.done + "/" + my.total + '</span><div class="bar" style="height:5px;margin-top:4px"><i style="width:' + st.pct + '%"></i></div></span></a>'; }).join("") : '<p class="small muted">Chưa tham gia sự kiện sắp tới nào.</p>') + "</div></section></aside>";
+      return '<a href="#ev-' + esc(e.id) + '" style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;text-decoration:none;color:var(--ink);padding:8px 0;border-top:1px solid var(--line)">' + evChip(e, "md") + '<span style="min-width:0"><b style="font-size:13px;display:block;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(e.name) + '</b><span class="small muted">' + esc(dday(e).big) + " · " + (e.Owner === me() ? "bạn là Owner · " : "") + "việc của bạn " + my.done + "/" + my.total + '</span><div class="bar" style="height:5px;margin-top:4px"><i style="width:' + st.pct + '%"></i></div></span></a>'; }).join("") : '<p class="small muted">Chưa tham gia sự kiện sắp tới nào.</p>') + "</div></section></aside>";
   return '<div class="sech"><h1 class="h2" style="font-size:26px">Việc của tôi</h1><small>Xếp theo hạn · nộp file / link ngay tại đây</small></div><div class="mine"><div>' + h + "</div>" + side + "</div>";
 }
 function tcard(t){
@@ -2232,14 +2295,14 @@ function tcard(t){
     (t.proof && ok && t.status !== "Chờ duyệt" && !boss ? '<button class="btn sm pri" data-setst="Chờ duyệt" data-id="' + esc(t.id) + '">' + ic("send") + "Gửi duyệt</button>" : "") +
     (t.status === "Chưa làm" ? '<button class="btn sm" data-setst="Đang làm" data-id="' + esc(t.id) + '">Bắt đầu</button>' : "") +
     '<button class="btn sm' + (ok && (boss || !t.proof) ? " ok" : "") + '" data-act="done" data-id="' + esc(t.id) + '">' + ic("check") + "Xong</button>";
-  return '<div class="tcard">' + chk(t) + '<img class="ti" src="' + esc(img(coverName(e))) + '" alt="" loading="lazy"><div style="min-width:0"><div class="tt" data-open="' + esc(t.id) + '">' + (t.priority === "Cao" ? '<span class="prio">GẤP · </span>' : "") + esc(t.title) + '</div><div class="meta"><a class="type ' + tc(e.type) + '" href="#ev-' + esc(e.id) + '" style="text-decoration:none">' + esc(e.name) + "</a>" +
+  return '<div class="tcard">' + chk(t) + evChip(e, "ti") + '<div style="min-width:0"><div class="tt" data-open="' + esc(t.id) + '">' + (t.priority === "Cao" ? '<span class="prio">GẤP · </span>' : "") + esc(t.title) + '</div><div class="meta"><a class="type ' + tc(e.type) + '" href="#ev-' + esc(e.id) + '" style="text-decoration:none">' + esc(e.name) + "</a>" +
     '<span class="due ' + dl.c + '">' + ic("clock") + " " + esc(dl.t) + (dl.s ? " · " + esc(dl.s) : "") + "</span>" + (t.status === "Đang làm" ? '<span class="pill prog">Đang làm</span>' : t.status === "Chờ duyệt" ? '<span class="pill wait">Chờ duyệt</span>' : "") + needChip(t) +
     (filesOf(t.id).length ? '<span class="pf">' + fileChips(t, 3) + "</span>" : "") + "</div></div>" + '<div class="acts">' + acts + "</div></div>";
 }
 
 function tcardOwner(t, acts){
   var e = evById(t.eventId), dl = dueLabel(t);
-  return '<div class="tcard"><span></span><img class="ti" src="' + esc(img(coverName(e))) + '" alt="" loading="lazy"><div style="min-width:0"><div class="tt" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="meta"><span>' + esc(e.name) + "</span><span>" + av(t.pic, "s") + " " + esc(t.pic || "") + "</span>" +
+  return '<div class="tcard"><span></span>' + evChip(e, "ti") + '<div style="min-width:0"><div class="tt" data-open="' + esc(t.id) + '">' + esc(t.title) + '</div><div class="meta"><span>' + esc(e.name) + "</span><span>" + av(t.pic, "s") + " " + esc(t.pic || "") + "</span>" +
     (t.status === "Pending" ? '<span class="pill warn">Lý do Pending: ' + esc(t.block || "") + "</span>" : '<span class="pill wait">Chờ duyệt · nộp ' + esc(ago(t.updatedAt)) + "</span>") + '<span class="due ' + dl.c + '">' + ic("clock") + " " + esc(dl.t) + "</span>" +
     (filesOf(t.id).length ? '<span class="pf">' + fileChips(t, 3) + "</span>" : "") + '</div></div><div class="acts">' + acts + "</div></div>";
 }
@@ -2419,7 +2482,6 @@ function mEvent(m){
     '<div class="grid3"><div><label class="fl" for="f-type">Loại</label>' + sel("f-type", TYPES, v.type) + '</div><div><label class="fl" for="f-start">Ngày bắt đầu *</label><input class="in" type="date" id="f-start" value="' + esc(v.start || "") + '"></div><div><label class="fl" for="f-end">Ngày kết thúc</label><input class="in" type="date" id="f-end" value="' + esc(v.end && v.end !== v.start ? v.end : "") + '"></div></div>' +
     '<div class="grid2"><div><label class="fl" for="f-city">Thành phố</label><input class="in" id="f-city" value="' + esc(v.city || "") + '" placeholder="Hà Nội / Online…"></div><div><label class="fl" for="f-venue">Địa điểm</label><input class="in" id="f-venue" value="' + esc(v.venue || "") + '"></div></div>' +
     '<div><label class="fl">Sản phẩm trọng tâm</label><div class="prods">' + PRODUCTS.map(function(p){ return '<button type="button" class="chip" data-prod="' + esc(p) + '" aria-pressed="' + (prods.indexOf(p) >= 0) + '">' + esc(p) + "</button>"; }).join("") + "</div></div>" +
-    '<div><label class="fl">Ảnh bìa ' + (v.cover ? "" : '<span class="muted">(chưa chọn: tự lấy theo sản phẩm / loại sự kiện)</span>') + '</label><div class="covpick">' + COVERS.map(function(c){ return '<button type="button" data-cover="' + esc(c) + '" aria-pressed="' + (c === v.cover) + '" title="' + esc(c) + '"><img src="' + esc(img(c)) + '" alt="" loading="lazy"></button>'; }).join("") + "</div></div>" +
     '<div class="grid3"><div><label class="fl" for="f-target">Khách mục tiêu</label><input class="in" type="number" min="0" id="f-target" value="' + esc(v.target || "") + '"></div><div><label class="fl" for="f-bp">Ngân sách dự kiến (đ)</label><input class="in" type="number" min="0" step="100000" id="f-bp" value="' + esc(v.budgetPlan || "") + '"></div>' +
     (e ? '<div><label class="fl" for="f-state">Tình trạng</label>' + sel("f-state", [["", "Đã chốt"], ["Chờ chốt", "Chờ chốt"], ["Huỷ", "Huỷ"]], v.state) + "</div>" : '<div><label class="fl" for="f-org">Đơn vị tổ chức</label><input class="in" id="f-org" value="' + esc(v.organizer || "MMH") + '"></div>') + "</div>" +
     (e ? '<div class="grid3"><div><label class="fl" for="f-actual">Khách thực tế</label><input class="in" type="number" min="0" id="f-actual" value="' + esc(v.actual || "") + '"></div><div><label class="fl" for="f-ba">Đã chi (đ)</label><input class="in" type="number" min="0" step="100000" id="f-ba" value="' + esc(v.budgetActual || "") + '"></div><div><label class="fl" for="f-follow">Theo dõi trên app</label>' + sel("f-follow", ["Có", "Không"], v.follow || "Có") + "</div></div>" : "") +
@@ -2804,7 +2866,7 @@ function renderLogin(msg){
       '<button class="btn pri" id="lg-go" type="submit">' + (LG.busy ? (LG.auto ? "Đang tự đăng nhập…" : "Đang đăng nhập…") : "Đăng nhập") + '</button></div>' +
       '<div class="lgalt">Lần đầu dùng, chưa có hoặc quên mật khẩu? <button class="lnk" type="button" id="lg-send">Nhận mã qua email</button></div>';
   }
-  $("#app").innerHTML = '<div class="login"><div class="art"><img src="' + esc(img("ws-comp-2.jpg")) + '" alt=""><div><i></i><b>Sự kiện MKT</b><span>Kế hoạch · giao việc · tiến độ sự kiện Marketing MMH</span></div></div><div class="fm"><form class="card2" id="lg" autocomplete="on" novalidate>' + H +
+  $("#app").innerHTML = '<div class="login"><div class="art"><div class="artflow">' + [["folder", "Kế hoạch"], ["users", "Giao việc"], ["check", "Tiến độ"], ["bell", "Nhắc việc"]].map(function(x, i){ return '<span class="af">' + ic(x[0]) + "<em>" + x[1] + "</em></span>" + (i < 3 ? '<span class="afl"></span>' : ""); }).join("") + '</div><div><i></i><b>Sự kiện MKT</b><span>Kế hoạch · giao việc · tiến độ sự kiện Marketing MMH</span></div></div><div class="fm"><form class="card2" id="lg" autocomplete="on" novalidate>' + H +
     '<p class="err" id="lg-err" role="alert">' + esc(msg || "") + "</p></form></div></div>";
   var err = $("#lg-err"), go = $("#lg-go"), f = $("#lg");
   if (LG.busy && go) go.disabled = true;
