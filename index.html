@@ -1520,6 +1520,13 @@ body{-webkit-font-smoothing:auto;-moz-osx-font-smoothing:auto;text-rendering:opt
 .phx .btn .ico{width:14px;height:14px}
 @media (max-width:860px){.bcbar .btn{flex:1 1 100%}.bcl label{padding:12px}}
 </style>
+<style id="v42-css">
+.evsrc{margin:6px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;color:#5E6A76}
+.evsrc-w{color:#A65A47;font-weight:600}
+.e4-src{margin:6px 0 0;font-size:13.5px;color:#4F5B68}
+.e4-src a{color:#3F6A8C}
+.e4-srcw{display:block;color:#A65A47;font-size:13px;margin-top:2px}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1529,7 +1536,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "4.1.4"
+  ver: "4.2"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -1755,7 +1762,7 @@ function health(e, s){
   return { k: "warn", t: "Cần chú ý" };
 }
 /* v2.4 — mốc quan trọng · giai đoạn sự kiện · cập nhật tuần */
-var MS_RE = /duyet ke hoach|hop dong kol|form dang ky|key visual|set up hoan thien|bao cao su kien|chuyen doi/;
+var MS_RE = /hop dong kol|form dang ky|key visual|set up hoan thien|bao cao su kien|chuyen doi/;
 function isMs(t){ return t.milestone === "x" || (!t.milestone && MS_RE.test(norm(t.title))); }
 var WEEK0 = iso(addD(TODAY, -((TODAY.getDay() + 6) % 7)));
 var AFTER_DAYS = 60;
@@ -2310,7 +2317,7 @@ function yearView(E){
 
 /* ═════════ DANH SÁCH SỰ KIỆN ═════════ */
 function vEvents(){
-  var all = evs(), F = [["up", "Sắp tới & đang diễn ra"], ["after", "Sau sự kiện · chưa đóng"], ["past", "Đã qua"], ["risk", "Cần chú ý"], ["mine", "Tôi tham gia"], ["all", "Tất cả"]];
+  var all = evs(), F = [["up", "Sắp tới & đang diễn ra"], ["after", "Sau sự kiện · chưa đóng"], ["past", "Đã qua"], ["risk", "Cần chú ý"], ["all", "Tất cả"]];
   var L = all.filter(function(e){
     var en = d0(e.end || e.start), past = en && en < TODAY;
     if (S.evf === "up" && (past || e.state === "Huỷ" || !e.start)) return false;
@@ -3515,8 +3522,8 @@ function gates(e){
     return { t: k ? k + " việc " + lab + " (hạn ≤ D−" + n + ") chưa xong" : "Việc " + lab + " đến D−" + n + " đã xong", ok: !k }; };
   var C = {
     G1: [{ t: "Đủ đội sự kiện (Owner + ≥ 2 vai trò)", ok: !!e.Owner && roles >= 3, fix: "team" }, { t: "Có mục tiêu số khách", ok: st.target > 0, fix: "reg" },
-         task("File kế hoạch tổng quan", /ke hoach tong quan|file ke hoach/), task("Giám đốc duyệt kế hoạch + ngân sách", /duyet ke hoach/),
-         task("Chốt KOL (hợp đồng, lịch di chuyển)", /hop dong kol/), task("Chia việc với NPP, Trường / Viện", /chia viec/),
+         task("File kế hoạch tổng quan", /ke hoach tong quan|file ke hoach/),
+         task("Chốt KOL (hợp đồng, lịch di chuyển)", /hop dong kol/), task("Phân công công việc", /phan cong cong viec|chia viec/),
          task("Form đăng ký (khảo sát trước, đồng ý dữ liệu)", /form dang ky/), expo(e) ? null : { t: "Kết nối file đăng ký (ghi rõ nguồn từng khách)", ok: st.via === "file", fix: "reg" },
          e.npp || nP ? { t: "Khai báo đối tác / NPP nhận thông báo", ok: nP > 0, fix: "partners" } : null],
     G2: [left(7, "Design", "ấn phẩm & in ấn"), web ? null : left(7, "Trade", "hậu cần (địa điểm, đồ MKT, gửi đồ)")],
@@ -4386,6 +4393,48 @@ document.addEventListener("click", function(ev){
     });
   }
 });
+/* ═════════ v4.2 (19/11/2026) — góp ý nhóm Marketing: chỉ sự kiện FY68 (từ 01/09/2026) · bỏ việc "Giám đốc duyệt kế hoạch + ngân sách" ·
+   "Chia việc với NPP, Trường / Viện" ⇒ "Phân công công việc" · mỗi sự kiện ghi rõ NGUỒN (file MKT Offline / file kế hoạch / tạo trên app) · bỏ lọc "Tôi tham gia".
+   Máy chủ (Event Hub v2.4) đã lọc; lớp này lọc thêm bản dữ liệu lưu trên máy từ trước. ═════════ */
+var FY_FROM = "2026-09-01", JUNK_RE = /list customer|customer list|danh sach (khach|kh\b)|data (khach|dang ky)|du lieu khach|khao sat|survey|check ?in|form dang ky|ket qua dang ky/;
+function fyTrim(D){
+  if (!D || D._fy42) return; D._fy42 = 1;
+  var nT = {}; (D.tasks || []).forEach(function(t){ nT[t.eventId] = (nT[t.eventId] || 0) + 1; });
+  var keep = {};
+  D.events = (D.events || []).filter(function(e){
+    var st = String(e.start || "").slice(0, 10);
+    if (st && st < FY_FROM) return false;
+    if (!st && !/^(APP|SAMPLE)$/.test(e.src || "") && !e.sample) return false;
+    if (e.src === "FILE" && !nT[e.id] && (JUNK_RE.test(norm(e.planName || "")) || JUNK_RE.test(norm(e.name || "")))) return false;
+    keep[e.id] = 1; return true; });
+  var by = function(x){ return !x.eventId || keep[x.eventId]; };
+  ["tasks", "files", "log", "comments", "meetings", "checkins", "partners", "pnotice", "notify"].forEach(function(k){ if (D[k]) D[k] = D[k].filter(by); });
+  var drop = {};
+  D.tasks = (D.tasks || []).filter(function(t){ var n = norm(t.title); if (/giam doc duyet ke hoach/.test(n)){ drop[t.id] = 1; return false; } if (/^chia viec voi npp/.test(n)) t.title = "Phân công công việc"; return true; });
+  D.tasks.forEach(function(t){ if (drop[t.parentId]) t.parentId = ""; });
+}
+var _index42 = index;
+index = function(){ fyTrim(S.D); return _index42.apply(this, arguments); };
+/* nguồn của sự kiện — trả lời "thông tin lấy từ đâu" */
+function evSrc(e){
+  var off = (lnk(e) || {}).off || {}, L = [];
+  if (e.sample) return { t: "dữ liệu mẫu", s: "" };
+  if (e.src === "APP") L.push("tạo trên app");
+  if (/OFFLINE/.test(e.src || "") || e.offlineName) L.push(off.url ? '<a href="' + esc(off.url) + '" target="_blank" rel="noopener">file MKT Offline (' + (off.src === "R" ? "REPORT_EVENT" : "PLAN_EVENT") + ")</a>" : "file MKT Offline");
+  if (e.planUrl || e.planName) L.push(e.planUrl ? '<a href="' + esc(e.planUrl) + '" target="_blank" rel="noopener">file kế hoạch' + (e.planName ? " “" + esc(e.planName) + "”" : "") + "</a>" : "file kế hoạch “" + esc(e.planName) + "”");
+  var only = e.src === "FILE" && !e.offlineName;
+  return { t: L.length ? L.join(" + ") : "không rõ", s: only ? "Chỉ có file trong thư mục Event FY68, chưa có dòng trong file MKT Offline — kiểm tra lại tên / ngày sự kiện." : "" };
+}
+var _evCard42 = evCard;
+evCard = function(e){
+  var x = evSrc(e), txt = String(x.t).replace(/<[^>]+>/g, "");
+  return _evCard42(e).replace('<div class="ft">', '<div class="evsrc" title="' + esc(txt + (x.s ? " — " + x.s : "")) + '">Nguồn: ' + esc(txt) + (x.s ? ' <b class="evsrc-w">· chưa có trong MKT Offline</b>' : "") + '</div><div class="ft">');
+};
+var _vEvent42 = vEvent;
+vEvent = function(e){
+  var x = evSrc(e);
+  return _vEvent42(e).replace('<div class="e4-st">', '<p class="e4-src">Nguồn: ' + x.t + (x.s ? ' <span class="e4-srcw">' + esc(x.s) + "</span>" : "") + '</p><div class="e4-st">');
+};
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
 })();

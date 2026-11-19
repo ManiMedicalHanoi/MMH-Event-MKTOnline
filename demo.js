@@ -13,7 +13,7 @@
   var MKT = ["Thu Trang", "Minh Khoa", "Đức Anh", "Hải Yến", "Ngọc Mai"], SALES = ["Quốc Bảo", "Văn Nam"];
   var TPL = [
     ["1. Kế hoạch & phê duyệt", "Owner", [["File kế hoạch tổng quan (Overview, nhân sự, checklist)", "Owner", "link", -30], ["Giám đốc duyệt kế hoạch + ngân sách", "Owner", "", -28]]],
-    ["2. KOL & đối tác", "Owner", [["Hợp đồng KOL + lịch di chuyển", "Owner", "file", -30], ["Chia việc với NPP, Trường / Viện", "Owner", "", -30], ["Họp với NPP (agenda, nhân sự, bán hàng)", "Owner", "file", -3]]],
+    ["2. KOL & đối tác", "Owner", [["Hợp đồng KOL + lịch di chuyển", "Owner", "file", -30], ["Phân công công việc", "Owner", "", -30], ["Họp với NPP (agenda, nhân sự, bán hàng)", "Owner", "file", -3]]],
     ["3. Tuyển sinh", "Digital", [["Form đăng ký (khảo sát trước, đồng ý dữ liệu)", "Digital", "link", -30], ["Nhóm Zalo khách tham dự", "Digital", "link", -30], ["Sales / NPP gửi đủ thông tin khách đăng ký hộ", "Sales", "", -5], ["Rà soát danh sách khách trước sự kiện", "Digital", "file", -3]]],
     ["4. Truyền thông", "Digital", [["Bài đăng teaser", "Digital", "link", -14], ["Bài giới thiệu chương trình / KOL", "Digital", "link", -10], ["Bài đếm ngược", "Digital", "link", -3], ["Bài cảm ơn + ảnh recap", "Digital", "link", 1], ["Video recap highlight", "Digital", "link", 2]]],
     ["5. Thiết kế ấn phẩm", "Design", [["Key visual / poster sự kiện", "Design", "file", -21], ["Backdrop / vách gian hàng", "Design", "file", -10, "live"], ["Standee", "Design", "file", -10, "live"], ["Flyer / brochure / CTKM", "Design", "file", -10], ["Thẻ đeo, bảng tên, biểu mẫu check-in", "Design", "file", -7, "live"]]],
