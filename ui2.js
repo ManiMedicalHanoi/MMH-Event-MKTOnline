@@ -333,7 +333,7 @@ function top(){
     '<header class="u2top"><a class="u2brand" href="#dash"><i>S<b>·</b></i><span>Sự kiện MKT</span></a>' +
     '<label class="u2srch">' + ic("search") + '<input id="u2q" type="search" placeholder="Tìm sự kiện, thành phố, Owner…" value="' + esc(st.q) + '" autocomplete="off"></label>' +
     '<span class="u2seg">' + [["tl", "Dòng thời gian"], ["cal", "Lịch tháng"]].map(function(t){ return '<button data-u2="left:' + t[0] + '" aria-pressed="' + (st.left === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</span>" +
-    '<span class="u2seg lt">' + [["fy", "Cả FY68"], ["live", "Đang theo dõi"], ["mine", "Tôi tham gia"]].map(function(t){ return '<button data-u2="f:' + t[0] + '" aria-pressed="' + (st.f === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</span>" +
+    '<span class="u2seg lt">' + [["fy", "Cả FY68"], ["live", "Đang theo dõi"]].map(function(t){ return '<button data-u2="f:' + t[0] + '" aria-pressed="' + (st.f === t[0]) + '">' + t[1] + "</button>"; }).join("") + "</span>" +
     '<span class="u2sp"></span>' +
     '<span style="position:relative"><button class="u2ib" data-act="bell" title="Thông báo" aria-label="Thông báo">' + ic("bell") + (unseen ? '<span class="badge">' + Math.min(unseen, 99) + "</span>" : "") + "</button>" + (S.pop === "bell" ? X("bellPop")(N, seen) : "") + "</span>" +
     (S.me && S.me.manager ? '<button class="u2ib" data-act="settings" title="Cài đặt" aria-label="Cài đặt">' + ic("gear") + "</button>" : "") +
