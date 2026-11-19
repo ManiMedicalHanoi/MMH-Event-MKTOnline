@@ -1505,6 +1505,21 @@ body{-webkit-font-smoothing:auto;-moz-osx-font-smoothing:auto;text-rendering:opt
 /* bảng nhiệt: ô xanh mức 4 dùng chữ đậm (chữ trắng chỉ 2,7 : 1) */
 .heat td.c.p4{color:#0D2431}
 </style>
+<style id="v413-close">
+/* v4.1.3 — đóng sự kiện đã qua: dòng nhắc ở Tổng quan / Sự kiện + danh sách chọn nhiều trong hộp Đóng */
+.bcbar{flex-wrap:wrap}
+.bcbar>.ico{color:var(--crit);flex:none}
+.bcbar small{color:var(--ink3);font-size:12.5px;min-width:0}
+.bcl{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:10px;max-height:46vh;overflow:auto}
+.bcl li+li{border-top:1px solid var(--line)}
+.bcl label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer}
+.bcl input{width:18px;height:18px;margin:2px 0 0;accent-color:#496B87;flex:none}
+.bcl b{display:block;font-weight:600;color:var(--ink);line-height:1.35}
+.bcl small{display:block;color:var(--ink3);font-size:12.5px;margin-top:2px}
+.bcl .crit{color:var(--crit);font-weight:600}
+.phx .btn .ico{width:14px;height:14px}
+@media (max-width:860px){.bcbar .btn{flex:1 1 100%}.bcl label{padding:12px}}
+</style>
 </head>
 <body>
 <div id="app"></div>
@@ -1514,7 +1529,7 @@ var EH_CFG = {
   api: "https://script.google.com/macros/s/AKfycbzn-5chMgO7lQPKmot8P7UkP9C40MdCPtiTTa4H1gcKepVsnr1IYfcB7sSdK1_jrZYY/exec",   /* backend marketing ▸ MKT_EventHub.gs + MKT_EventHubPlus.gs */
   hub: "https://script.google.com/macros/s/AKfycbwsX4cQEoH4LNlmcNfe8qWIM9K6EiDEXy7PjhP9bHY2citL6xHn5L1unsAlQJHyL9EP/exec",   /* Training Hub — đăng nhập email + mã */
   img: "https://manimedicalhanoi.github.io/Training-Hub/media/brand/",
-  ver: "4.1.2"
+  ver: "4.1.3"
 };
 </script>
 <script>if (/[?&]demo=1/.test(location.search) && !window.EH_DEMO) document.write('<script src="demo.js"><\/script>');</script>
@@ -3677,7 +3692,7 @@ function v3Click(a, ev){
   var k = a.dataset.v3, e = evById(S.evId); if (/^(fix|plink|pnew|pedit|compose|preview|nskip)$/.test(k) || a.tagName === "A") ev.preventDefault();
   if (k === "bdf"){ S.bdf = a.dataset.f === "pn" ? S.bdf : (S.bdf === a.dataset.f ? "all" : a.dataset.f); if (a.dataset.f === "pn"){ var n0 = (S.D.pnotice || []).filter(function(n){ return n.status === "Chờ gửi"; })[0]; if (n0) location.hash = "ev-" + n0.eventId + "/partners"; return; } render(); return; }
   if (k === "gtoggle"){ S.gOpen = !S.gOpen; LS.set("eh_gopen", S.gOpen ? "1" : null); render(); return; }
-  if (k === "fix"){ var f = a.dataset.fix; if (f === "team"){ S.modal = { k: "team", ev: S.evId }; render(); return; } if (f === "close"){ S.modal = { k: "close", ev: S.evId }; render(); return; } S.tab = f; render(); return; }
+  if (k === "fix"){ var f = a.dataset.fix; if (f === "team"){ S.modal = { k: "team", ev: S.evId }; render(); return; } if (f === "close"){ S.modal = { k: canEv(evById(S.evId)) ? "close" : "askclose", ev: S.evId }; render(); return; }   /* v4.1.3 */ S.tab = f; render(); return; }
   if (k === "plink"){ var url = new URL("doi-tac.html?k=" + a.dataset.k + (window.EH_DEMO ? "&demo=1" : ""), location.href).href; (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(function(){ toast("Đã sao chép link trang theo dõi của đối tác"); }, function(){ prompt("Link trang theo dõi của đối tác:", url); }); return; }
   if (k === "pnew"){ S.modal = { k: "partner", ev: S.evId, name: a.dataset.name || "" }; render(); setTimeout(function(){ var x = $("#p-name"); if (x) x.focus(); }, 30); return; }
   if (k === "pedit"){ S.modal = { k: "partner", ev: S.evId, pid: a.dataset.pid }; render(); return; }
@@ -4292,6 +4307,82 @@ if (window.EH_UI2 && window.EH_UI2.render){
 window.addEventListener("hashchange", function(){
   var h = decodeURIComponent(location.hash.replace(/^#/, ""));
   if (/^apv-/.test(h)){ A4.open = h.slice(4); A4.st = "all"; A4.kind = "all"; A4.scope = "all"; A4.who = ""; render(); }
+});
+/* ═════════ v4.1.3 (18/11/2026) — báo kết thúc (đóng) sự kiện đã qua ═════════
+   Người dùng: "sự kiện qua rồi mà vẫn chưa thể báo kết thúc". Trước: người không phải Owner / quản lý bấm dòng đỏ "thiếu Owner đóng sự kiện"
+   ⇒ mở hộp Đóng ⇒ ghi lý do ⇒ máy chủ từ chối ("Chỉ quản lý hoặc Owner…"); khung "Sau sự kiện" không nói ai đóng được.
+   ① Không có quyền ⇒ khung ghi rõ "chỉ Owner X hoặc quản lý đóng được" + nút Nhắc Owner đóng (bình luận @Owner trong Thảo luận ⇒ Owner nhận
+     thông báo + email như mọi bình luận @tên); dòng đỏ cũng mở hộp nhắc này thay cho hộp Đóng.
+   ② Owner / quản lý ⇒ dòng "n sự kiện đã qua chưa đóng" ở Tổng quan và Sự kiện + hộp Đóng các sự kiện đã qua (chọn nhiều, 1 lý do chung khi
+     còn việc; gọi lần lượt event.close như nút Đóng của từng sự kiện — việc còn lại chuyển "Bỏ qua", Mở lại được). */
+function pastOpen(){ return evs().filter(function(e){ return /after|old/.test(phase(e)); }).sort(function(a, b){ return (a.end || a.start || "") < (b.end || b.start || "") ? -1 : 1; }); }
+function openCnt(e){ return leafs(e.id).filter(function(t){ return !/done|skip/.test(stateOf(t)); }).length; }
+var _phaseBox413 = phaseBox;
+phaseBox = function(e, s){
+  var h = _phaseBox413(e, s);
+  if (!/after|old/.test(phase(e)) || canEv(e)) return h;
+  return h.replace("</span>", " · chỉ " + (e.Owner ? "Owner <b>" + esc(e.Owner) + "</b>" : "Owner") + " hoặc quản lý đóng được</span>")
+          .replace(/<\/div>$/, '<button class="btn sm" data-act="askclose">' + ic("bell") + "Nhắc Owner đóng</button></div>");
+};
+function bulkBar(){
+  var L = pastOpen().filter(canEv); if (!L.length) return "";
+  return '<div class="b4mk bcbar">' + ic("flag") + "<b>" + L.length + " sự kiện đã qua chưa đóng</b><small>" + esc(L.slice(0, 3).map(function(e){ return e.name; }).join(" · ")) + (L.length > 3 ? " …" : "") +
+    '</small><span class="sp"></span><button class="btn sm pri" data-act="bulkclose">' + ic("check") + "Đóng các sự kiện đã qua</button></div>";
+}
+var _vBoard413 = vBoard;
+vBoard = function(){ var h = _vBoard413(), b = bulkBar(), i = h.indexOf('<div class="b4mk">'); return !b ? h : i >= 0 ? h.slice(0, i) + b + h.slice(i) : b + h; };
+var _vEvents413 = vEvents;
+vEvents = function(){ var h = _vEvents413(), b = bulkBar(); return b && h.indexOf('<div class="toolbar">') >= 0 ? h.replace('<div class="toolbar">', b + '<div class="toolbar">') : h; };
+function mAskClose(m){
+  var e = evById(m.ev), n = openCnt(e), who = e.Owner || "";
+  var txt = (who ? "@" + who + " " : "") + "Sự kiện “" + e.name + "” (" + evDates(e) + ") đã qua — nhờ " + (who ? "anh / chị" : "quản lý") + " bấm Đóng sự kiện trên app để báo kết thúc." + (n ? " Còn " + n + " việc chưa xong." : " Mọi việc đã xong.");
+  return mHead("Báo kết thúc sự kiện") + '<div class="mb"><p style="margin:0"><b>' + esc(e.name) + "</b> · " + esc(evDates(e)) + "</p>" +
+    '<p style="margin:0">Chỉ ' + (who ? "Owner <b>" + esc(who) + "</b>" : "Owner") + " hoặc quản lý đóng được sự kiện. Gửi lời nhắc vào Thảo luận của sự kiện" + (who ? " — " + esc(who) + " nhận thông báo và email." : ".") + "</p>" +
+    '<div><label class="fl" for="ak-msg">Lời nhắc</label><textarea class="in" rows="4" id="ak-msg">' + esc(txt) + "</textarea></div>" +
+    '<p class="small" id="ak-err" style="color:var(--crit);margin:0"></p></div><div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Huỷ</button><button class="btn pri" data-act="doaskclose">' + ic("send") + "Gửi lời nhắc</button></div>";
+}
+function mBulkClose(){
+  var L = pastOpen().filter(canEv);
+  if (!L.length) return mHead("Đóng sự kiện đã qua") + '<div class="mb"><p style="margin:0">Không còn sự kiện đã qua nào chưa đóng.</p></div><div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Đóng hộp</button></div>';
+  return mHead("Đóng sự kiện đã qua") + '<div class="mb"><p class="small muted" style="margin:0">Đóng ⇒ hệ thống thôi nhắc việc, sự kiện chuyển “Đã đóng”; việc còn lại chuyển “Bỏ qua”. Mở lại được bất cứ lúc nào.</p>' +
+    '<ul class="bcl">' + L.map(function(e){ var n = openCnt(e);
+      return '<li><label><input type="checkbox" data-bc="' + esc(e.id) + '" checked><span><b>' + esc(e.name) + "</b><small>" + esc(evDates(e)) + (e.Owner ? " · Owner " + esc(e.Owner) : "") + " · " +
+        (n ? '<span class="crit">còn ' + n + " việc chưa xong</span>" : "mọi việc đã xong") + "</small></span></label></li>"; }).join("") + "</ul>" +
+    '<div><label class="fl" for="bc-note">Lý do đóng (bắt buộc khi còn việc chưa xong)</label><textarea class="in" rows="2" id="bc-note" placeholder="Ví dụ: Sự kiện đã qua, đã báo cáo; NPP tự follow-up khách."></textarea></div>' +
+    '<p class="small" id="bc-err" style="color:var(--crit);margin:0"></p></div><div class="mf"><span class="sp"></span><button class="btn" data-act="mclose">Huỷ</button><button class="btn pri" data-act="dobulkclose" id="bc-go">' + ic("check") + "Đóng " + L.length + " sự kiện</button></div>";
+}
+var _modal413 = modal;
+modal = function(){
+  var m = S.modal; if (!m || !/^(askclose|bulkclose)$/.test(m.k)) return _modal413();
+  return '<div class="modal" data-act="mclose"><div class="mbox sm" role="dialog" aria-modal="true" data-stop="1">' + (m.k === "askclose" ? mAskClose(m) : mBulkClose(m)) + "</div></div>";
+};
+document.addEventListener("change", function(ev){
+  if (!ev.target.matches || !ev.target.matches("[data-bc]")) return;
+  var n = $$("[data-bc]").filter(function(c){ return c.checked; }).length, b = $("#bc-go"); if (b){ b.innerHTML = ic("check") + (n ? "Đóng " + n + " sự kiện" : "Chưa chọn sự kiện"); b.disabled = !n; }
+});
+document.addEventListener("click", function(ev){
+  var a = ev.target.closest && ev.target.closest("[data-act]"); if (!a) return; var act = a.dataset.act;
+  if (act === "askclose"){ S.modal = { k: "askclose", ev: S.evId }; render(); return; }
+  if (act === "bulkclose"){ S.modal = { k: "bulkclose" }; render(); return; }
+  if (act === "doaskclose"){
+    var t = $("#ak-msg"), e = evById(S.modal.ev); if (!t || !t.value.trim()){ $("#ak-err").textContent = "Ghi lời nhắc trước khi gửi."; if (t) t.focus(); return; }
+    var msg = t.value.trim(); S.modal = null; addComment(e.id, "", msg); return;
+  }
+  if (act === "dobulkclose"){
+    var ids = $$("[data-bc]").filter(function(c){ return c.checked; }).map(function(c){ return c.dataset.bc; }), nt = $("#bc-note"), note = nt ? nt.value.trim() : "";
+    if (!ids.length){ $("#bc-err").textContent = "Chưa chọn sự kiện nào."; return; }
+    if (!note && ids.some(function(id){ return openCnt(evById(id)); })){ $("#bc-err").textContent = "Còn việc chưa xong — ghi lý do đóng (dùng chung cho các sự kiện đã chọn)."; if (nt) nt.focus(); return; }
+    a.disabled = true; $$("[data-bc]").forEach(function(c){ c.disabled = true; });
+    var ok = 0, fail = [];
+    ids.reduce(function(p, id, i){ return p.then(function(){
+      a.textContent = "Đang đóng " + (i + 1) + "/" + ids.length + "…";
+      return api("ehSave", { op: "event.close", rid: rid(), data: { id: id, note: note } }).then(function(d){
+        if (!d || !d.ok) throw new Error(d && d.error || "Không lưu được"); Object.assign(evById(id), d.event || {}); mergeTasks(d.tasks); ok++;
+      }).catch(function(err){ fail.push((evById(id) || {}).name + ": " + err.message); });
+    }); }, Promise.resolve()).then(function(){
+      S.modal = null; render(); toast("Đã đóng " + ok + " sự kiện" + (fail.length ? " · chưa đóng được " + fail.length + " — " + fail.join("; ") : ""), !!fail.length);
+    });
+  }
 });
 window.EH_X = function(n){ return eval(n); };   /* ui2.js đọc hàm / biến nội bộ (chỉ đọc) */
 boot(false);
